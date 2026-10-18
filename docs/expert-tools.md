@@ -23,6 +23,10 @@ than the MCP server:
     Godot on Linux, macOS, and Windows in `.github/workflows/godot.yml` whenever a Godot script
     changes. Without Godot installed its live tests skip; its lock and GUI-check tests still run in
     `pnpm test`.
+  - Blender's live suites (`tests/scenario-blender-expert/test_live_*.py`) run Blender headless
+    against fixtures with known answers. `.github/workflows/blender.yml` installs the release the
+    skills were verified on, on Linux, whenever a Blender script or test changes, and fails if a
+    live suite skips. Without Blender they skip in `pnpm test`.
   - Unity's `tests/scenario-unity-expert/test_toolkit_offline.py` needs no application: it runs the
     toolkit's lock probe, process-table parsing, and signal handling in `pnpm test`.
     `.github/workflows/unity.yml` runs it on macOS, the OS the toolkit targets, whenever a Unity
