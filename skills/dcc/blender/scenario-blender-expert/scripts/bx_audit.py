@@ -95,6 +95,40 @@ def _flipped(bm):
     return bad
 
 
+def _winding(bm, step):
+    """Edges whose two faces run them the same way, and those of their faces that point
+    into the part: a ray along the normal meets the back of another face. The rest are
+    folds at a seam. On open geometry the ray can escape, so a fold may still leave a
+    hairline gap under back-face culling. Returns (edges, inward faces)."""
+    mixed, suspects = 0, set()
+    for e in bm.edges:
+        if len(e.link_faces) != 2:
+            continue
+        l1, l2 = e.link_loops[0], e.link_loops[1]
+        if l1.vert == l2.vert:
+            mixed += 1
+            suspects.update(e.link_faces)
+    if not suspects:
+        return 0, []
+    bm.faces.index_update()
+    tree = BVHTree.FromBMesh(bm)
+    inward = []
+    for f in suspects:
+        n = f.normal
+        near = {g.index for v in f.verts for g in v.link_faces}
+        origin = f.calc_center_median() + n * step
+        for _ in range(8):  # step past the face's own neighbours, a fold's partner included
+            loc, hit_n, idx, _d = tree.ray_cast(origin, n)
+            if loc is None:
+                break
+            if idx not in near:
+                if hit_n.dot(n) > 0:
+                    inward.append(f)
+                break
+            origin = loc + n * step
+    return mixed, inward
+
+
 def _self_intersections(bm, limit=200000):
     if len(bm.faces) > limit:
         return None  # too heavy, skip on dense sculpts
@@ -251,6 +285,8 @@ GATE = {  # check:        game     render   print    roblox
     "unapplied_scale":  ("error", "warn",  "warn",  "error"),
     "inside_out":       ("error", "error", "error", "error"),
     "winding":          ("error", "warn",  "error", "error"),
+    "winding_sliver":   ("warn",  None,    "error", "warn"),
+    "fold":             ("warn",  None,    "warn",  "warn"),
     "double_faces":     ("error", "warn",  "error", "error"),
     "z_fighting":       ("error", "error", "warn",  "error"),
     "back_to_back":     ("warn",  None,    "warn",  "warn"),
@@ -421,10 +457,21 @@ def deliverable(objs, profile="game", eps=None, tol=None, gap=None, evaluated=Tr
             flag("double_faces", [n], f"{n}: {_n(double, 'duplicate face')}")
         if b2b:
             flag("double_faces", [n], f"{n}: {_n(b2b, 'back-to-back face')} on the same vertices")
-        flipped = _flipped(bm)
-        if flipped:
-            flag("winding", [n], f"{n}: {_n(flipped, 'edge')} between faces of opposite winding")
-        else:
+        mixed, inward = _winding(bm, eps)
+        if inward:
+            # engines cull these faces: past 0.1% of the surface the hole shows at a glance
+            share = sum(f.calc_area() for f in inward) / max(sum(f.calc_area() for f in bm.faces), 1e-12)
+            out["per_object"][n]["inward_faces_at"] = [[round(c, 4) for c in f.calc_center_median()]
+                                                       for f in inward[:10]]
+            what = f"{n}: {_n(len(inward), 'face')} pointing into the part ({share:.2%} of its surface)"
+            if share >= 1e-3:
+                flag("winding", [n], f"{what}, at edges of opposite winding")
+            else:
+                flag("winding_sliver", [n], f"{what}: engines cull them, leaving sliver holes")
+        elif mixed:
+            flag("fold", [n], f"{n}: {_n(mixed, 'edge')} of opposite winding where faces fold over at a seam; "
+                                  "look at it with back-face culling")
+        if not inward:
             inv = sum(1 for p in isl if p["closed"] and p["volume"] < -(diag ** 3) * 1e-9)
             if inv:
                 flag("inside_out", [n], f"{n}: {_n(inv, 'closed part')} with normals pointing inward")

@@ -23,8 +23,9 @@ Agent skills that make Claude (Claude Code) or Codex work in Blender 5.2 like th
   after refactor, on par on a bouncing ball; all 12 test suites pass headless on Blender 5.2.1.
 - The delivery gate `bx_audit.deliverable()` has a live suite in Blender,
   `tests/scenario-blender-expert/test_live_gate.py`: planted defects, clean fixtures, a glTF round
-  trip and the fixes the router documents. It also ran on 18 GLBs from an earlier engine-import
-  test; renders confirmed its z-fighting and inside-out findings there.
+  trip and the fixes the router documents. It also ran on 188 GLBs from an earlier engine-import
+  test and two generated chests; renders with and without back-face culling confirmed its
+  z-fighting, inside-out and inward-face findings there.
 - Known limits: headless sculpting reaches concept quality (finished surfaces need real brushes in a
   live session); hair-curve and Grease Pencil draw strokes cannot be scripted; procedural retopology
   still needs a human pass on the finest face loops.

@@ -101,6 +101,23 @@ class DeliveryGate(unittest.TestCase):
         r = self.verdict("double_faces")
         self.assertIn("Doubled: 1 duplicate face", r["errors"])
 
+    def test_face_pointing_inward_fails(self):
+        r = self.verdict("flipped_face")
+        self.assertIn("Flipped: 1 face pointing into the part (16.67% of its surface), at edges of opposite winding",
+                      r["errors"])
+
+    def test_sliver_hole_warns_for_engines_and_fails_print(self):
+        r = self.verdict("sliver_game")
+        self.assertTrue(r["pass"], r["errors"])
+        self.assertTrue(any("sliver holes" in w for w in r["warnings"]), r["warnings"])
+        self.assertEqual(len(r["per_object"]["Sliver"]["inward_faces_at"]), 1)
+        self.assertFalse(self.verdict("sliver_print")["pass"])
+
+    def test_fold_at_a_seam_only_warns(self):
+        r = self.verdict("folded")
+        self.assertTrue(r["pass"], r["errors"])
+        self.assertTrue(any("fold over at a seam" in w for w in r["warnings"]), r["warnings"])
+
     def test_open_mesh_fails_print_only(self):
         self.assertTrue(self.verdict("open_game")["pass"])
         r = self.verdict("open_print")
