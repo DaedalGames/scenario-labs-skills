@@ -21,6 +21,10 @@ Agent skills that make Claude (Claude Code) or Codex work in Blender 5.2 like th
 - Evidence: blind-graded written scenarios, with skills won 7 of 7 against the same model without
   them; execution tests better on retopology and bake + material, on par or better on sculpting
   after refactor, on par on a bouncing ball; all 12 test suites pass headless on Blender 5.2.1.
+- The delivery gate `bx_audit.deliverable()` has a live suite in Blender,
+  `tests/scenario-blender-expert/test_live_gate.py`: planted defects, clean fixtures, a glTF round
+  trip and the fixes the router documents. It also ran on 18 GLBs from an earlier engine-import
+  test; renders confirmed its z-fighting and inside-out findings there.
 - Known limits: headless sculpting reaches concept quality (finished surfaces need real brushes in a
   live session); hair-curve and Grease Pencil draw strokes cannot be scripted; procedural retopology
   still needs a human pass on the finest face loops.
@@ -65,6 +69,11 @@ runs changed:
 - `K.figure`: shins end at the ankle, and the rough capsule's base sits on z = 0 (it floated 4 cm).
 - `K.vehicle`: dark red rear blocks.
 - `B.solid_view`: Material by default.
+
+The delivery gate in `bx_audit.py` was written for this repository on 2026-10-18. A comparison with
+[EL4CTEO/blender-skills](https://github.com/EL4CTEO/blender-skills) (MIT) prompted it: that
+repository's QA check catches deliverability defects (floating parts, z-fighting, inside-out parts,
+unapplied scale) that `audit` did not grade. No code was copied.
 
 Paths such as `tests/...` inside the references point to the test evidence on the build machine.
 They are provenance only; the skills do not need them to run.

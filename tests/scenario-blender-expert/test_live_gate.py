@@ -1,0 +1,125 @@
+"""Runs bx_audit.deliverable() in a real Blender against fixtures with planted defects.
+
+gate_cases.py builds every fixture in one Blender run and writes the verdicts to JSON;
+these tests read them. Without Blender (the repository's script-tests job) every test
+skips; .github/workflows/blender.yml installs Blender and runs them.
+"""
+
+import json
+import os
+import shutil
+import subprocess
+import tempfile
+import unittest
+from pathlib import Path
+
+HERE = Path(__file__).parent
+SCRIPTS = HERE.parents[1] / "skills" / "dcc" / "blender" / "scenario-blender-expert" / "scripts"
+
+
+def find_blender():
+    for path in (os.environ.get("BLENDER"), shutil.which("blender"),
+                 "/Applications/Blender.app/Contents/MacOS/Blender"):
+        if path and Path(path).is_file():
+            return path
+    return None
+
+
+BLENDER = find_blender()
+
+
+@unittest.skipUnless(BLENDER, "Blender is not installed")
+class DeliveryGate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        tmp = tempfile.mkdtemp(prefix="bx_gate_test_")
+        out = Path(tmp) / "cases.json"
+        run = subprocess.run(
+            [BLENDER, "-b", "--factory-startup", "--python-exit-code", "1",
+             "-P", str(HERE / "gate_cases.py"), "--", str(SCRIPTS), str(out), tmp],
+            capture_output=True, text=True, timeout=600,
+        )
+        if run.returncode != 0:
+            raise AssertionError(run.stdout[-3000:] + run.stderr[-3000:])
+        cls.cases = json.loads(out.read_text())
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    def verdict(self, name):
+        return self.cases[name]
+
+    def test_planted_defects_are_exactly_the_errors(self):
+        r = self.verdict("crate_defects")
+        self.assertFalse(r["pass"])
+        self.assertEqual(len(r["errors"]), 4, r["errors"])
+        text = " | ".join(r["errors"])
+        for needle in ("Lid: unapplied scale", "Bracket: 1 closed part with normals pointing inward",
+                       "Body <-> Label", "z-fighting", "Handle: floating"):
+            self.assertIn(needle, text)
+        self.assertEqual(r["warnings"], [])
+
+    def test_documented_fixes_clear_the_gate(self):
+        r = self.verdict("crate_fixed")
+        self.assertTrue(r["pass"], r["errors"])
+        self.assertEqual(r["warnings"], [])
+
+    def test_clean_crate_passes_every_profile(self):
+        for name in ("crate_clean", "crate_clean_render", "crate_clean_print", "crate_clean_roblox"):
+            with self.subTest(case=name):
+                r = self.verdict(name)
+                self.assertTrue(r["pass"], r["errors"])
+                self.assertEqual(r["warnings"], [])
+
+    def test_glb_round_trip_welds_split_seams(self):
+        r = self.verdict("crate_glb")
+        self.assertTrue(r["pass"], r["errors"])
+        self.assertEqual(r["warnings"], [])
+        self.assertEqual(sum(o["parts"] for o in r["per_object"].values()), 5)
+
+    def test_fragment_inside_one_mesh_floats(self):
+        r = self.verdict("fragment")
+        self.assertEqual(r["errors"], ["Hull: 1 floating fragment (50% of its faces), nearest 0.775 from the rest"])
+
+    def test_small_gap_warns_but_fails_print(self):
+        r = self.verdict("near_gap_game")
+        self.assertTrue(r["pass"], r["errors"])
+        self.assertEqual(r["warnings"], ["Handle: not touching, 0.005 from the nearest part"])
+        r = self.verdict("near_gap_print")
+        self.assertEqual(r["errors"], ["Handle: not touching, 0.005 from the nearest part"])
+
+    def test_enclosed_part_warns_without_floating(self):
+        r = self.verdict("enclosed")
+        self.assertTrue(r["pass"], r["errors"])
+        self.assertEqual(len(r["warnings"]), 1)
+        self.assertIn("Core: 1 part enclosed", r["warnings"][0])
+
+    def test_negative_scale_fails(self):
+        r = self.verdict("negative_scale")
+        self.assertEqual(len(r["errors"]), 1)
+        self.assertIn("Mirror: negative scale", r["errors"][0])
+
+    def test_duplicate_face_fails(self):
+        r = self.verdict("double_faces")
+        self.assertIn("Doubled: 1 duplicate face", r["errors"])
+
+    def test_open_mesh_fails_print_only(self):
+        self.assertTrue(self.verdict("open_game")["pass"])
+        r = self.verdict("open_print")
+        self.assertFalse(r["pass"])
+        self.assertIn("Open: 1 open border (4 edges)", r["errors"])
+
+    def test_roblox_triangle_limit(self):
+        self.assertTrue(self.verdict("dense_game")["pass"])
+        r = self.verdict("dense_roblox")
+        self.assertEqual(r["errors"], ["Dense: 20480 triangles, over the 20000 per-mesh limit"])
+
+    def test_missing_uv_fails_only_under_a_texture(self):
+        r = self.verdict("bare")
+        self.assertTrue(r["pass"], r["errors"])
+        self.assertEqual(len(r["warnings"]), 2, r["warnings"])
+        self.assertIn("Bare: no material or an empty material slot", r["warnings"])
+        r = self.verdict("textured_no_uv")
+        self.assertEqual(r["errors"], ["Painted: no UV map, and a material samples an image texture"])
+
+
+if __name__ == "__main__":
+    unittest.main()

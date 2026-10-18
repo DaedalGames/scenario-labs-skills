@@ -1,6 +1,6 @@
 ---
 name: scenario-blender-expert
-description: "Use when doing any 3D work in Blender through Python or an MCP bridge, headless or in a live session: modeling, sculpting a character or head, retopology, UV unwrapping, baking, texturing, rigging, animating, previs, geometry nodes, lighting and rendering, grease pencil, or finishing an AI-generated mesh into a production asset. Also when a bpy script fails on Blender 5.x API changes, a brush or sculpt operator fails or crashes headless, or a result has to be judged like a professional 3D artist would."
+description: "Use when doing any 3D work in Blender through Python or an MCP bridge, headless or in a live session: modeling, sculpting a character or head, retopology, UV unwrapping, baking, texturing, rigging, animating, previs, geometry nodes, lighting and rendering, grease pencil, or finishing an AI-generated mesh into a production asset. Also before exporting or handing off an asset, to check it is ready for a game engine, a render or a 3D print (floating parts, z-fighting, inside-out normals, unapplied scale, missing UVs). Also when a bpy script fails on Blender 5.x API changes, a brush or sculpt operator fails or crashes headless, or a result has to be judged like a professional 3D artist would."
 license: MIT
 ---
 
@@ -98,7 +98,9 @@ remembered operator, brush name or API.
    `references/critique.md`.
 5. **Fix before advancing.** A problem found at blockout costs one script; found after texturing it
    costs the stage.
-6. **Deliver with evidence:** final renders, audit numbers, and what was not verified.
+6. **Deliver with evidence:** run the delivery gate (`bx_audit.deliverable`, below) on the parts of
+   the asset before any export or handoff and fix every error. Then report final renders, gate and
+   audit numbers, and what was not verified.
 
 Never report a model, rig, animation or render as done without having looked at a render of it.
 
@@ -107,7 +109,7 @@ Never report a model, rig, animation or render as done without having looked at 
 | Persona / brief                                     | Skill chain                                                                                                                                                                                                | Deliverable                                                  |
 | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | Character artist, stylized or realistic             | scenario-blender-sculpting, scenario-blender-retopology, scenario-blender-uv-baking, scenario-blender-texturing-shading, scenario-blender-hair                                                             | sculpt, animation-ready low poly, UVs, baked maps, materials |
-| AI-mesh finisher (Scenario 3D output to production) | audit the generated mesh, scenario-blender-retopology (or cleanup + remesh), scenario-blender-uv-baking (bake FROM the generated high), scenario-blender-texturing-shading; generation itself: scenario-3d | clean, UV'd, baked asset at a stated budget                  |
+| AI-mesh finisher (Scenario 3D output to production) | gate the generated asset, scenario-blender-retopology (or cleanup + remesh), scenario-blender-uv-baking (bake FROM the generated high), scenario-blender-texturing-shading; generation itself: scenario-3d | clean, UV'd, baked asset at a stated budget                  |
 | Game asset artist                                   | scenario-blender-hard-surface or scenario-blender-sculpting, scenario-blender-retopology (game budget), scenario-blender-uv-baking, scenario-blender-texturing-shading                                     | low poly + PBR set, exported glTF/FBX                        |
 | Rigger / character TD                               | scenario-blender-rigging                                                                                                                                                                                   | rig with controls, weights, deformation tests                |
 | Animator                                            | scenario-blender-previs-storyboard (shot planning), scenario-blender-animation                                                                                                                             | blocked, splined, polished shot + playblast                  |
@@ -125,6 +127,21 @@ textures).
   non-manifold, loose, duplicates, flipped faces, self-intersections, boundary loops, symmetry %,
   edge-length CV, and fidelity to a high poly; `verdict(report)` lists problems. CLI:
   `blender -b f.blend --python bx_audit.py -- --object Name [--high Sculpt] [--json out.json]`.
+- `bx_audit.deliverable(objs, profile="game")`: the delivery gate. `audit` grades topology; this
+  grades what an engine, renderer or slicer receives, across the parts of ONE asset:
+  - errors in every profile: floating parts and fragments, closed parts inside out, negative scale;
+    z-fighting between parts everywhere but `print`;
+  - by profile (`game`, `render`, `print`, `roblox`): unapplied scale, mixed winding, duplicate
+    faces, no UV map under an image texture, open borders for `print` and `roblox`, any gap between
+    parts for `print`, the Roblox 20,000-triangle mesh limit (checked 2026-10-18).
+  - Returns `{pass, errors, warnings, per_object}`. Tolerances scale with the asset's diagonal.
+    UV-seam splits from a glTF import are welded for the checks, so seams never read as holes.
+  - Gate separate props one by one: every prop but the largest reads as floating.
+  - CLI, exit code 2 on failure:
+    `blender -b --factory-startup --python-exit-code 1 -P bx_audit.py -- --deliverable [--import model.glb | --objects A B] --profile game [--json out.json]`.
+  - Fixes: apply scale (`obj.data.transform(Matrix.Diagonal(obj.scale).to_4x4())`, then
+    `obj.scale = (1, 1, 1)`), `bmesh.ops.recalc_face_normals` for inside-out parts, delete or offset
+    the hidden face of a z-fighting pair, join or move floating parts, delete fragments.
 - `bx_review.py`: `review(objs, out_dir, views, modes)` writes one contact sheet (rows = modes, cols
   = views) in a temporary scene, user settings untouched; `playblast(out_path, res_pct=50)`;
   `turntable(obj, out_path, frames=72, res=720)`. Only `review` has a command line: call the others
