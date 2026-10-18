@@ -102,14 +102,14 @@ Generating a stylized game prop image:
    call per asset. `asset_download` returns a file URL (save with `curl -L`, it may redirect).
    `format` converts images (`png`, `webp`, `jpg`, and `gif` to keep an animated GIF animated: the
    `png` default flattens it to one frame) and meshes (`glb`, `fbx`, `obj`); omit it for video and
-   audio. When `curl` reports `host_not_allowed` or `CONNECT tunnel failed, response 403` while MCP
-   calls work, check the host's proxy or sandbox egress policy. A CDN 403 alone does not establish
-   the cause; request a fresh download URL before diagnosing it:
+   audio. `curl` failing with `host_not_allowed` or `CONNECT tunnel failed, response 403` while MCP
+   calls work points at the host's egress policy; a CDN 403 alone does not, so fetch a fresh URL
+   first.
    [Sandbox network access](https://mcp.scenario.com/docs/troubleshooting#sandbox-network-access)
-   names the setting that lifts it, an organization-level allowlist on some hosts that the user may
-   not be able to change. Meanwhile hand over the `app_url` that `asset_display` returns, where the
-   user downloads directly and, for a mesh, picks the 3D export format the app offers, none of which
-   `asset_download` converts to. The signed URL expires: a last resort, never the deliverable.
+   names the setting, on some hosts an organization allowlist the user may not control. Meanwhile
+   hand over `asset_display`'s `app_url`: the user downloads there and, for a mesh, picks an export
+   format `asset_download` does not offer. The signed URL expires: a last resort, never the
+   deliverable.
 
 Local inputs go up with `upload_asset`: always `file_name`, `content_type`, and `kind` (`image`,
 `audio`, `video`, `3d`), plus exactly one of `file_size` or `data`, since the call fails without
@@ -122,12 +122,12 @@ rides on both; they take no other fields: no parts list, no etags. The server de
 completion, so `Upload upl_… failed: Corrupt JPEG data`, `premature end of data segment`,
 `bad Huffman code` or `libpng read error` means the uploaded image could not be decoded: check for a
 corrupt source, a truncated or re-encoded body, a missing part, or a mismatched `file_size`. Confirm
-the local file opens, its content type matches, and its byte count is correct, then start over with
-a fresh `upload_asset` and raw PUTs; never re-complete the same `upload_id`. A phone's HEIC photo
-uploads as is (`content_type: "image/heic"`), so do not convert it first; `Unhandled image format`
-lists what `kind: "image"` accepts, so convert a file of any other type locally. A host with no
-shell cannot PUT parts at all; the user uploads in the web app at app.scenario.com and the agent
-continues from the asset id.
+the local file opens under its declared content type, then start over with a fresh `upload_asset`
+and raw PUTs; never re-complete the same `upload_id`. A phone's HEIC photo uploads as is
+(`content_type: "image/heic"`), so do not convert it first; `Unhandled image format` lists what
+`kind: "image"` accepts, so convert a file of any other type locally. A host with no shell cannot
+PUT parts at all; the user uploads in the web app at app.scenario.com and the agent continues from
+the asset id.
 
 Filing is part of delivering, not a tidy-up. `collection_create` takes a name and the scope pair
 only; `asset_ids` sent there is ignored without an error, so adding is always a second call,
@@ -154,7 +154,7 @@ Uploading and filing alone are not publication.
 | 403 naming a plan                                                      | Surface the upgrade or switch models; retrying never clears it. `recommend` pre-flags these as `requires_plan_upgrade` (never run one) unless its response says plan gating is `_degraded`; then this row is the backstop                                                                                                                                                                                                                                                                                                                                              |
 | 429 with `details.actionName` = `parallel-custom-jobs`                 | Per-team generation concurrency ceiling: keep at most `actionLimit` jobs in flight, use `wait=false` for launches and `jobs_wait` to retire existing jobs before launching more. An immediate retry repeats the error                                                                                                                                                                                                                                                                                                                                                  |
 | 429 `custom-generation`, or naming a quota, balance, or seat limit     | `actionLimit` is the period's CU allowance (Free: 50 a day) and `actionValue` what is already consumed; a run priced above the gap is refused, so a low `actionValue` means this payload costs too much, not that credits ran out. Stop the batch, `dry_run` the payload, offer a cheaper member or fewer outputs, or report the reset or upgrade (unattended: report and stop). `usage` takes the same `project_id` (or `scope: "team"`). A per-user cap goes to the team admin; a seat-cap error can also block uploads. Never change billing or membership yourself |
-| 429 with an explicit retry delay                                       | Respect the returned delay before retrying; this is not evidence that the user needs an upgrade                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 429 `Too Many Requests. Please, wait N seconds` (`remainingSeconds`)   | Relaxed generation: once the plan's credits are spent, each job is followed by a wait that grows with its CU cost, so one heavy job can block the next for many minutes. Never re-submit inside `remainingSeconds`. A batch stops here, handled as the row above: report, then offer a cheaper member, fewer outputs, a top-up, or a later run                                                                                                                                                                                                                         |
 | Other 429, including an unfamiliar `actionName`                        | Never infer its behavior from the name: report it and run `diagnostics_run` in the same scope before choosing recovery                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `jobs_wait` timeout (`in_progress`)                                    | Not an error: re-call with the returned `pending_job_ids`, never a second `model_run` or a cancel; it takes no timeout argument                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | Transport error on `model_run` (no HTTP status)                        | The request may still have landed: `jobs_list` before any re-run, or a lost response becomes a double charge; a `dry_run` call creates no job and always retries safely                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -176,9 +176,8 @@ Uploading and filing alone are not publication.
   (`metadata.referenceImages`, `parentId`), the cheapest proof it was not.
 - Taking `recommend`'s `ranked[0]` blindly: read `next_step.type` first. On `ask_user`, present the
   options; the user's pick wins (non-interactive: task instructions, else `proceed`). On `proceed`,
-  prefer `specialty.model_id`, else the first `ranked` entry its own text does not mark deprecated,
-  reading `tradeoff` and `explanation` as well as `caveats`, since the flag lands in any of them:
-  the ranking is by measured performance, not by lifecycle, so a deprecated member can top it.
+  prefer `specialty.model_id`, else the first `ranked` entry not marked deprecated in its `caveats`,
+  `tradeoff`, or `explanation`: the ranking measures performance, not lifecycle.
 - Debugging blind: the `diagnose` MCP prompt (or `diagnostics_run` with the scope pair the failure
   happened under and any `mcpt_` ids seen as `observed_trace_ids`) returns trace ids; `usage`
   answers credit questions.
