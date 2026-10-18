@@ -37,6 +37,10 @@ for every later step (step 2, plus any rig or retexture): it is the plan check, 
 `requires_plan_upgrade` fails with a 403 naming the plan (`ModelAccessRestrictedError`) only after
 the steps before it were paid, so settle the upgrade or pick another member first.
 
+Price a batch per finished asset: one representative's `dry_run` per candidate chain, times the
+count. At authoring time one LLM-based member quoted 1,300 CU at its default effort, a single-image
+Tripo generator 45; past the plan's credits each job's wait also grows with its cost.
+
 1. Generate the concept: pick a text-to-image model via `recommend` with the user's own words as
    `prompt`, then `model_schema_get` and `model_run` with a prompt describing a single centered
    subject on a plain background. If the user has a reference, `upload_asset` it (plus
@@ -46,14 +50,14 @@ the steps before it were paid, so settle the upgrade or pick another member firs
    GPT-6 Astra 3D, and Claude Opus 5.5 3D (the cheaper of the two at authoring time; compare both
    with `dry_run`), which reconstruct one object from 1 to 8 photos or renders into an editable mesh
    with named parts and per-part PBR materials. Their builds suit props and hard-surface subjects,
-   not characters, and need those images (a prompt alone returned 400 at authoring time). The price
-   rises with `buildEffort` from `standard` to `high` (the default) to `maximum`. `faceBudget` caps
-   the delivered triangle count at export (10k to 50k for a game-ready asset; the default keeps fine
-   detail and is not that). To change the result, edit it (see Refining meshes).
+   not characters or creatures, and need those images (a prompt alone returned 400 at authoring
+   time). The price rises with `buildEffort` from `standard` to `high` (the default) to `maximum`.
+   `faceBudget` caps the delivered triangle count at export (10k to 50k for a game-ready asset; the
+   default keeps fine detail and is not that). To change the result, edit it (see Refining meshes).
 3. `model_schema_get` on the chosen model. 3D schemas vary widely: single image vs multi-view
    arrays, polycount targets, PBR toggles, topology choices.
-4. `model_run` with `parameters={"image": "asset_xxx", ...}` and `wait=false` (`dry_run=true` first
-   to price a batch), then `jobs_wait` with `job_ids=["<job_id>"]` (re-call it with the returned
+4. `model_run` with `parameters={"image": "asset_xxx", ...}` and `wait=false` (`dry_run=true`
+   first), then `jobs_wait` with `job_ids=["<job_id>"]` (re-call it with the returned
    `pending_job_ids` as `job_ids` if it times out). A downstream step (rig, retexture) has no
    payload to `dry_run` until its input mesh exists: quote it from `recommend` as an estimate, then
    re-price it with `dry_run` on the real asset before launching. Never `dry_run` it with a
@@ -77,9 +81,9 @@ away, so read them before promising a look. Authoring-time examples from the Tri
   when the user will texture in a DCC. `textureQuality` (`fast`, `standard`, `detailed`, `extreme`)
   also moves the price, and a texture version picker, left empty, keeps the provider's default.
 - `delight` strips lighting and shadows baked into the reference image so the mesh lights correctly
-  in the user's engine. It defaulted to on; turn it off only when the painted shading is the art
-  style, as on a hand-painted prop. The export stays a lit material either way, so for no engine
-  relighting at all the user sets an unlit shader on import.
+  in the user's engine. It defaulted to on; turn it off only when painted shading is the art style.
+  The export stays a lit material either way, so for no engine relighting at all the user sets an
+  unlit shader on import.
 - The `pbr` flag's description said PBR on, its default, ignores the texture parameters. A texture
   setting the user asked for is honored only with `pbr: false` there, so read that description on
   the chosen member and say which one won.
@@ -92,11 +96,11 @@ away, so read them before promising a look. Authoring-time examples from the Tri
 
 ## Inspecting results
 
-Hosts without MCP Apps get the `app_url` dashboard link instead of the `asset_display` viewer. The
-viewer's capture button calls `capture_3d_view`, an app-only tool: it uploads the current camera
-view as a new image asset and posts the `asset_id` back into the conversation. Use that capture as a
-reference for follow-up generations or similarity `search`. Never call `capture_3d_view` yourself;
-it requires PNG canvas data only the viewer has.
+Hosts without MCP Apps get the `app_url` link instead of the viewer. The viewer's capture button
+calls `capture_3d_view`, an app-only tool: it uploads the current camera view as a new image asset
+and posts the `asset_id` back into the conversation. Reuse it as a generation reference or a
+similarity `search` image. Never call `capture_3d_view` yourself; it requires PNG canvas data only
+the viewer has.
 
 ## Refining meshes
 
@@ -125,10 +129,9 @@ A convincing mesh is not a game-ready one: part separation, joint placement, mat
 animation are each their own pass, and polygon caps differ by topology on the members that offer
 both (a quad cap sat well under the triangle cap on one), so read the slider's `max` off the schema
 instead of promising a count. A named provider feature is a valid `search` target, but an empty
-result or one member's body-plan enum does not prove a capability is absent platform-wide. For an
-unmet need such as a hinged prop, use `recommend` with that need and inspect the returned schemas;
-if none exposes it, report it as unverified in the inspected models, without inventing a call from
-the provider's own site.
+result or one member's enum does not prove a capability absent platform-wide: `recommend` the unmet
+need (a hinged prop), inspect the returned schemas, and report it unverified if none exposes it,
+never inventing a call from the provider's site.
 
 ## A staged chain toward game-ready
 
@@ -165,11 +168,11 @@ without checking the file format, so the real run is what confirms it), else con
 Rigging is a separate `3d23d` step on a finished mesh, not a generator flag: `recommend` with that
 capability plus the rigging need in the user's own words.
 
-Body plan picks the model. Humanoid models take the mesh and little else (a front-facing hint, or an
-approximate height, depending on the model) and infer a biped skeleton. Non-biped work goes to a
-model exposing `rigType`, whose values cover `quadruped`, `hexapod`, `octopod`, `avian`,
-`serpentine`, and `aquatic`. A static prop has no body plan to rig: if `recommend` answers
-`ask_user`, part segmentation is the nearer step.
+Body plan picks the model. Humanoid models take the mesh plus at most a front-facing hint or an
+approximate height, and infer a biped skeleton. Non-biped work goes to a model exposing `rigType`,
+whose values cover `quadruped`, `hexapod`, `octopod`, `avian`, `serpentine`, and `aquatic`. A static
+prop has no body plan to rig: if `recommend` answers `ask_user`, part segmentation is the nearer
+step.
 
 A character headed for a rig is built for it from the concept on. Generate the concept in a T- or
 A-pose (full body, front view, arms clear of the torso, plain background), since riggers infer
@@ -184,12 +187,11 @@ the quad FBX beside it and say so.
 
 Three schema details decide whether the output is usable:
 
-- **Formats.** Rigging models accept GLB, and often OBJ, FBX, or STL. None exposes an output-format
-  field, so the rig comes back as GLB or FBX and most descriptions do not say which: expect a DCC
-  pass when the engine needs the other.
-- **Size ceiling.** A `max_size` on the file input is the exception rather than the rule (one
-  humanoid rigging model caps at 30 MB). Check the schema before assuming a large mesh needs
-  decimating.
+- **Formats.** Rigging models accept GLB, often OBJ, FBX, or STL, and expose no output-format field:
+  the rig comes back as GLB or FBX, mostly unannounced, so expect a DCC pass when the engine needs
+  the other.
+- **Size ceiling.** A file `max_size` is rare (one humanoid rigger capped at 30 MB): check the
+  schema before decimating a large mesh.
 - **Animation versus rig.** Where a rigger exposes `animation` it retargets a preset clip, and its
   `allowed_values` are rig-type prefixed (`quadruped:walk`), so read them rather than guess. By
   default only the retarget file comes back: set `includeRiggedModel` to keep the plain rigged mesh
