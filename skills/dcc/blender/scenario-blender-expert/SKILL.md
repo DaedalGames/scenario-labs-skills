@@ -131,17 +131,22 @@ textures).
   grades what an engine, renderer or slicer receives, across the parts of ONE asset:
   - errors in every profile: floating parts and fragments, closed parts inside out, negative scale;
     z-fighting between parts everywhere but `print`;
-  - by profile (`game`, `render`, `print`, `roblox`): unapplied scale, mixed winding, duplicate
-    faces, no UV map under an image texture, open borders for `print` and `roblox`, any gap between
-    parts for `print`, the Roblox 20,000-triangle mesh limit (checked 2026-10-18).
+  - by profile (`game`, `render`, `print`, `roblox`): unapplied scale, faces pointing into a part
+    (an error from 0.1% of its surface, a warning below except for `print`), duplicate faces, no UV
+    map under an image texture, open borders for `print` and `roblox`, any gap between parts for
+    `print`, the Roblox 20,000-triangle mesh limit (checked 2026-10-18).
   - Returns `{pass, errors, warnings, per_object}`. Tolerances scale with the asset's diagonal.
     UV-seam splits from a glTF import are welded for the checks, so seams never read as holes.
   - Gate separate props one by one: every prop but the largest reads as floating.
   - CLI, exit code 2 on failure:
     `blender -b --factory-startup --python-exit-code 1 -P bx_audit.py -- --deliverable [--import model.glb | --objects A B] --profile game [--json out.json]`.
   - Fixes: apply scale (`obj.data.transform(Matrix.Diagonal(obj.scale).to_4x4())`, then
-    `obj.scale = (1, 1, 1)`), `bmesh.ops.recalc_face_normals` for inside-out parts, delete or offset
-    the hidden face of a z-fighting pair, join or move floating parts, delete fragments.
+    `obj.scale = (1, 1, 1)`), `bmesh.ops.recalc_face_normals` for inside-out parts,
+    `bmesh.ops.reverse_faces` for faces pointing inward (`per_object[name]["inward_faces_at"]`),
+    delete or offset the hidden face of a z-fighting pair, join or move floating parts, delete
+    fragments.
+  - Engines cull back faces: to see what they draw, render Workbench with
+    `scene.display.shading.show_backface_culling = True` and compare with it off.
 - `bx_review.py`: `review(objs, out_dir, views, modes)` writes one contact sheet (rows = modes, cols
   = views) in a temporary scene, user settings untouched; `playblast(out_path, res_pct=50)`;
   `turntable(obj, out_path, frames=72, res=720)`. Only `review` has a command line: call the others
