@@ -37,9 +37,9 @@ for every later step (step 2, plus any rig or retexture): it is the plan check, 
 `requires_plan_upgrade` fails with a 403 naming the plan (`ModelAccessRestrictedError`) only after
 the steps before it were paid, so settle the upgrade or pick another member first.
 
-Price a batch per finished asset: one representative's `dry_run` per candidate chain, times the
-count. At authoring time one LLM-based member quoted 1,300 CU at its default effort, a single-image
-Tripo generator 45; past the plan's credits each job's wait also grows with its cost.
+Price a batch per asset from one real concept: `dry_run` each candidate on it (later legs per step
+4), times the count. At authoring time one LLM-based member quoted 1,300 CU at its default effort, a
+single-image Tripo generator 45; past the plan's credits each job's wait grows with its cost.
 
 1. Generate the concept: pick a text-to-image model via `recommend` with the user's own words as
    `prompt`, then `model_schema_get` and `model_run` with a prompt describing a single centered
@@ -78,8 +78,8 @@ Several image-to-3D families split texture from geometry, and each dial is one `
 away, so read them before promising a look. Authoring-time examples from the Tripo members:
 
 - `texture: false` returns a bare mesh with no texture and is a `cost_impact` field, the cheap path
-  when the user will texture in a DCC. `textureQuality` (`fast`, `standard`, `detailed`, `extreme`)
-  also moves the price, and a texture version picker, left empty, keeps the provider's default.
+  when the user will texture in a DCC. `textureQuality` also moves the price, and a texture version
+  picker, left empty, keeps the provider's default.
 - `delight` strips lighting and shadows baked into the reference image so the mesh lights correctly
   in the user's engine. It defaulted to on; turn it off only when painted shading is the art style.
   The export stays a lit material either way, so for no engine relighting at all the user sets an
