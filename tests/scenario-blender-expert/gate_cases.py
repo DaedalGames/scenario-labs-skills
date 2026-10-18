@@ -156,6 +156,48 @@ ob.active_material.use_nodes = True
 ob.active_material.node_tree.nodes.new("ShaderNodeTexImage")
 cases["textured_no_uv"] = gate(["Painted"])
 
+# One face of a closed box reversed: it points into the part, an engine culls it.
+empty()
+ob = box("Flipped", (1, 1, 1), (0, 0, 0.5))
+bm = bmesh.new()
+bm.from_mesh(ob.data)
+bm.faces.ensure_lookup_table()
+bmesh.ops.reverse_faces(bm, faces=[bm.faces[0]])
+bm.to_mesh(ob.data)
+bm.free()
+cases["flipped_face"] = gate(["Flipped"])
+
+# The same defect on one of 2646 faces: a sliver hole, under 0.1% of the surface.
+empty()
+ob = box("Sliver", (1, 1, 1), (0, 0, 0.5))
+bm = bmesh.new()
+bm.from_mesh(ob.data)
+bmesh.ops.subdivide_edges(bm, edges=bm.edges[:], cuts=20, use_grid_fill=True)
+bm.faces.ensure_lookup_table()
+bmesh.ops.reverse_faces(bm, faces=[bm.faces[100]])
+bm.to_mesh(ob.data)
+bm.free()
+cases["sliver_game"] = gate(["Sliver"])
+cases["sliver_print"] = gate(["Sliver"], "print")
+
+# A flap folded back over its neighbour: mixed winding on the shared edge, both faces
+# still facing up, as in generated meshes where open borders meet at a seam.
+empty()
+me = bpy.data.meshes.new("Folded")
+bm = bmesh.new()
+uv = bm.loops.layers.uv.new("UVMap")
+v = [bm.verts.new(c) for c in ((0, 0, 0), (1, 0, 0), (1, 1, 0), (0, 1, 0), (0.6, 1, 0.002), (0.6, 0, 0.002))]
+bm.faces.new((v[0], v[1], v[2], v[3]))
+bm.faces.new((v[1], v[2], v[4], v[5]))
+for f in bm.faces:
+    for loop in f.loops:
+        loop[uv].uv = (loop.vert.co.x, loop.vert.co.y)
+bm.to_mesh(me)
+bm.free()
+me.materials.append(bpy.data.materials.new("M_Folded"))
+bpy.context.scene.collection.objects.link(bpy.data.objects.new("Folded", me))
+cases["folded"] = gate(["Folded"])
+
 with open(OUT, "w") as f:
     json.dump(cases, f, indent=1)
 print("GATE CASES", len(cases))
