@@ -112,11 +112,12 @@ refused), and counts against the plan's project limit, which refuses the call on
 the limit, never delete a project to make room. Pass the returned `project.id` as `project_id` from
 then on. In a team with no projects, the API first creates a default project, which stays even when
 the call is refused: check `projects_list` afterwards and offer to rename it with `project_update`
-rather than keep two.
+rather than keep two (unattended: report it, change nothing).
 
 - **Privacy.** `privacy_mode: true`, on `project_create` or `project_update`, limits non-admin
   members to the assets and models they created; project and team admins still see everything.
-  Turning it off shows every member everything: confirm with the user first.
+  Turning it off shows every member everything: confirm with the user first; unattended, only when
+  the task instructions say so.
 - **Rename.** `project_update` changes only the fields passed: `name`, `description` (up to 2,000
   characters), `privacy_mode`, `avatar_asset_id`. Access, model lists, and credit caps live in the
   tools above or the web app.
@@ -124,7 +125,9 @@ rather than keep two.
   models, generation records, API keys, and memory with it. Confirm the name and id from
   `project_get` first. It takes the target as `project_id`, and is refused while anyone but the
   caller holds a role on the project or a key is attached: report who remains and ask, and never
-  remove a member or delete a key to unblock it without a separate confirmation of each.
+  remove a member or delete a key to unblock it without a separate confirmation of each. Unattended,
+  delete only a project the task instructions name, when exactly one matches, and report a refusal
+  and stop.
 
 ## Who spent what
 
