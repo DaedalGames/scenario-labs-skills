@@ -21,14 +21,14 @@ flag the gap.
 
 ## Quick reference
 
-| Step           | Tool                                                                           | Notes                                                                                                                                                                       |
-| -------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Find 3D models | `recommend` with the capability and the user's own words (`search` for a name) | Capabilities: `txt23d`, `img23d`, `3d23d`                                                                                                                                   |
-| Inspect inputs | `model_schema_get`                                                             | Always call before `model_run`                                                                                                                                              |
-| Generate       | `model_run`                                                                    | Pass reference images as asset IDs                                                                                                                                          |
-| Wait           | `jobs_wait`                                                                    | Any `job_id` returned without assets (`in_progress` after a timed-out wait, `queued` or `in-progress` after `wait=false`) goes in `job_ids`; never poll `job_get` in a loop |
-| Preview        | `asset_display`                                                                | Interactive GLB/FBX/VOX/OBJ viewer on MCP App hosts                                                                                                                         |
-| Download       | `asset_download`                                                               | Returns a URL; save with `curl -L`                                                                                                                                          |
+| Step           | Tool                                                                           | Notes                                                                                  |
+| -------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| Find 3D models | `recommend` with the capability and the user's own words (`search` for a name) | Capabilities: `txt23d`, `img23d`, `3d23d`                                              |
+| Inspect inputs | `model_schema_get`                                                             | Always call before `model_run`                                                         |
+| Generate       | `model_run`                                                                    | Pass reference images as asset IDs                                                     |
+| Wait           | `jobs_wait`                                                                    | Any `job_id` returned without assets goes in `job_ids`; never poll `job_get` in a loop |
+| Preview        | `asset_display`                                                                | Interactive GLB/FBX/VOX/OBJ viewer on MCP App hosts                                    |
+| Download       | `asset_download`                                                               | Returns a URL; save with `curl -L`                                                     |
 
 ## Worked example: concept image to game-ready mesh
 
@@ -65,8 +65,11 @@ the steps before it were paid, so settle the upgrade or pick another member firs
    the LLM-based members. Ask for `fbx` for a Unity project without a glTF importer, and keep the
    GLB too: at authoring time the FBX embedded only two images, so it may not carry every PBR map.
 
-Multi-view models accept several images of one subject from different angles; the count and ordering
-vary per model, so take both from `model_schema_get` (the first image is usually the front view).
+Multi-view models accept several images of one subject from different angles; the count and fields
+vary per model, so take both from `model_schema_get`. Side fields follow the subject: on the Tripo
+multi-view members at authoring time, `leftImage` is the character's own left (nose toward frame
+left) and `rightImage` the mirror. A sheet labeled by the viewer's side has them reversed, and a
+swapped pair can fuse front and back into one shell.
 
 ## Texture and lighting controls
 
@@ -86,9 +89,9 @@ away, so read them before promising a look. Authoring-time examples from the Tri
 - Geometry and texture take separate seeds (`seed`, `textureSeed`): hold `seed` and the image fixed
   and vary `textureSeed` alone for texture variants on one shape.
 - `autoSize` scales the output to real-world meters and defaulted to off: set it to `true` for a
-  real-scale engine import, or the mesh keeps its native size. The asset's `dimensions` still read
-  the unit-normalized mesh (longest side 1.0) because the meters sit in the GLB's node scale, so
-  `dimensions` is not proof it failed.
+  real-scale engine import, or the mesh keeps its native size. `dimensions` still reads the
+  unit-normalized mesh (longest side 1.0), as the meters sit in the GLB's node scale: no proof it
+  failed.
 
 ## Inspecting results
 
@@ -205,11 +208,8 @@ one place an `outputFormat` enum picks the engine target.
 
 - Running `model_run` without `model_schema_get`: 3D model parameters differ far more between models
   than image models do.
-- Passing a local file path as an image input: `upload_asset` first, then pass the returned asset
-  ID.
 - Hardcoding model IDs: catalogs rotate (a `deprecated:<replacement_id>` tag names the successor).
   Re-discover each session, `recommend` for the need or `search` for a name.
-- Pasting raw asset URLs into chat instead of calling `asset_display`.
 - Promising a named skeleton, an influence count, or bones for wings and extra limbs that the chosen
   member does not document: pick the closest body plan, then finish the rest in a DCC.
 - Sending a biped to a `rigType` model: the enum has no biped value, because humanoids have their
