@@ -40,9 +40,9 @@ Confirm the pair with the user: a guess writes into someone else's project. A no
 takes the pair from its task instructions; when they name none, stop and list the choices.
 
 The server fills scope in only for read-only tools with one candidate remaining; anything else fails
-rather than guesses, and the error names which half is wrong (see Errors and recovery). Scope errors
-are the most common failure here, surfacing mid-session on the first call that drops the pair once a
-second team or project is in play.
+rather than guesses, and the error names which half is wrong. Scope errors are the most common
+failure here, surfacing mid-session on the first call that drops the pair once a second team or
+project is in play.
 
 ## Quick reference
 
@@ -150,7 +150,7 @@ Uploading and filing alone are not publication.
 | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `context_missing`                                                      | Nothing resolved: `teams_list`, then `projects_list`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `context_ambiguous`                                                    | Several fit: present the options; the user picks (non-interactive: task instructions name the pair, else stop and list)                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| 403 Forbidden                                                          | Usually wrong scope, not missing: re-check the id pair                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 403 Forbidden                                                          | Usually wrong scope, not missing: re-check the id pair. On an asset input, a private asset reads only from its own project: ask which, then catalog `asset_copy` (`asset_id`, that `project_id`, `target_project_id`) and use the returned id                                                                                                                                                                                                                                                                                                                          |
 | 403 naming a plan                                                      | Surface the upgrade or switch models; retrying never clears it. `recommend` pre-flags these as `requires_plan_upgrade` (never run one) unless its response says plan gating is `_degraded`; then this row is the backstop                                                                                                                                                                                                                                                                                                                                              |
 | 429 with `details.actionName` = `parallel-custom-jobs`                 | Per-team generation concurrency ceiling: keep at most `actionLimit` jobs in flight, use `wait=false` for launches and `jobs_wait` to retire existing jobs before launching more. An immediate retry repeats the error                                                                                                                                                                                                                                                                                                                                                  |
 | 429 `custom-generation`, or naming a quota, balance, or seat limit     | `actionLimit` is the period's CU allowance (Free: 50 a day) and `actionValue` what is already consumed; a run priced above the gap is refused, so a low `actionValue` means this payload costs too much, not that credits ran out. Stop the batch, `dry_run` the payload, offer a cheaper member or fewer outputs, or report the reset or upgrade (unattended: report and stop). `usage` takes the same `project_id` (or `scope: "team"`). A per-user cap goes to the team admin; a seat-cap error can also block uploads. Never change billing or membership yourself |
@@ -182,15 +182,15 @@ Uploading and filing alone are not publication.
 - Debugging blind: the `diagnose` MCP prompt (or `diagnostics_run` with the scope pair the failure
   happened under and any `mcpt_` ids seen as `observed_trace_ids`) returns trace ids; `usage`
   answers credit questions.
-- Guessing a file field's name: 400 `Input image is required` (or `images`, `referenceImages`,
-  `startImage`, `frontImage`, `video`, `model`, each a different model's name for the same idea)
-  means the payload never carried the field the schema's `required` list names, so copy that name
-  verbatim; a URL in a file field reads as missing too, since file fields take asset ids only.
+- Guessing a file field's name: 400 `Input image is required` (or `referenceImages`, `startImage`,
+  `frontImage`, `video`: each model names its own) means the payload lacks the schema's `required`
+  field, so copy its name verbatim; a URL in a file field reads as missing, since they take asset
+  ids only.
 - Feeding an image field a video, audio, or 3D asset: 400 `Unhandled image format` lists the image
   types it accepts. `asset_get` reports the asset's `mimeType`; pull a still with the clip's
   `firstFrame` when the model wants an image.
-- `filters.kind` on `search` with `target="models"`: a 400 `"kind" is not a filterable field`, since
-  `kind` describes assets. Narrow models with `filters.type` (the architecture) or `tags`, or go
-  through `recommend` for a capability.
+- `filters.kind` on `search` with `target="models"`: a 400 `"kind" is not a filterable field`, as it
+  describes assets. Narrow models by `filters.type` (architecture) or `tags`, or `recommend` a
+  capability.
 - Filtering `models_list` by `type` without `privacy: "public"`: a 400 says so. A private listing
   narrows by `status` or `modality`, or goes through `search` (private by default).
