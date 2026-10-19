@@ -91,10 +91,11 @@ bring Photoshop to the front, click the screen, or open a modal dialog.
    unchanged by the agent.
 
 **Many files.** Prove stages 1 to 8 on one file, quote the whole batch once, then run one job per
-file that opens it, registers it as the job's own, applies the recipe, exports and closes it. Skip
-files the user has open; stop at the first failure ([procedures](references/procedures.md) P10).
-**The user's Actions:** read the steps first, then `app.doAction` (P11). **Image to video:** export
-the frame, generate with `scenario-video`, outside Photoshop (P12).
+file that opens it, registers it as the job's own, applies the recipe, exports and closes it.
+Ownership lasts one job: a later job's `psr_close` refuses a copy an earlier job made. Skip files
+the user has open; stop at the first failure ([procedures](references/procedures.md) P10). **The
+user's Actions:** read the steps first, then `app.doAction` (P11). **Image to video:** export the
+frame, generate with `scenario-video`, outside Photoshop (P12).
 
 ## Numbers
 

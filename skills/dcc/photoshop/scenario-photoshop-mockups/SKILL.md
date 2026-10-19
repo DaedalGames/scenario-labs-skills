@@ -111,7 +111,8 @@ Each call is one ExtendScript job through `ps_run`, with one named History state
    dark and bright ends; `map` exists on disk and goes in the report.
 6. **Designs.** `M.replace_design(layer, path)` per design, or
    `M.batch(layer, designs, OUT + "/mockups")`. GATE: `drift` under 0.5 and `content_size` unchanged
-   per design; one PNG per design; after a batch, the History length and active state as before.
+   per design; one PNG per design; after a batch, the active History state is the one before it.
+   Compare the state, not the length: the stepped-back state stays in the list.
 7. **Hand finish (not tested).** Ink blur 0.6 to 1 px as a Smart Filter on the design, shadows
    desaturated where color seeps, 90% on a dark garment, a contrast Curves on top
    ([gui-paths](references/gui-paths.md)). GATE: at 100%, folds cross the design, highlights sit on

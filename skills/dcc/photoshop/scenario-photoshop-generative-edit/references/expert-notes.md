@@ -225,7 +225,9 @@ Jesús Ramirez on Photoshop on the web.
   free of credits), protects outside the selection natively, and its own fill model reads the whole
   image and returns three variations. Scenario wins when the agent runs unattended, when the edit
   needs several references or a trained style, or when the output must exceed what Photoshop's fill
-  returns. The toolkit has no Generative Fill call, so an agent cannot run Photoshop's route.
+  returns. Adobe documents no script call for Generative Fill and the toolkit has none. A forum
+  reports an undocumented batchPlay descriptor (not tested), and Adobe's generative AI guidelines
+  may cover automated use, so the toolkit does not reach for it.
 - **All sides at once or one side at a time?** Patterson selects both sides in one pass [S-03awqbtqs
   01:40]; Ramirez does one side at a time [fR0CI04XBpM 09:16]. Decide by output size: one pass when
   the whole new area fits the member's output at the photo's pixel density, else one side per pass,

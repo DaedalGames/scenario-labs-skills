@@ -25,6 +25,11 @@ lead skill, `scenario-photoshop-expert`.
 - Every toolkit has a live suite run against Photoshop 27.11 on macOS: 68 tests across 10 suites,
   several on real Scenario outputs (inpaint, upscale, restore, seamless texture repair). Steps no
   script reaches are listed as GUI paths and marked not tested.
+- Blind grading on seven briefs, one per skill: the same model answered with the skills and from
+  memory alone, and a separate grader scored the shuffled pairs without knowing which was which.
+  With the skills: 102 of 105, six briefs won and one tie. Without: 91. The gain is mostly expert
+  technique and fewer wrong claims (one against three). Seven briefs and one grader are a small
+  sample.
 
 ## Requirements
 

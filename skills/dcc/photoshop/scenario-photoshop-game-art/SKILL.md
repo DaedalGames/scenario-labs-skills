@@ -97,9 +97,12 @@ one `ps_run` job. Code: [procedures](references/procedures.md).
    Soft Light layer at 1 to 2% flow and a Color layer at 5 to 10% [9_36YihB8I4 06:34, 07:41]
    ([gui-paths](references/gui-paths.md)). GATE: `patch_range` under 12, preview read again.
 6. **Maps.** Extract maps from the approved albedo (`scenario-textures`); `IO.place` each as a layer
-   named by role. Confirm roughness or smoothness and invert a copy if the shader wants the other.
-   GATE: every map the albedo's size; `GA.tile_check(layer=name)` passes per map [added: an
-   extractor can break the wrap].
+   named by role. Plan the pack from the member's `maps` values, not from the engine's slots: the
+   members read at authoring time return base color, normal, roughness, metalness and height, and no
+   AO. Fill an AO slot with 255 (no occlusion) and say so, unless the user supplies a bake. Confirm
+   roughness or smoothness and invert a copy if the shader wants the other. GATE: every map the
+   albedo's size; `GA.tile_check(layer=name)` passes per map [added: an extractor can break the
+   wrap].
 7. **Export.** `A.deliverable("game-texture")` on the master; color maps
    `GA.export_texture(out, size=1024)`; data maps `data=True` (`gray=True` for one channel); packs
    `GA.pack_channels(out, r, g, b, a=...)`, TGA when `a` is set. GATE: `[]`; every result `pow2`;
