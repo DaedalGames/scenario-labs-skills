@@ -198,6 +198,41 @@ me.materials.append(bpy.data.materials.new("M_Folded"))
 bpy.context.scene.collection.objects.link(bpy.data.objects.new("Folded", me))
 cases["folded"] = gate(["Folded"])
 
+# A unit-scale part under a scaled parent: the engine still receives the scale, and the
+# message names the parent, where applying it clears the gate.
+empty()
+root = bpy.data.objects.new("Root", None)
+bpy.context.scene.collection.objects.link(root)
+root.scale = (2, 2, 2)
+ob = box("Child", (0.5, 0.5, 0.5), (0, 0, 0.25))
+ob.parent = root
+cases["parent_scale"] = gate(["Child"])
+for o in (root, ob):
+    o.select_set(True)
+bpy.context.view_layer.objects.active = root
+bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+cases["parent_scale_applied"] = gate(["Child"])
+
+# No UV map on the base mesh, one written by Geometry Nodes: exporters write the evaluated
+# mesh, so the gate reads UVs from it.
+empty()
+ob = box("NodesUV", (1, 1, 1), (0, 0, 0.5), uv=False)
+ob.active_material.use_nodes = True
+ob.active_material.node_tree.nodes.new("ShaderNodeTexImage")
+ng = bpy.data.node_groups.new("StoreUV", "GeometryNodeTree")
+ng.interface.new_socket("Geometry", in_out="INPUT", socket_type="NodeSocketGeometry")
+ng.interface.new_socket("Geometry", in_out="OUTPUT", socket_type="NodeSocketGeometry")
+gi, go = ng.nodes.new("NodeGroupInput"), ng.nodes.new("NodeGroupOutput")
+store = ng.nodes.new("GeometryNodeStoreNamedAttribute")
+store.data_type, store.domain = "FLOAT2", "CORNER"
+store.inputs["Name"].default_value = "UVMap"
+ng.links.new(gi.outputs[0], store.inputs["Geometry"])
+ng.links.new(ng.nodes.new("GeometryNodeInputPosition").outputs[0], store.inputs["Value"])
+ng.links.new(store.outputs[0], go.inputs[0])
+ob.modifiers.new("UV", "NODES").node_group = ng
+cases["nodes_uv"] = gate(["NodesUV"])
+cases["nodes_uv_base"] = bx_audit.deliverable(["NodesUV"], evaluated=False)
+
 with open(OUT, "w") as f:
     json.dump(cases, f, indent=1)
 print("GATE CASES", len(cases))
