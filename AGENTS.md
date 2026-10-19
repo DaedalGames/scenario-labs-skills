@@ -292,6 +292,7 @@ drive applications installed on the user's machine through their Python, bridges
   [docs/expert-tools.md](docs/expert-tools.md). The authoring contract applies there with
   differences: no MCP rules, longer descriptions and bodies, family-level tests, and the expert
   groupings last.
+- A family that calls Scenario models (Photoshop) follows the Scenario MCP rules for those steps.
 
 ## Authoring aids
 

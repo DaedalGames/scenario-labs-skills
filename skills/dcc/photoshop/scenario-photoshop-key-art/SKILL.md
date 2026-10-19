@@ -1,6 +1,6 @@
 ---
 name: scenario-photoshop-key-art
-description: "Use when building key art, ads, YouTube thumbnails, Steam store capsules, social posts, posters or campaign files in Adobe Photoshop around a Scenario image: a canvas per channel at the channel's size, a generated plate or subject that has to fill it, live headline and copy text from a copy sheet, a size set (16:9, 4:5, 9:16, store capsules) or campaign variants from one master, Variables and Data Sets, or an export under a file-size cap such as YouTube's 2 MB. Also when a headline is unreadable at phone size, copy hides under a duration badge or a story bar, Photoshop silently swaps a missing font, paragraph text is cut off without warning, a plate looks soft or cropped wrong in one format, or an export is over the size limit."
+description: "Use when building key art, ads, YouTube thumbnails, Steam store capsules, social posts, digital posters or campaign files in Adobe Photoshop around a Scenario image: a canvas per channel at the channel's size, a generated plate or subject that has to fill it, live headline and copy text from a copy sheet, a size set (16:9, 4:5, 9:16, store capsules) or campaign variants from one master, Variables and Data Sets, or an export under a file-size cap such as YouTube's 2 MB. Also when a headline is unreadable at phone size, copy hides under a duration badge or a story bar, Photoshop silently swaps a missing font, paragraph text is cut off without warning, a plate looks soft or cropped wrong in one format, or an export is over the size limit. Not for print: a printed poster goes to scenario-photoshop-upscale-restore's print path."
 license: MIT
 ---
 
@@ -81,7 +81,8 @@ Variables and Data Sets, the `social` profile, a paid plate, Windows.
 
 `sys.path.insert(0, "<this skill>/scripts")`, then `import ps_keyart as K` (it puts the lead's
 `scripts/` on the path) and `import ps_io as IO, ps_review as R, ps_audit as A`. Each call is one
-`ps_run` job and acts on the active document. Code: [procedures](references/procedures.md).
+`ps_run` job and acts on the active document; after one raises or times out, recover as the lead's
+Quality gates say. Code: [procedures](references/procedures.md).
 
 1. **Intake.** One preset per channel: `K.PRESETS[name]` holds `size`, `unsafe`, `display` and, for
    YouTube, `max_bytes`. A channel without a preset is a dict with the same keys. Presets are
@@ -183,7 +184,8 @@ Visual gates:
 - **Sends** a soft or small plate to scenario-photoshop-upscale-restore; a crop that cuts the
   subject to scenario-photoshop-generative-edit (expand); a pasted-on subject, relight, shadows or a
   face retouch to scenario-photoshop-compositing; key art onto a product or screen photo to
-  scenario-photoshop-mockups.
+  scenario-photoshop-mockups; print (canvases here are 72 ppi screen files) to the print path of
+  scenario-photoshop-upscale-restore (its procedures P10).
 - **Scenario siblings:** `scenario` (connection, quote, jobs), `scenario-image` (plates, instruction
   edits), `scenario-thumbnails` (a video cover's concept), `scenario-consistency` (one character
   across plates), `scenario-formats` (a size set made on the platform when nobody needs a PSD). When
@@ -197,8 +199,6 @@ Visual gates:
 - Dynamic Text (27.6, any shape since 27.10) has no script call; `type_layers` fitting replaces it.
 - Type size is in points: px = pt x ppi / 72, equal at the toolkit's 72 ppi. `check` converts at any
   resolution.
-- ExtendScript groups chained ternaries from the left: a left alignment came out right. Use if/else
-  in your own jobs.
 - The DOM has no artboard API; artboards by Action Manager are not tested here. One document per
   channel replaces them.
 - Photoshop's Generate Image has no toolkit call; scripted plates come from Scenario.

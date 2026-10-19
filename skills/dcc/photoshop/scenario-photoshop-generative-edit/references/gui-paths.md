@@ -75,7 +75,7 @@ releases. Shortcuts are macOS first, Windows second.
 ## Prompt to edit and Markup
 
 - **Prompt to edit:** with no selection or with Select All, Prompt to edit in the Contextual Task
-  Bar, or Edit > Prompt to Edit. It edits the whole image from an instruction.
+  Bar, or Edit > Prompt to edit. It edits the whole image from an instruction.
 - **Markup** (27.10): arrows, circles, color picks and notes drawn on the image as instructions for
   Prompt to edit. It creates a temporary markup layer.
 

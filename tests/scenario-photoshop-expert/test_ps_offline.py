@@ -324,6 +324,30 @@ class MockupHelpersTest(unittest.TestCase):
         self.assertEqual(tones["pixels"], 100)
         self.assertTrue(tones["p25"] <= tones["mid"] <= tones["p75"])
 
+    def test_lighter_swatch_is_flagged_flat(self):
+        dark = [(v, v, v) for v in range(20, 52)]
+        lifted = [(v + 175, v + 175, v + 175) for v in range(20, 52)]   # an offset: same depth
+        r = ps_mockup.swatch_check(dark, lifted, (210, 210, 210))
+        self.assertTrue(r["flat"])
+        self.assertAlmostEqual(r["spread"], 1.0)
+        self.assertLess(r["contrast"][1], r["contrast"][0] * 0.3)       # far shallower, relative
+        self.assertGreater(r["folds"], 0.99)                            # folds sees no difference
+        light = [(v, v, v) for v in range(200, 232)]
+        navy = [(round(v * 0.23), round(v * 0.23), round(v * 0.23)) for v in range(200, 232)]
+        self.assertFalse(ps_mockup.swatch_check(light, navy, (52, 52, 52))["flat"])
+
+    def test_lab_swatch(self):
+        self.assertEqual(ps_mockup._rgb({"lab": [100, 0, 0]}), [255, 255, 255])
+        navy = ps_mockup.lab_to_rgb([32, 10, -45])
+        self.assertLess(ps_mockup.delta_e(navy, ps_mockup.lab_to_rgb(ps_mockup._lab(navy))), 1)
+        for bad in ({"lab": [1, 2]}, {"rgb": [1, 2, 3]}):
+            with self.assertRaises(ValueError):
+                ps_mockup._rgb(bad)
+        base = [(v, v, v) for v in range(150, 250)]
+        red = [(255, 0, 18)] * 100                                       # the clipped swatch
+        out = ps_mockup.swatch_check(base, red, ps_mockup._rgb({"lab": [60, 90, 70]}), lab=[60, 90, 70])
+        self.assertGreater(out["delta_e"], 5, "an out-of-gamut Lab target fails the check")
+
     def test_solid_png_is_valid(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = ps_mockup._solid_png(os.path.join(tmp, "p.png"), 7, 3, (214, 72, 72))
@@ -331,6 +355,57 @@ class MockupHelpersTest(unittest.TestCase):
         self.assertEqual(size, (7, 3))
         self.assertEqual(len(raw), 3 * (1 + 7 * 3))
         self.assertEqual(tuple(raw[1:4]), (214, 72, 72))
+
+
+class CompositeGrainTest(unittest.TestCase):
+    def test_each_element_gets_its_own_grain_layer(self):
+        """Two elements with the default name: two layers, never the first element's refilled."""
+        calls = []
+        trials = {"n": 0}
+
+        def fake_run(js, args, undo=None, timeout=240):
+            calls.append((js, dict(args), undo))
+            if js == ps_composite.GRAIN_JS:
+                trials["n"] += 1
+            return {"layer": args.get("name")}
+
+        def fake_texture(layer=None, region=None, radius=2):
+            if "ring" in region:                 # the scene ring: first call of each match_grain
+                trials["n"] = 0
+                return {"energy": 10.0}
+            return {"energy": 2.0 + 3 * trials["n"]}
+
+        saved = (ps_composite._run, ps_composite.G.texture, ps_composite.A.history,
+                 ps_composite.A.step_back, ps_composite.A.history_gate)
+        try:
+            ps_composite._run = fake_run
+            ps_composite.G.texture = fake_texture
+            ps_composite.A.history = lambda: {"index": 3, "name": "mark", "id": 7}
+            ps_composite.A.step_back = lambda h0, undo: h0
+            ps_composite.A.history_gate = lambda h0, undo=None: []
+            a = ps_composite.match_grain("element")
+            b = ps_composite.match_grain("patch")
+            c = ps_composite.match_grain("patch", name="Grain, patch take 2")
+        finally:
+            (ps_composite._run, ps_composite.G.texture, ps_composite.A.history,
+             ps_composite.A.step_back, ps_composite.A.history_gate) = saved
+        self.assertEqual((a["layer"], b["layer"], c["layer"]),
+                         ("Grain match: element", "Grain match: patch", "Grain, patch take 2"))
+        grain = [args for js, args, undo in calls if js == ps_composite.GRAIN_JS]
+        self.assertEqual({g["name"] for g in grain if g["layer"] == "element"}, {"Grain match: element"})
+        self.assertEqual({g["name"] for g in grain if g["layer"] == "patch"},
+                         {"Grain match: patch", "Grain, patch take 2"})
+        # The ownership check runs before the first named state, as a job without undo.
+        checks = [(args, undo) for js, args, undo in calls if js.startswith(ps_composite.GRAIN_CHECK_JS)
+                  and js != ps_composite.GRAIN_JS]
+        self.assertEqual(len(checks), 3)
+        self.assertTrue(all(undo is None for _a, undo in checks))
+
+    def test_grain_job_refuses_a_layer_clipped_to_another_element(self):
+        self.assertTrue(ps_composite.GRAIN_JS.startswith(ps_composite.GRAIN_CHECK_JS))
+        self.assertIn("pc_clip_base(g)", ps_composite.GRAIN_CHECK_JS)
+        self.assertIn("is not clipped to", ps_composite.GRAIN_CHECK_JS)
+        self.assertIn("function pc_clip_base", ps_composite.HELPERS_JS)
 
 
 class UpscaleHelpersTest(unittest.TestCase):

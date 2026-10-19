@@ -231,8 +231,9 @@ npx skills add scenario-labs/skills --skill scenario scenario-chatgpt-pet-create
 ## Expert tools
 
 Teams of skills that drive DCC software and game engines installed on your machine. They need the
-application; only the Photoshop family also uses the Scenario MCP server, for its generative steps.
-Each family installs as one set: [ZBrush](skills/dcc/zbrush/README.md),
-[Blender](skills/dcc/blender/README.md), [Maya](skills/dcc/maya/README.md),
-[Photoshop](skills/dcc/photoshop/README.md), [Unreal Engine](skills/game-engines/unreal/README.md),
-[Unity](skills/game-engines/unity/README.md), [Godot](skills/game-engines/godot/README.md).
+application. The Photoshop family and the Blender blockout skill also call the Scenario MCP server;
+a few Godot and Unity skills take assets made through it by the Scenario skills. Each family
+installs as one set: [ZBrush](skills/dcc/zbrush/README.md), [Blender](skills/dcc/blender/README.md),
+[Maya](skills/dcc/maya/README.md), [Photoshop](skills/dcc/photoshop/README.md),
+[Unreal Engine](skills/game-engines/unreal/README.md), [Unity](skills/game-engines/unity/README.md),
+[Godot](skills/game-engines/godot/README.md).

@@ -16,17 +16,19 @@ tool schemas and flag the gap.
 **REQUIRED BACKGROUND:** scenario-photoshop-expert (execution channel, round trip, gates).
 
 **Status (2026-10-19):** every call in [`scripts/ps_mockup.py`](scripts/ps_mockup.py) is verified
-live on Photoshop 27.11 (macOS): `test_mockup_live.py` runs 15 tests on striped and checkered
-fixtures and on white and black shirts. Not tested: `fit="contain"`, `color=`, `prefix=`, the
-default map folder, the shell commands, lighting from a Background layer, SVG placement, corners
-read from a path, Windows, the Scenario jobs and the GUI paths.
+live on Photoshop 27.11 (macOS): `test_mockup_live.py` runs 15 tests on synthetic fixtures (striped,
+checkered, a white and a black shirt drawn with folds). On the black shirt, a light colorway matches
+the swatch but keeps the black shirt's fold contrast in levels (flagged `flat`). Not tested:
+`fit="contain"`, `color=`, `prefix=`, the default map folder, the shell commands, lighting from a
+Background layer, SVG placement, corners read from a path, Windows, the Scenario jobs and the GUI
+paths.
 
 ## Stance (the expert delta)
 
 - **Scenario makes what the photo lacks; the client's artwork stays a file.** Anders upscales a
   generated plate before placing the design (Anders [rrxTM5AZALU 00:34]). Hastie cleans the bottle
-  with Generative Fill, then places the label "in SVG form" (Hastie [70L2ngS8raY 02:47]) as a smart
-  object [70L2ngS8raY 03:21]. Existing artwork goes in through `replace_design`, never regenerated.
+  with Generative Fill, then places the label "in SVG form" as a smart object (Hastie [70L2ngS8raY
+  02:47, 03:21]). Existing artwork goes in through `replace_design`, never regenerated.
 - **Build the placeholder first; the design goes in last.** Builders convert a rectangle to a smart
   object to "insert and edit your design non-destructively" (Quick Fix Up [boONV-waIUk 00:33]). Test
   it with "both bright and dark color" (Dinda [sy1w5mTif-E 01:38]): a ramp or check pattern, never
@@ -49,13 +51,14 @@ read from a path, Windows, the Scenario jobs and the GUI paths.
 - **A fit is done when the corners measure right.** [added] Measured on 27.11: a scripted warp can
   return success and change nothing, or land up to 60 px off. `corner_error` and `fit_check` gate
   every fit. Hand builders check too (GraphiqVibe [WeDJv63Wgjk 06:13]).
-- **A colorway shows the swatch and keeps the folds.** WeJustClickme clips a Solid Color layer in
-  Color mode to a t-shirt (WeJustClickme [i-hYHLXDheU 02:10]). [added] Color mode keeps the
-  garment's luminance: navy on a white shirt came out pale blue (measured). `colorways` moves the
-  mid-tones to the swatch's luminance with Curves first, then measures the color.
-- **Printed ink is never pin sharp.** "Whenever we print something on a piece of fabric like this,
-  it is not that sharp" (Dinda [_VNqOhHJIm8 07:17]). On a dark shirt, Anders lowers the design to
-  90% (Anders [rrxTM5AZALU 06:38]).
+- **A colorway shows the swatch and keeps the folds, from a light blank.** WeJustClickme clips a
+  Solid Color layer in Color mode to a t-shirt (WeJustClickme [i-hYHLXDheU 02:10]). [added] Color
+  mode keeps the garment's luminance: navy on a white shirt came out pale blue (measured).
+  `colorways` moves the mid-tones to the swatch's luminance with Curves first, then measures the
+  color. A lighter color on a dark garment keeps its shallow folds and reads flat (measured), so
+  colorways start from a white or light-gray blank.
+- **Printed ink is never pin sharp.** Print on fabric "is not that sharp" (Dinda [_VNqOhHJIm8
+  07:17]). On a dark shirt, Anders lowers the design to 90% (Anders [rrxTM5AZALU 06:38]).
 
 ## Establish first
 
@@ -74,10 +77,10 @@ read from a path, Windows, the Scenario jobs and the GUI paths.
 
 ## Workflow
 
-Each call is one ExtendScript job through `ps_run`, with one named History state.
-`import ps_mockup as M` puts the lead's `scripts/` on the path; then
-`import ps_gates as G, ps_review as R, ps_audit as A, ps_io as IO`. Code:
-[procedures](references/procedures.md).
+`sys.path.insert(0, "<this skill>/scripts")`, then `import ps_mockup as M` (it puts the lead's
+`scripts/` on the path) and `import ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A`. Each
+call is one ExtendScript job through `ps_run`, with one named History state; after one raises or
+times out, recover as the lead's Quality gates say. Code: [procedures](references/procedures.md).
 
 1. **Intake.** `A.doc_state()`: name, size, mode, profile, layers. Name the product layer, each
    printable face, the designs and the colorways. A soft or small plate goes to
@@ -86,9 +89,8 @@ Each call is one ExtendScript job through `ps_run`, with one named History state
 2. **Scenario inputs.** Each Scenario job is quoted first, with the user's yes (`scenario`).
    - No product photo: a plate or scene from `scenario-image`; a product to restage or relight:
      `scenario-product-shots`; a fix on the photo: scenario-photoshop-generative-edit.
-   - A logo: vectorize with `scenario-image-editing` or `scenario-brand-kit`. Save the SVG from
-     `asset_get`'s `url` with `curl -L` (`asset_download` returns a raster), then render it to a PNG
-     at least the content size (not tested).
+   - A logo: vectorize with `scenario-image-editing` or `scenario-brand-kit`; save and render the
+     SVG as procedures P9 shows (not tested).
    - New designs: `scenario-image` at the print ratio; repeats: `scenario-textures`. A material
      change (heather, wash): an instruction edit per color, `scenario-product-shots` (not tested).
 
@@ -114,11 +116,14 @@ Each call is one ExtendScript job through `ps_run`, with one named History state
    `M.batch(layer, designs, OUT + "/mockups")`. GATE: `drift` under 0.5 and `content_size` unchanged
    per design; one PNG per design; after a batch, `A.history_gate(h0) == []` with `h0 = A.history()`
    taken before it.
-7. **Colorways.** Select the garment, then
-   `M.colorways(product, {"navy": "#1e3278"}, OUT + "/colorways")`: per color, a Curves layer and a
-   Solid Color fill in Color mode above the product, masked by the selection (else clipped), one
-   PNG, one step back. GATE: per colorway `check["delta_e"]` 5 or less and `check["folds"]` 0.9 or
-   more; print and background unchanged; `A.history_gate(h0) == []`.
+7. **Colorways** (Pillow needed). Start from a white or light-gray blank; with only a dark plate,
+   ask the user for one or make one by instruction edit (`scenario-product-shots`, quoted). Select
+   the garment, `h0 = A.history()`, then `M.colorways(product, {"navy": "#1e3278"}, OUT + "/cw")`:
+   per color, Curves and a Color-mode fill above the product, masked by the selection (else
+   clipped), one PNG, one step back. A raise midway, with "Scenario: Colorway" active:
+   `A.step_back(h0, "Scenario: Colorway")`. GATE: per colorway `check["delta_e"]` 5 or less and
+   `check["folds"]` 0.9 or more; `check["flat"]` true: a 100% crop of a fold shown to the user;
+   print and background unchanged; `A.history_gate(h0) == []`.
 8. **Hand finish (not tested).** Ink blur 0.6 to 1 px as a Smart Filter on the design, shadows
    desaturated where color seeps, 90% on a dark garment, a contrast Curves on top
    ([gui-paths](references/gui-paths.md)). GATE: at 100%, folds cross the design, highlights sit on
@@ -127,43 +132,39 @@ Each call is one ExtendScript job through `ps_run`, with one named History state
    layered handoff. GATE: every design and colorway seen on the sheet; `A.deliverable` returns `[]`;
    the report names the map path, the gate numbers and what was not verified.
 
-**A placed Scenario result** (screen art, a poster frame):
-`IO.place(path, "Scenario result", bounds=b, fit="contain")`, then
-`M.fit_quad("Scenario result", quad)`; use the returned `id` (every fit wraps a new smart object).
-Gate as stage 4.
+**A placed Scenario result** (screen art, a poster frame): `IO.place`, then `M.fit_quad` with the
+returned `id` (procedures P8). Gate as stage 4.
 
-**Fit order.** Fit before `displace`: a fit refuses a layer with Smart Filters or a layer mask
-(masks go on the group). A fit replaces any hand warp (`reset` true). Several faces take one
-placeholder each. A tapered bottle or a pouch keeps the hand warp
-([gui-paths](references/gui-paths.md)), after the last fit.
+**Fit order.** Fit before `displace` and before any hand warp (a tapered bottle, a pouch): a fit
+refuses Smart Filters and layer masks, and replaces any warp. One placeholder per face.
 
 ## Numbers
 
-| Value                                                   | Relative to                     | Source                                          |
-| ------------------------------------------------------- | ------------------------------- | ----------------------------------------------- |
-| `corner_error` under 1 px, `fit_check` under 0.5 px     | the requested corners           | toolkit, verified live                          |
-| `drift` under 0.5 px                                    | corners before Replace Contents | toolkit, verified live                          |
-| Cylinder `angle` 120 degrees; `top_bulge` = `bulge`     | the label's visible arc         | toolkit default                                 |
-| Fill 60 while fitting, 100 after a replace              | the placeholder                 | toolkit default                                 |
-| Shading 85%, Highlights 50%                             | the two product copies          | toolkit default                                 |
-| Displace scale 8; map blur max(1, doc width / 1500)     | the toolkit's defaults          | toolkit default                                 |
-| Displace 4, map blur 1 px                               | a fabric tote                   | Dinda [_VNqOhHJIm8 06:11]; [_VNqOhHJIm8 05:39]  |
-| Displace 15, map blur 3 px                              | a crushed can                   | Geller [0l2Ma_2B-A8 05:24]; [0l2Ma_2B-A8 01:04] |
-| Displace 10, then 20; map blur 18 px for big folds only | a t-shirt                       | Dinda [sy1w5mTif-E 06:27]; [sy1w5mTif-E 05:54]  |
-| Ink blur 1 px; 0.6 px with a stroke                     | the design                      | Dinda [_VNqOhHJIm8 07:17]; [_VNqOhHJIm8 08:55]  |
-| Design opacity 90%                                      | a dark garment                  | Anders [rrxTM5AZALU 06:38]                      |
-| Colorway Delta E 5 or less; folds 0.9 or more           | mid-tones vs swatch (CIE76)     | authoring-time                                  |
+| Value                                                        | Relative to                     | Source                                                                                     |
+| ------------------------------------------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------ |
+| `corner_error` under 1 px, `fit_check` under 0.5 px          | the requested corners           | toolkit, verified live                                                                     |
+| `drift` under 0.5 px                                         | corners before Replace Contents | toolkit, verified live                                                                     |
+| Cylinder `angle` 120 degrees; `top_bulge` = `bulge`          | the label's visible arc         | toolkit default                                                                            |
+| Fill 60 while fitting, 100 after a replace                   | the placeholder                 | toolkit default                                                                            |
+| Shading 85%, Highlights 50%                                  | the two product copies          | toolkit default                                                                            |
+| Displace scale 8; map blur max(1, doc width / 1500)          | the toolkit's defaults          | toolkit default                                                                            |
+| Displace 4, map blur 1 px                                    | a fabric tote                   | Dinda [_VNqOhHJIm8 06:11]; [_VNqOhHJIm8 05:39]                                             |
+| Displace 15, map blur 3 px                                   | a crushed can                   | Geller [0l2Ma_2B-A8 05:24]; [0l2Ma_2B-A8 01:04]                                            |
+| Displace 10, then 20; map blur 18 px for big folds only      | a t-shirt                       | Dinda [sy1w5mTif-E 06:27]; [sy1w5mTif-E 05:54]                                             |
+| Ink blur 1 px; 0.6 px with a stroke                          | the design                      | Dinda [_VNqOhHJIm8 07:17]; [_VNqOhHJIm8 08:55]                                             |
+| Design opacity 90%                                           | a dark garment                  | Anders [rrxTM5AZALU 06:38]                                                                 |
+| Colorway Delta E 5 or less (CIE76); fold pattern 0.9 or more | mid-tones vs swatch or Lab      | authoring-time: proves the math, catches clipping; brand specs hold about 2 (Delta E 2000) |
+| Colorway `flat`: swatch over 1.25 times the mid-tones        | the garment's mid-tones         | authoring-time                                                                             |
 
-Toolkit thresholds are authoring-time, from striped and checkered fixtures: check them on your own
-images. Expert values depend on pixel width, crease depth and material.
+Toolkit thresholds are authoring-time: check them on your own images.
 
 ## Quality gates
 
-- **Code:** after every fit, `corner_error` under 1 and `fit_check` under 0.5; `corners` returns
-  `consistent` true. After every replace, `drift` under 0.5 and `content_size` unchanged.
-  `A.history_gate(h0, undo) == []` per call. `lighting` returns two layers; `displace` returns a
-  `map` that exists; `batch` and `colorways` return one `out` per item and pass
-  `A.history_gate(h0)`; each colorway's `check` within Numbers.
+- **Code:** after every fit, `corner_error` under 1, `fit_check` under 0.5, `corners` consistent;
+  after every replace, `drift` under 0.5 and `content_size` unchanged;
+  `A.history_gate(h0, undo) == []` per call, `A.history_gate(h0) == []` after `batch` and
+  `colorways`; the `displace` map on disk; each colorway's `check` within Numbers, a `flat` one seen
+  at 100%.
 - **Visual:** each corner at 100%; a cylinder's columns narrowing toward the sides; the ramp under
   light and creases; the printable edge (no design on a lid, seam or hand); each export on the
   sheet. Rubric: [critique](references/critique.md).
@@ -178,10 +179,9 @@ images. Expert values depend on pixel width, crease depth and material.
 | Blend If read from the design layer | highlights follow the artwork, not the product   | product copies (Dinda [sy1w5mTif-E 09:11])        |
 | Displace map deleted or moved       | Replace Contents: "the file was not found"       | keep the map folder; re-run `displace`            |
 | A fit judged by eye                 | corners a few px off, or a warp that did nothing | `corner_error`, `fit_check`, corner crops         |
-| Foreshortened `size`                | artwork squashed after a replace                 | the printed area's real size                      |
 | A can label fitted with `fit_quad`  | a flat sticker on a round can                    | `fit_cylinder`                                    |
 | A colorway in Color mode alone      | navy on a white shirt comes out pale blue        | `colorways`: Curves under the Color fill          |
-| A raster logo enlarged              | soft edges, wrong letters                        | the SVG master, rendered at content size          |
+| A light colorway from a dark blank  | shallow folds; every number passes               | a white or light-gray blank; read `flat`          |
 
 ## Handoffs
 
@@ -203,10 +203,6 @@ Measured on 27.11 (more in [expert-notes](references/expert-notes.md)):
 
 - A custom warp lands on its points only when the object is scaled up from the box it was wrapped
   at; at that box or below, corners drift up to 60 px. Each fit wraps at 97% of the target's box.
-- `warpNone` can leave a transform the next fit rejects; a re-fit flattens with an identity warp.
-- Replace Contents keeps the transform and renames the layer after the file; `replace_design`
-  handles both.
-- The Color blend mode is `BlendMode.COLORBLEND`; `BlendMode.COLOR` throws.
 
 ## References
 

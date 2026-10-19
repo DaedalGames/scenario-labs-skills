@@ -10,6 +10,7 @@ than the MCP server:
 - The MCP rules (MCP as the surface, `recommend` discovery, model ids) do not apply. The rest does,
   including the frontmatter, the 2500-word cap, house style, public content only, and the
   sibling-install sentence.
+- A family that calls Scenario models (Photoshop) follows the Scenario MCP rules for those steps.
 - Descriptions follow the spec's 1024-character cap, not the 500-character target. Bodies run near
   the cap, not the 1000-word target. Both are the author's choice, kept until a live run shows what
   to trim.

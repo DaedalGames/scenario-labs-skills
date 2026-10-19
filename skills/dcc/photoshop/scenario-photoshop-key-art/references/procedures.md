@@ -22,7 +22,7 @@ OUT = "/path/to/a/work/folder"    # never the folder of the user's PSD
 def job(js, undo=None):           # one ExtendScript body; raises on a Photoshop error
     r = ps_run.run(js, undo=undo)
     if not r["ok"]:
-        raise RuntimeError("%s (line %s)" % (r["error"], r.get("line")))
+        raise RuntimeError("%s (line %s)" % (r["error"], r.get("body_line", r.get("line"))))
     return r["result"]
 ```
 

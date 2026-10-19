@@ -16,9 +16,11 @@ Library:
                                         # Multiply layers under the element; angle = light from
   C.match_tone(layer, strength=0.5)     # clipped Curves moving the element's color cast toward
                                         # the scene ring around it, luminance kept
-  C.match_grain(layer)                  # clipped Overlay noise until texture energy matches the
+  C.match_grain(layer, name=None)       # clipped Overlay noise until texture energy matches the
                                         # ring (only adds, never removes grain); trials step
-                                        # back, so one named state remains (checked, else raises)
+                                        # back, so one named state remains (checked, else raises).
+                                        # Layer "Grain match: <layer>", one per element; a layer
+                                        # of that name clipped to another element raises
 Shell:
   python3 ps_composite.py mask LAYER | pick L,T,R,B L,T,R,B | blendif LAYER [--channel gray]
       [--this a,b,c,d] [--under a,b,c,d] | halo LAYER [--px 1] | shadows LAYER [--angle 135]
@@ -110,6 +112,17 @@ function pc_chain_top(l) {
     top = x;
   }
   return top;
+}
+// The base of a clipped layer: the first layer below it that is not clipped.
+function pc_clip_base(x) {
+  var p = x.parent, idx = -1;
+  for (var i = 0; i < p.layers.length; i++) if (p.layers[i].id === x.id) { idx = i; break; }
+  for (var j = idx + 1; j < p.layers.length; j++) {
+    var y = p.layers[j], g = false;
+    try { g = y.grouped; } catch (e) {}
+    if (!g) return y;
+  }
+  return null;
 }
 function pc_bounds(l) {
   return [l.bounds[0].as("px"), l.bounds[1].as("px"), l.bounds[2].as("px"), l.bounds[3].as("px")];
@@ -252,9 +265,22 @@ var clipped = false; try { clipped = a.grouped; } catch (e) {}
 return {layer: a.name, id: a.id, clipped_to: l.name, clipped: clipped};
 """
 
-GRAIN_JS = r"""
+# Reuse only this element's own grain layer (a rerun). A layer of that name clipped to another
+# element is that element's grain: refilling it would change finished work.
+GRAIN_CHECK_JS = r"""
 var l = pc_layer(ARGS.layer);
 var g = pc_find(d, ARGS.name);
+if (g) {
+  var gb = null, gc = false;
+  try { gc = g.grouped; } catch (e) {}
+  if (gc) gb = pc_clip_base(g);
+  if (!gb || gb.id !== l.id)
+    throw new Error("layer '" + ARGS.name + "' exists and is not clipped to '" + l.name +
+                    "': pass another name=");
+}
+"""
+
+GRAIN_JS = GRAIN_CHECK_JS + r"""
 if (!g) {
   // Directly above the chain top, moved there: artLayers.add() lands at the top of the stack
   // (measured on 27.11), where the clip would take whatever layer is on top.
@@ -272,10 +298,6 @@ d.activeLayer = g;
 d.selection.selectAll(); pc_fill([128, 128, 128]); d.selection.deselect();
 if (ARGS.amount > 0) g.applyAddNoise(ARGS.amount, NoiseDistribution.GAUSSIAN, true);
 return {layer: g.name, id: g.id, amount: ARGS.amount};
-"""
-
-DELETE_JS = r"""
-var l = pc_find(d, ARGS.name); if (l) l.remove(); return l !== null;
 """
 
 
@@ -366,9 +388,14 @@ def match_tone(layer, strength=0.5, ring=40, gap=4, name="Tone match",
     return out
 
 
-def match_grain(layer, ring=40, gap=4, name="Grain match", amounts=(1.5, 3, 5, 8, 12),
+def match_grain(layer, ring=40, gap=4, name=None, amounts=(1.5, 3, 5, 8, 12),
                 radius=1.5, undo="Scenario: Match grain"):
+    """Grain for one element: an Overlay noise layer clipped to it, named "Grain match: <layer>"
+    unless `name` is given. A rerun on the same element reuses its layer; a layer of that name
+    clipped to another element raises. `end` is the chosen trial's energy (the final apply draws
+    new noise of the same amount)."""
     k = _key(layer)
+    name = name or "Grain match: %s" % layer
     inside = {"alpha": k, "contract": 3}
     outside = {"alpha": k, "ring": ring, "gap": gap}
     target = G.texture(None, outside, radius)["energy"]
@@ -377,6 +404,7 @@ def match_grain(layer, ring=40, gap=4, name="Grain match", amounts=(1.5, 3, 5, 8
     if start >= 0.9 * target:
         out["action"] = "none: the element already has at least the scene's grain"
         return out
+    _run(GRAIN_CHECK_JS + "return true;", {"layer": k, "name": name})   # refuses before any state
     # Each trial is one state on top of the mark, measured, then stepped back by state (never by
     # list length or index: gates leave redo states, and the index stops moving at the History
     # limit). The final pick is the one state left.

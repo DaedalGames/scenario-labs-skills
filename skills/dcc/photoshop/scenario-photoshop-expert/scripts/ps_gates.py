@@ -1,7 +1,8 @@
 """
 ps_gates: measurable quality gates computed inside Photoshop from histograms of temporary copies.
-The user's document is never changed: every gate works on duplicates the job closes, and a stored
-selection is stepped back out of History. No Python packages needed.
+Pixels, layers and the active History state stay as they were: every gate works on duplicates the
+job closes, and a stored selection is stepped back out of History (at the History limit, those
+temporary states drop the user's oldest undo steps). No Python packages needed.
 
 Library (each call is one ps_run job):
   import ps_gates as G

@@ -72,8 +72,12 @@ Live suites on Photoshop 27.11 (macOS), 2026-10-19:
   toolkits name, read and, for blend modes, assigned.
 - **`test_gates_live.py`** (9 tests) and **`test_audit_live.py`** (5 tests): the gates, the delivery
   profiles (hidden takes kept in a group named "Takes" pass), and `A.history`.
-- **`test_history_live.py`** (7 tests): History lowered to 5 states and filled on a document the
-  test makes, the preference restored in a `finally`. The gate passes a correct edit and fails a
-  missing, unnamed, doubled or misnamed one; `place_edit`, `A.step_back`, `match_grain` and
-  `colorways` keep their gates at the limit and with redo states above the mark.
+- **`test_history_live.py`** (7 tests, 2026-10-19): History lowered to 5 states and filled on a
+  document the test makes, the preference restored in a `finally`. At the limit, the gate passes a
+  correct edit and fails a missing, unnamed, doubled or misnamed one; `IO.place` with a mask (and a
+  selection gate after it), `A.step_back`, `match_grain` (trials 2.3 to 16.6 against a scene grain
+  of 21.4, one named state left) and `colorways` on a selection (the marked state active again, the
+  layers unchanged, the list down from 6 states to 3 as the oldest dropped) keep their gates.
+  `match_grain` also keeps its gate with redo states above the mark (left by a selection gate).
+  Generative-edit's `place_edit` is gated in its own suite, below the limit.
 - The specialists' suites run `ps_run`, `ps_io` and `ps_review` inside their own procedures.

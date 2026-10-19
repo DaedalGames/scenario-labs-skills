@@ -3,7 +3,10 @@
 Each procedure names the calls it runs and its status. "Verified live" means a live suite on
 Photoshop 27.11 (macOS) runs those calls; "not tested" means the block was written from the
 toolkit's code and Adobe's documentation but never run as shown. Every call below is one `ps_run`
-job, so each is its own unit of failure: read `ok`, `error` and `body_line` after each one.
+job, so each is its own unit of failure. A toolkit call raises `RuntimeError` with the error and the
+line; a raw `ps_run.run` returns `ok`, `error`, `exit` and `body_line` instead. After either,
+recover as the SKILL.md's Quality gates say: read `A.history()`, step back a partial named state,
+and never retry on top of it.
 
 Setup for every block:
 
@@ -38,9 +41,12 @@ s = A.doc_state()                       # name, path, saved, width, height, ppi,
   its index is one higher. Never gate on `count`: captures, previews and exports step History back
   and leave redo states in the list, and a selection is a state of its own. At the History limit
   (`full`) the oldest state drops and the index holds still, so the gate skips the index there
-  (verified live at a lowered limit, `test_history_live.py`).
+  (verified live at a lowered limit with state ids, `test_history_live.py`; the id-less fallback is
+  not verified at the limit).
 - `A.step_back(h0, undo)` undoes one named edit and checks that `h0`'s state is active again; it
-  raises if the active state has another name. Use it for trials, never an index or the list length.
+  raises if the active state has another name. It steps first and compares with `h0` after, so a
+  raise on that comparison comes after History moved: read `A.history()` before anything else. Use
+  it for trials, never an index or the list length.
 - `A.layer_find("Sky")` returns every layer with that exact name, with its path and kind. Two hits
   mean the name is ambiguous: rename or use the id.
 
@@ -137,8 +143,10 @@ st = G.structure(L["name"], "Background")["score"]   # tone-blind; compare candi
   does not. Use it after an upscale or a whole-frame edit.
 - After a colorize, relight or restore, a plain difference flags everything. Use `structure` and the
   overlay (P7).
-- Gates never edit the document: they measure on duplicates the job closes, and a stored selection
-  steps back out of History (verified live).
+- Gates leave pixels, layers and the active History state as they were: they measure on duplicates
+  the job closes, and a stored selection steps back out of History (verified live). The temporary
+  states still count: at the History limit each one drops one of the user's oldest undo steps
+  ([traps](photoshop-2026-traps.md), section 5).
 
 ## P5. A new take on the same layer
 

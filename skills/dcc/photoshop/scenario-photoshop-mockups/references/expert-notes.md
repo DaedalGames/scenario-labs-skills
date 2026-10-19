@@ -44,7 +44,13 @@ photo.
   degrees, the strips' order of lightness kept, the background and the print above unchanged, the
   document rendering identically afterwards. With a selection, only the selected strips change. On a
   white and a black shirt with folds (F7), navy, red and sand measured on the delivered PNGs: Delta
-  E 0.12 to 0.48, folds 0.998 to 1.0; navy in Color mode alone on the white shirt: Delta E 75.
+  E 0.12 to 0.48, folds 0.998 to 1.0; navy in Color mode alone on the white shirt: Delta E 75. On
+  the black shirt a light colorway matches the swatch but keeps the black shirt's fold contrast in
+  levels, so it reads flat: relative fold contrast 0.58 before, 0.41 to 0.11 after (sand the
+  lowest), all three flagged `flat`; on the white shirt it stays at 0.21 to 0.23. `folds` is a
+  correlation and reads 1.0 whatever the depth. The fixtures are synthetic; the same math on two
+  frames from Anders [rrxTM5AZALU] (offline): a white tee kept 0.21, a black sweatshirt fell from
+  1.13 to 0.14 under sand.
 - **Replace.** A design swapped in moves no corner by more than 0.5 px; the content size does not
   change; Fill returns to 100; a left/right two-color design keeps its sides (no transposition).
 - **Lighting.** Under a flat gray design, the composite got darker by more than 15 over a dark strip
@@ -302,8 +308,9 @@ Tests an agent driving Adobe tools; no Photoshop document is built by hand.
   (Quick Fix Up [boONV-waIUk 02:47]). Color mode alone keeps the garment's luminance, so a white
   shirt cannot turn navy (measured below); `colorways` puts a Curves layer under the fill first.
   Decider: a dye or a flat color stays a Solid Color layer (`colorways`, checked against the
-  swatch); a change of material (heather, wash, a different weave) is an instruction edit per color
-  on the plate.
+  swatch), on a white or light-gray blank; a change of material (heather, wash, a different weave),
+  or light colors wanted from only a dark garment, is an instruction edit on the plate. [added] No
+  source shows a dark garment turned light.
 - **Logo cutout.** A channel for a large flat logo (Williams [tNrV1XdZX0o 00:31]); a vector for
   print (Hastie [70L2ngS8raY 02:47]). Decider: a small, blurry or photographed logo needs a vector
   trace.

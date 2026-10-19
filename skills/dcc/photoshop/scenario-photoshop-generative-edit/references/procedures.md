@@ -85,8 +85,9 @@ r = ps_run.run(SEL.replace("%ARGS%", json.dumps(args)), undo="Scenario: Select c
 ## P2. Inpaint or instruction edit: the round trip
 
 Status: `capture`, `check`, `place_edit` and `verify` verified live (`test_generative_live.py`; the
-seam gate on two takes of a real Scenario inpaint). `R.sheet` verified live in the lead's
-`test_io_live.py`. The take loop is not tested as written.
+seam gate on two takes of a real Scenario inpaint; `place_edit` gated with `A.history_gate` as
+below). `R.sheet` verified live in the lead's `test_io_live.py`. The take loop is not tested as
+written.
 
 ```python
 cap = GE.capture(OUT + "/car", polarity="white")
@@ -283,13 +284,22 @@ def gap_to(t, keep):                              # 0 when the tile touches the 
 
 keep = cap["keep"]                                # after P5; else the box of the untouched area
 tiles = sorted(GE.tile_plan(area, tile, overlap=64), key=lambda t: gap_to(t, keep))
+# Count the tiles that touch the edit area before any paid run: one quote for the set.
+doc = A.doc_state()
+IO.export_mask(OUT + "/area.png", bounds=[0, 0, doc["width"], doc["height"]])   # the area, canvas size
+from PIL import Image
+with Image.open(OUT + "/area.png") as m:
+    tiles = [t for t in tiles if m.convert("L").crop(tuple(t)).getbbox()]
+takes = 1
+print(len(tiles), "tiles x", takes, "take(s): quote this once, get the user's yes")
 for i, t in enumerate(tiles):
-    if not ps_run.run(TILE.replace("%BOX%", json.dumps(t)), undo="Scenario: Tile selection")["result"]:
-        continue                                  # the tile misses the edit area
+    ps_run.run(TILE.replace("%BOX%", json.dumps(t)), undo="Scenario: Tile selection")
     c = GE.capture(OUT + "/tiles/%02d" % i, margin=TILE_MARGIN, polarity="white")
     # Scenario MCP: the same member and settings for every tile; prompt empty or texture only
     # check (P2 gates), then:
     # GE.place_edit(c, take, "Sky fill, tile %02d" % i); assert GE.verify(c)["untouched"]
+    # Tile 1 (i == 0) is the proof: it passes P2's gates and a 100% look before tile 2 runs.
+    # If it fails, stop and re-plan (member, prompt, tile size) before spending on the rest.
 ps_run.run('app.activeDocument.channels.getByName("Scenario edit area").remove(); return 1;',
            undo="Scenario: Remove edit area")
 ```

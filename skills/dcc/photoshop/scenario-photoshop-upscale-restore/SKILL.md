@@ -74,43 +74,44 @@ Photoshop's Generative Upscale and Neural Filters, Windows.
 | Risky content              | faces, product text, ornament, sky, gradients   | look for them; crop boxes go there                |
 | Factor or target size      | `build_stack(factor)`; the member's own factor  | print inches x 300 over source pixels; else 2x    |
 | Scope                      | whole image, one layer, one region              | whole image                                       |
-| Candidates                 | layers to compare                               | two Scenario takes plus the baseline              |
+| Candidates                 | layers to compare                               | baseline first; two takes on a crop; the winner   |
 | Source mode and depth      | a Grayscale master shows no color               | ask before Image > Mode > RGB Color on the master |
 | Output document            | where results live                              | the stack document; the master is never resized   |
 | Model ratios and input cap | `prepare_input(ratios=..., max_px=...)`         | from the member's schema (`scenario`)             |
 
 ## Workflow
 
-Each call is one `ps_run` job. `import ps_upscale as U` puts the lead's `scripts/` on the path; then
-`import ps_gates as G, ps_review as R, ps_audit as A, ps_io as IO`. Code:
-[procedures](references/procedures.md).
+`sys.path.insert(0, "<this skill>/scripts")`, then `import ps_upscale as U` (it puts the lead's
+`scripts/` on the path) and `import ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A`. Each
+call is one `ps_run` job; after one raises or times out, recover as the lead's Quality gates say.
+Code: [procedures](references/procedures.md).
 
 1. **Intake.** `A.doc_state()`: name, size, mode, bits, profile, layers. Note faces, text, gradients
    and damage. For a colorize on a Grayscale master, ask before switching it to RGB (Dinda
    [G5yuLhm0SdM 12:32]). GATE: document read by name; job, fidelity and factor written.
 2. **Prepare the input.** `prep = U.prepare_input(OUT + "/input.png", ratios=[...], max_px=n)`:
    merged pixels (or one layer) as sRGB 8-bit, padded with black to the nearest ratio, the source
-   placed exactly, capped with Bicubic Sharper. History does not change. Keep `prep`. GATE:
-   `prep["ratio"]` is one the member takes; `prep["output"]` fits its input cap; `input.png` opened.
-3. **Quote and generate.** Scenario MCP steps: `scenario` for the connection, `recommend`, the price
-   quote and the user's yes before the run; `scenario-image-editing` for upscale tool models;
-   `scenario-image` for an instruction restore or colorize, with a keep-clause such as "without
-   changing anything about the image" (Dinda [knYusnpB9zI 00:33]). Two candidates, one quote: the
-   lead defaults to one take, but an upscale is judged by comparison, since members differ most in
-   the texture they invent. GATE: quote approved; every output on disk; a failed job reported, not
-   silently retried.
-4. **Upscale stack.** `st = U.build_stack([{"path": p, "label": name}, ...], 2)`: a new document at
-   source x factor, the scripted baseline (likely Preserve Details 2.0), one masked layer per
-   candidate named "<label>, 2x scale". GATE per layer: `size_ok`, `aspect_ok`, `match["matches"]`
-   (mean under 6 at 256 px), `detail_vs_base` near 1 or above. `texture_change` has no threshold.
-5. **Crop grid.** `g = U.crops(OUT + "/crops", boxes=[face, text, sky])`: the same 100% crops of
-   every layer and `crops grid.png`, one labeled row per layer. Without `boxes`: the center and the
-   1/3 and 2/3 points. GATE: every row read against [critique](references/critique.md); losers
-   hidden, never deleted.
-6. **Restore: land and align.**
-   `L = U.place_result(path, "Restore, take 1", prep=prep, base="Background")`: the source area
-   covers the canvas; `L["match"]` is the 256 px difference, which a colorize fails by design. Then
-   `G.structure(layer, "Background")` per take (lower is better, relative only) and
+   placed exactly, capped with Bicubic Sharper. Keep `prep`. For an upscale, also export the
+   riskiest region: `IO.export_region(OUT + "/risk.png", bounds=box)`, at a ratio the member takes.
+   GATE: `prep["ratio"]` is one the member takes; `prep["output"]` fits its input cap.
+3. **Free baseline first (upscales).** `st = U.build_stack([], 2)`: a new document at source x
+   factor holding the scripted baseline alone (likely Preserve Details 2.0), then
+   `U.crops(OUT + "/base", boxes=[face, text, sky])`. GATE: the baseline read at 100%; if it holds,
+   deliver it and quote nothing.
+4. **Candidates on the riskiest crop (paid).** `scenario` for the connection, `recommend`, the quote
+   and the user's yes; `scenario-image-editing` for upscale tool models, run on `risk.png`. Two
+   candidates, one quote: an upscale is judged by comparison. GATE: one beats the baseline's crop at
+   100% (`R.sheet` of both), else stop at the baseline.
+5. **Winner on the full frame (paid).** Quote the winner on `prep["path"]`. In the stack,
+   `L = U.place_result(p, "<label>, 2x scale", prep=prep, base=st["base"])`, then `U.crops` again.
+   GATE: `L["match"]["matches"]` (mean under 6 at 256 px); its `G.texture` near the baseline's or
+   above; every grid row read against [critique](references/critique.md). Stages 3 to 5 in this
+   order are not tested; P2 tests a stack built with two candidates.
+6. **Restore: land and align.** `scenario-image` runs the instruction restore or colorize, quoted,
+   with a keep-clause such as "without changing anything about the image" (Dinda [knYusnpB9zI
+   00:33]). `L = U.place_result(path, "Restore, take 1", prep=prep, base="Background")`: the source
+   area covers the canvas; `L["match"]` is the 256 px difference, which a colorize fails by design.
+   Then `G.structure(layer, "Background")` per take (lower is better, relative only) and
    `R.overlay(out, "Background", layer)`: gray where aligned, red and cyan fringes where not. On
    visible drift, `r = U.align(layer, "Background")`. GATE: no fringe on the eyes; `r["kept"]` read;
    `r["uncovered"]` all zero or cropped back.
@@ -143,8 +144,6 @@ reads black, and reuses its mask (Smith [iy0IxTpT4OY 03:15]; [iy0IxTpT4OY 03:47]
 | Structure: 11.3 returned, 14.0 shifted 3 px, 22.7 drifted    | damaged original, relative only | measured, one restore                               |
 | Bad Auto-Align: structure 15.1 to 29.6, moved 2.5 to 17 px   | same                            | measured, three runs                                |
 | Keep an align: score drop 10% or more (`gain=0.9`)           | structure before                | toolkit default                                     |
-| Blur 0.8 to 1 px, then grain 20 lowered to 12                | a downloaded restore            | Dinda [knYusnpB9zI 09:02]; [knYusnpB9zI 09:35]      |
-| Saturation -33 after a restore and colorize                  | Hue/Saturation layer            | Geller [jIvcJtPsJss 02:56]                          |
 | From 300 px, faces deform; from about 1000 px, "sensational" | upscaler source size            | Hutchinson [XNCimyJ8aQk 12:21]; [XNCimyJ8aQk 12:56] |
 
 Toolkit thresholds are authoring-time, from one 512 px photo: check them on your own images.
@@ -205,7 +204,6 @@ Toolkit thresholds are authoring-time, from one 512 px photo: check them on your
 - Auto-Align by Action Manager needs the projection charID `Auto` (the string ID `auto` aligns
   nothing), does nothing on a smart object, and turns a Background into "Layer 0". `U.align` works
   on rasterized copies in a temporary document.
-- `U.align` restores layer visibility itself after a step back.
 - Neural Filters (Colorize, Photo Restoration, Super Zoom) appear in recent videos (Dinda
   [G5yuLhm0SdM 01:04]; Alwash [WwRbCKao7S4 00:33]); not tested here.
 
@@ -214,7 +212,7 @@ Toolkit thresholds are authoring-time, from one 512 px photo: check them on your
 - [`references/expert-notes.md`](references/expert-notes.md): the measured calibration, each
   expert's method, disagreements and deciders. Load when a case is not covered above.
 - [`references/procedures.md`](references/procedures.md): code per job. Load before writing a job.
-- [`references/critique.md`](references/critique.md): the rubric. Load at stages 5 to 8.
+- [`references/critique.md`](references/critique.md): the rubric. Load at stages 3 to 8.
 - [`references/gui-paths.md`](references/gui-paths.md): Photoshop's own upscale, restore and
   alignment routes by menu, for the user or a computer-use agent.
 - [`references/sources.md`](references/sources.md): videos, credentials, URLs, docs.

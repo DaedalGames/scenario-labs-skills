@@ -31,16 +31,24 @@ Library:
       # "<document> maps/" next to a saved document, else Documents/Scenario Photoshop/
       # displace maps/. Returns its path; never delete it while the filter exists.
   M.batch(layer, designs, out_dir, fit="cover")
-      # one merged PNG per design file; the document ends as it started
+      # one merged PNG per design file; pixels, layers and the active History state end as they
+      # started (at the History limit the temporary states drop the oldest undo steps)
   M.colorways(product, colors, out_dir, match=True, check=True)
       # one merged PNG per product color: a Solid Color fill in Color mode above `product`,
       # masked by the active selection, else clipped to the product layer; colors =
-      # {"name": (r, g, b) or "#rrggbb"}; the document ends as it started. match: a Curves
-      # under the fill brings the product's mid-tones to the swatch's luminance first (Color
-      # mode alone keeps the product's, so navy on white came out pale blue). check: per
-      # colorway, the product's mid-tones against the swatch ("delta_e", CIE76), "folds" (1 =
-      # the same fold pattern) and "spread". match and check need Pillow.
-  M.tone_curve(tones, rgb), M.swatch_check(base, result, rgb), M.delta_e(a, b)
+      # {"name": (r, g, b), "#rrggbb" or {"lab": [L, a, b]}}; pixels, layers and the active
+      # History state end as they started. match: a Curves under the fill brings the product's
+      # mid-tones to the swatch's luminance first (Color mode alone keeps the product's, so navy
+      # on white came out pale blue). check: per colorway, the product's mid-tones against the
+      # swatch ("delta_e", CIE76, against the Lab value when one is given), "folds" (correlation
+      # of the luminance pattern: 1 = folds in the same places, blind to their depth),
+      # "spread" (fold depth in levels, after over before), "contrast" (fold depth relative to
+      # the mid-tones, (p90 - p10) / p50, before and after) and "flat" (the swatch is more than
+      # 25% lighter than the garment's mid-tones: the folds keep their depth in levels and read
+      # shallower; show a 100% crop of a fold, or start from a light blank). match and check
+      # need Pillow.
+  M.tone_curve(tones, rgb), M.swatch_check(base, result, rgb, lab=None), M.delta_e(a, b),
+  M.lab_to_rgb(lab)
       # the pure math behind match and check
 Every fit wraps the object once more (Convert to Smart Object) at the target's size: fit before
 displace (Smart Filters refuse a fit), and keep layer masks on the group.
@@ -703,6 +711,10 @@ def batch(layer, designs, out_dir, fit="cover"):
 
 
 def _rgb(c):
+    if isinstance(c, dict):
+        if "lab" not in c or len(c["lab"]) != 3:
+            raise ValueError("a Lab color needs {\"lab\": [L, a, b]}")
+        return lab_to_rgb(c["lab"])
     if isinstance(c, str):
         h = c.lstrip("#")
         if len(h) != 6:
@@ -755,29 +767,63 @@ def tone_curve(tones, rgb, margin=3):
     return [[0, round(y0, 2)], [round(x1, 2), 255]]
 
 
+def _lab(c):
+    """CIE Lab (D65) of an sRGB color (0 to 255)."""
+    def lin(v):
+        v /= 255.0
+        return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+    r, g, bl = (lin(float(x)) for x in c)
+    x = (0.4124 * r + 0.3576 * g + 0.1805 * bl) / 0.95047
+    y = 0.2126 * r + 0.7152 * g + 0.0722 * bl
+    z = (0.0193 * r + 0.1192 * g + 0.9505 * bl) / 1.08883
+
+    def f(t):
+        return t ** (1.0 / 3) if t > 0.008856 else 7.787 * t + 16.0 / 116
+    fx, fy, fz = f(x), f(y), f(z)
+    return 116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)
+
+
+def lab_to_rgb(lab):
+    """sRGB (0 to 255, rounded, clipped to the gamut) of a CIE Lab (D65) color."""
+    L, a, b = (float(v) for v in lab)
+    fy = (L + 16) / 116.0
+    fx, fz = fy + a / 500.0, fy - b / 200.0
+
+    def finv(t):
+        return t ** 3 if t ** 3 > 0.008856 else (t - 16.0 / 116) / 7.787
+    x, y, z = finv(fx) * 0.95047, finv(fy), finv(fz) * 1.08883
+    lin = (3.2406 * x - 1.5372 * y - 0.4986 * z, -0.9689 * x + 1.8758 * y + 0.0415 * z,
+           0.0557 * x - 0.2040 * y + 1.0570 * z)
+
+    def enc(v):
+        v = v * 12.92 if v <= 0.0031308 else 1.055 * v ** (1 / 2.4) - 0.055
+        return max(0, min(255, round(v * 255)))
+    return [enc(v) for v in lin]
+
+
 def delta_e(a, b):
     """CIE76 color difference of two sRGB colors (0 to 255)."""
-    def lab(c):
-        def lin(v):
-            v /= 255.0
-            return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
-        r, g, bl = (lin(float(x)) for x in c)
-        x = (0.4124 * r + 0.3576 * g + 0.1805 * bl) / 0.95047
-        y = 0.2126 * r + 0.7152 * g + 0.0722 * bl
-        z = (0.0193 * r + 0.1192 * g + 0.9505 * bl) / 1.08883
-
-        def f(t):
-            return t ** (1.0 / 3) if t > 0.008856 else 7.787 * t + 16.0 / 116
-        fx, fy, fz = f(x), f(y), f(z)
-        return 116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)
-    return round(math.dist(lab(a), lab(b)), 2)
+    return round(math.dist(_lab(a), _lab(b)), 2)
 
 
-def swatch_check(base, result, rgb):
+# A swatch this much lighter than the garment's mid-tones (luminance ratio) is flagged "flat": the
+# lightening offset keeps the folds' depth in levels, so relative to the lighter color they keep
+# about mid / swatch of their contrast, under 80% past this ratio. Authoring-time.
+FLAT_RATIO = 1.25
+
+
+def _rel_contrast(v):
+    mid = _pct(v, 50)
+    return round((_pct(v, 90) - _pct(v, 10)) / mid, 3) if mid else None
+
+
+def swatch_check(base, result, rgb, lab=None):
     """The colorway's mid-tones against the swatch. base and result: the same product pixels
-    [(r, g, b)] before and after. Returns the mid-tones' mean color, delta_e (CIE76) to the
-    swatch, folds (correlation of the luminance pattern, 1 = the same folds) and spread (fold
-    contrast after over before)."""
+    [(r, g, b)] before and after. Returns the mid-tones' mean color; delta_e (CIE76) to the
+    swatch, or to `lab` when given; folds (correlation of the luminance pattern: 1 = folds in the
+    same places, blind to their depth); spread (p90 - p10 of the luminance, after over before);
+    contrast ((p90 - p10) / p50, before and after); flat (the swatch's luminance is more than
+    FLAT_RATIO times the garment's mid-tones)."""
     if len(base) != len(result) or not base:
         raise ValueError("base and result need the same, non-empty pixel list")
     lb, lr = [_lum(p) for p in base], [_lum(p) for p in result]
@@ -792,9 +838,12 @@ def swatch_check(base, result, rgb):
     vb = sorted(lb)
     before = _pct(vb, 90) - _pct(vb, 10)
     after = _pct(v, 90) - _pct(v, 10)
-    return {"mean": mean, "swatch": list(rgb), "delta_e": delta_e(mean, rgb),
+    target = _lab(rgb) if lab is None else [float(x) for x in lab]
+    mid = garment_tones(lb)["mid"]
+    return {"mean": mean, "swatch": list(rgb), "delta_e": round(math.dist(_lab(mean), target), 2),
             "folds": round(folds, 3), "spread": round(after / before, 2) if before else None,
-            "pixels": len(lr)}
+            "contrast": [_rel_contrast(vb), _rel_contrast(v)],
+            "flat": _lum(rgb) > FLAT_RATIO * mid, "pixels": len(lr)}
 
 
 def _area_pixels(path, mask, size=400):
@@ -830,6 +879,7 @@ def colorways(product, colors, out_dir, match=True, check=True):
     results = []
     for name, color in colors.items():
         rgb = _rgb(color)
+        lab = list(color["lab"]) if isinstance(color, dict) else None
         curve = tone_curve(tones, rgb) if match else None
         r = _run(COLORWAY_JS, {"product": _key(product), "name": name, "rgb": rgb, "curve": curve},
                  undo=state)
@@ -838,7 +888,7 @@ def colorways(product, colors, out_dir, match=True, check=True):
             keep = ["Colorway: " + name, "Colorway tone: " + name]
             cp = _run(SOLO_EXPORT_JS, {"product": _key(product), "keep": keep,
                                        "path": os.path.join(work, name + ".png")})
-            r["check"] = swatch_check(base, _area_pixels(cp, mask), rgb)
+            r["check"] = swatch_check(base, _area_pixels(cp, mask), rgb, lab=lab)
         r["out"] = _run(EXPORT_JS, {"out": out, "state": state})
         r.update({"colorway": name, "curve": curve, "tones": tones})
         results.append(r)

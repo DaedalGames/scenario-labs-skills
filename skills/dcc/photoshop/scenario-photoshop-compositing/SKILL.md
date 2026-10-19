@@ -20,7 +20,7 @@ flag the gap.
 
 **Status (2026-10-19):** every call in [`scripts/ps_composite.py`](scripts/ps_composite.py)
 (`subject_mask`, `channel_pick`, `blend_if`, `fix_halo`, `shadows`, `match_tone`, `match_grain`) is
-verified live on Photoshop 27.11 (macOS) by `test_composite_live.py` (9 tests on a sample photo and
+verified live on Photoshop 27.11 (macOS) by `test_composite_live.py` (10 tests on a sample photo and
 a fringed disc). [`scripts/ps_retouch.py`](scripts/ps_retouch.py) is verified by
 `test_retouch_live.py` (frequency separation at 8 and 16 bits, radius pick, smoother, dodge and
 burn). `skin_tone` is not run live; the `G.stats` skin line it wraps is, on a flat patch. Not
@@ -32,9 +32,8 @@ placement, Windows.
 - **Harmonize and relighting regenerate the subject; keep the original under the result.** Harmonize
   generated the whole layer and masked what changed, at 1024 px in 2025 (Smith [dWiOA5YZXwc 03:19]);
   a hat lost detail at 200% (Smith [dWiOA5YZXwc 05:05]). New textures, edges and hair appear between
-  variations (Kloskowski [JGbvUOytwX0 02:46]). One Scenario image-edit job, two takes, measured the
-  same: mean difference 17 to 18 outside the edit. Mask the original back over faces, logos and fine
-  edges.
+  variations (Kloskowski [JGbvUOytwX0 02:46]). A Scenario image-edit job measured the same
+  (Numbers). Mask the original back over faces, logos and fine edges.
 - **Take the light, control the color.** Smith sets a copy of the harmonized layer to Luminosity,
   which keeps the original color, then brings the full result back only partway (Smith [C2lo7ew8lHY
   06:33, 07:06]). When every variation is too dark, a clipped Levels layer fixes it, shadow included
@@ -87,9 +86,10 @@ placement, Windows.
 
 ## Workflow
 
-Each call is one `ps_run` job. `import ps_composite as C` and `import ps_retouch as RT` put the
-lead's `scripts/` on the path; then
-`import ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A`. Code:
+`sys.path.insert(0, "<this skill>/scripts")`, then `import ps_composite as C` and
+`import ps_retouch as RT` (they put the lead's `scripts/` on the path) and
+`import ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A`. Each call is one `ps_run` job;
+after one raises or times out, recover as the lead's Quality gates say. Code:
 [procedures](references/procedures.md).
 
 1. **Intake.** `A.doc_state()`; name the element layer and the plate; write the key light, the
@@ -102,8 +102,9 @@ lead's `scripts/` on the path; then
    scale and horizon read right in `R.preview`.
 3. **Cutout.** People and products: `C.subject_mask(layer)`. Trees, sky, smoke:
    `C.channel_pick(keep, drop)`, then `C.blend_if(layer, best, this=...)`, then a smart object. Hard
-   cases: a background-removal tool model (`scenario-image-editing`, quoted) or Select and Mask by
-   the user ([gui-paths](references/gui-paths.md)). GATE: `G.halo(layer)` rims at 8 or less, else
+   cases: a segmentation model named in words (`scenario-image`, step 4; procedures P2), a
+   background-removal tool model (`scenario-image-editing`), each quoted, or Select and Mask by the
+   user ([gui-paths](references/gui-paths.md)). GATE: `G.halo(layer)` rims at 8 or less, else
    `C.fix_halo(layer, px=1)` and again; edges seen at 100% on black, white and gray (procedures P4).
 4. **Light.** Choose one route: Harmonize run by the user on a pixel copy; a relight tool model
    through `scenario-image-editing` (quoted), placed over the original; or clipped Curves by hand.
@@ -116,8 +117,9 @@ lead's `scripts/` on the path; then
 6. **Tone.** `t = C.match_tone(layer, strength=0.5)`: clipped Curves toward the scene ring,
    luminance kept. Contrast or brightness off: a clipped Levels by hand. GATE: `cast_after` closer
    to `cast_scene` than `cast_before`; luminance within 12%; no new cast at fit-to-screen.
-7. **Grain.** `g = C.match_grain(layer)` on the element and on each generated patch. GATE: `end`
-   within 50% of `target` (or `action` none); 100% and 200% crops across the edge match.
+7. **Grain.** `g = C.match_grain(layer)` on the element and on each generated patch; each gets its
+   own clipped layer, `"Grain match: <layer>"` (`name=` to change it). GATE: `end` within 50% of
+   `target` (or `action` none); 100% and 200% crops across the edge match.
 8. **Skin after a generative edit.** Same region before and after: texture ratio and
    `RT.skin_tone(region)`. Lost identity: mask the original eyes, teeth and marks back. Lost
    texture: the original's High Pass in Linear Light over aligned skin, or `C.match_grain`.
@@ -147,7 +149,6 @@ lead's `scripts/` on the path; then
 | Contact shadow: blur 0.8%, opacity 80                  | element height                 | toolkit defaults                                                    |
 | Tone match strength 0.5; ring 40 px past a 4 px gap    | element alpha                  | toolkit defaults                                                    |
 | Grain tries: amount 1.5, 3, 5, 8, 12; Gaussian, mono   | Overlay 50% gray               | toolkit                                                             |
-| Harmonization filter strength: 75 too strong, 50 used  | the older Neural Filter        | Gress [aawE1ZFxl78 14:39]                                           |
 | Harmonize: 3 variations, 5 credits per generation      | one generation                 | Smith [dWiOA5YZXwc 02:09]; Adobe                                    |
 | Re-render outside an edit: mean 17 to 18               | aligned result vs source       | measured, one job, two takes                                        |
 
@@ -182,7 +183,7 @@ Toolkit thresholds are authoring-time: check them on your own images.
 
 - **Receives** from scenario-photoshop-expert: document state and round-trip rules; from
   scenario-photoshop-generative-edit: large edits that need tone and grain; from the user: the
-  plate, the element, the key light, what must not change.
+  inputs under Establish first.
 - **Delivers** a layered PSD: masked element smart objects, named shadow and match layers clipped or
   grouped, retouch scaffolds with black masks, gate numbers. Local fixes inside a plate go to
   scenario-photoshop-generative-edit; soft or small elements to scenario-photoshop-upscale-restore;
@@ -190,23 +191,22 @@ Toolkit thresholds are authoring-time: check them on your own images.
 - **Scenario siblings:** `scenario` (connection, `recommend`, quote, job waiting), `scenario-image`
   (plates, subjects, instruction edits), `scenario-image-editing` (background removal, relight,
   split into layers), `scenario-product-shots`, `scenario-consistency`, `scenario-quality-gate`
-  (scoring takes), `scenario-refine-loop` (re-prompting after a failed gate).
+  (scoring takes, an Enterprise add-on; otherwise scenario-asset-analysis), `scenario-refine-loop`
+  (re-prompting after a failed gate).
 
 ## Photoshop 2026 notes
 
-- Harmonize is run on a pixel layer here (on a smart object it is not tested), costs 5 generative
-  credits per generation, and has no script call: the user runs it
-  ([gui-paths](references/gui-paths.md), not tested).
+- Harmonize is run on a pixel layer here (on a smart object it is not tested) and has no script
+  call: the user runs it ([gui-paths](references/gui-paths.md), not tested).
 - Blend If set through `blendRange` works, but `executeActionGet` never reports it: test by effect.
-  A layer inserted inside a clipping chain releases the whole chain; the toolkit adds above the top.
-- Curves made with points are refused: make the default, then set. Adjustment layers are born with a
-  white mask.
+  A layer inserted between a base and its first clipped layer releases the whole chain; the toolkit
+  adds directly above the chain's top clipped layer (lead traps, section 4).
+- Adjustment layers: Curves points refused at creation, a white mask at birth (lead traps, section
+  4).
 - Grain, Dehaze, Color Grading and Vignette adjustment layers could not be made by script, so
   `match_grain` uses Overlay noise. The Light adjustment layer (27.10) pauses while layers below it
   are edited (Rudis [m6nSl2-t-iQ 07:19]).
 - Relight Layer (September 2026 beta) spends credits only on Done (Smith [P0OsXyEeuvM 04:05]).
-- `match_grain` tries amounts on the live document, stepping each back by name; exactly one new
-  state remains (checked).
 
 ## References
 

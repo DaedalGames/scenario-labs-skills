@@ -30,7 +30,7 @@ coordinates, or open a modal dialog.
 | Select Subject                                                      | `autoCutout`                                                                 | Select and Mask refine brush                            | measured; refine documented           |
 | Remove Background, Camera Raw Filter                                | Action Manager, a subset                                                     | most Camera Raw controls                                | documented                            |
 | Generative Fill, Expand, Prompt to edit                             | no toolkit call; a recorded Action played with `app.doAction` may replay one | Adobe documents these steps in Actions                  | not tested                            |
-| Harmonize, Relight Layer, Rotate Object, Enhance edge               | no toolkit call                                                              | GUI; no Action step documented                          | not tested                            |
+| Harmonize, Relight Layer, Rotate Object, Enhance Edge               | no toolkit call                                                              | GUI; no Action step documented                          | not tested                            |
 | Generative Upscale                                                  | no toolkit call                                                              | GUI; UXP `Document.generativeUpscale` (27.2 and later)  | documented                            |
 | Brush work: painting, healing, Remove strokes, Mixer Brush, Liquify | scaffold layers only                                                         | the strokes                                             | documented                            |
 | Actions                                                             | `app.doAction(action, set)` plays a loaded action                            | loading an `.atn` from a script is unverified on 27.11  | not tested                            |
@@ -147,12 +147,15 @@ MCP and describe Adobe's features as manual alternatives in [gui-paths.md](gui-p
 - **Exports into a missing folder** fail with "General Photoshop error occurred. This functionality
   may not be available in this version of Photoshop". `psr_export` creates the folder first
   (measured).
-- **Clipping chains.** A layer inserted between a base and its clipped layers unclips the whole
-  chain. `artLayers.add()` puts the new layer at the top of the stack, not above the active layer:
-  move it above the chain top (measured).
-- **`grouped` is a toggle.** A layer added or moved inside a clipping chain is clipped already, and
-  setting `grouped = true` on it releases the clip; `grouped = false` on a layer that is not clipped
-  clips it (measured on 27.11). Read `grouped`, set it only when it differs, then check it.
+- **Clipping chains** (measured; the position decides):
+  - A layer inserted between the base and its first clipped layer unclips the whole chain.
+  - A layer moved directly above the chain's top clipped layer joins the chain: it is clipped
+    already.
+  - `artLayers.add()` puts the new layer at the top of the stack, not above the active layer: move
+    it directly above the chain's top.
+- **`grouped` is a toggle.** On a layer that is clipped already (directly above a chain's top),
+  setting `grouped = true` releases the clip; `grouped = false` on a layer that is not clipped clips
+  it (measured on 27.11). Read `grouped`, set it only when it differs, then check it.
 - **Select Subject** is `executeAction(stringIDToTypeID("autoCutout"))` with
   `sampleAllLayers: false` (measured).
 - **Selections.** ExtendScript has no `Selection.border`. Build a ring as expand, store, contract,
@@ -183,8 +186,17 @@ MCP and describe Adobe's features as manual alternatives in [gui-paths.md](gui-p
   back and leave redo states in the list; making a selection is a state of its own (measured). At
   the History limit the oldest state drops and the index holds still, so an index check fails a
   correct edit there; `A.history_gate` checks the name and that the state is new, and skips the
-  index at the limit (verified live at a lowered limit, `test_history_live.py`). A job with `undo`
-  that throws still leaves its named state, possibly empty.
+  index at the limit (verified live at a lowered limit with state ids, `test_history_live.py`; the
+  fallback for a version without ids compares names and is not verified at the limit). A job with
+  `undo` that throws still leaves its named state, possibly empty: the lead SKILL.md's Quality gates
+  say how to recover.
+- **At the History limit, read-only calls still cost undo depth.** Mask captures (`IO.export_mask`,
+  `export_region(punch_selection=True)`, `GE.capture`), gates on `"selection"` or `"outside"`, and
+  the batch and colorway exports push temporary states, then step back. Pixels, layers and the
+  active state end as they were, but at the limit each temporary state drops one of the user's
+  oldest undo steps. Measured at a limit of 5: one `G.stats` on a selection pushed four. At the
+  default of 50 states a long session loses its oldest steps, never pixels. Before a long batch, ask
+  the user to raise the limit (Preferences > Performance) or take a snapshot.
 - **History stepping does not restore layer visibility** under the default preference, which leaves
   visibility out of History (measured). Restore visibility explicitly.
 - **Layer XMP** written on a layer survives save, close and reopen (measured). `ps_io.place` writes

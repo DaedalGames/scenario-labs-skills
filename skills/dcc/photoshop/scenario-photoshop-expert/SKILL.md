@@ -14,10 +14,10 @@ ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`
 proceed from tool schemas and flag the gap.
 
 **Status (2026-10-19):** every toolkit call in Workflow is verified live on Photoshop 27.11 (macOS)
-by the io, gates, audit and restore suites and the specialists' suites. `test_io_live.py` runs stage
-5 as written (a masked placement with provenance, then the outside gate), `ps_io.replace`,
-`layer_xmp`, `ps_review.sheet` and `before_after`. Not tested: the `social` profile, `app.doAction`,
-the batch loop, and Windows.
+by the io, gates, audit, history and restore suites and the specialists' suites. `test_io_live.py`
+runs stage 5 as written (a masked placement with provenance, then the outside gate);
+`test_history_live.py` runs the History gate and `step_back` at a lowered History limit. Not tested:
+the `social` profile, `app.doAction`, the batch loop, and Windows.
 
 ## Stance (the expert delta)
 
@@ -64,8 +64,9 @@ the batch loop, and Windows.
 
 Import once: `sys.path.insert(0, "<this skill>/scripts")`, then
 `import ps_run, ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A`. Each call is one
-`ps_run` job; read `ok`, `error` and `exit` after every one. The user keeps working meanwhile: never
-bring Photoshop to the front, click the screen, or open a modal dialog.
+ExtendScript job ("job" below; a paid run is a Scenario job). A library call raises `RuntimeError`
+on failure; a raw `ps_run.run` returns `ok`, `error` and `exit`. The user keeps working meanwhile:
+never bring Photoshop to the front, click the screen, or open a modal dialog.
 
 1. **Connect and read.** `ps_run.find_photoshop()`, `ps_run.run("return app.version;")` (exit 3:
    `ps_run.py --launch`; exit 6: the user allows automation), then `A.doc_state()`. GATE: exit 0;
@@ -94,11 +95,9 @@ bring Photoshop to the front, click the screen, or open a modal dialog.
    unchanged by the agent.
 
 **Many files.** Prove stages 1 to 8 on one file, quote the whole batch once, then run one job per
-file that opens it, registers it as the job's own, applies the recipe, exports and closes it.
-Ownership lasts one job: a later job's `psr_close` refuses a copy an earlier job made. Skip files
-the user has open; stop at the first failure ([procedures](references/procedures.md) P10). **The
-user's Actions:** read the steps first, then `app.doAction` (P11). **Image to video:** export the
-frame, generate with `scenario-video`, outside Photoshop (P12).
+file that opens it, registers it as the job's own, applies the recipe, exports and closes it. Skip
+files the user has open; stop at the first failure ([procedures](references/procedures.md) P10).
+**The user's Actions:** read the steps first, then `app.doAction` (P11).
 
 ## Numbers
 
@@ -106,7 +105,7 @@ frame, generate with `scenario-video`, outside Photoshop (P12).
 | ----------------------- | --------------------------------------------- | -------------------------------------------------------------- |
 | `pad` 32 px or more     | capture around a selection                    | [added], model context                                         |
 | diff max <= 2           | outside the mask, composite against the base  | measured                                                       |
-| mean 17 to 18           | outside the mask, model output before masking | measured, one job, 2 takes                                     |
+| mean 17 to 18           | outside the mask, model output before masking | measured, one Scenario job, 2 takes                            |
 | bias < 12, residual < 6 | seam ring just outside the mask               | measured, generative-edit                                      |
 | texture ratio >= 0.6    | after over before, same region                | authoring-time                                                 |
 | rim <= 8                | `light_rim`, `dark_rim` of a cut-out          | authoring-time                                                 |
@@ -114,7 +113,7 @@ frame, generate with `scenario-video`, outside Photoshop (P12).
 | drop >= 10%             | structure score, to keep an Auto-Align        | measured, restore                                              |
 | mean < 6 at 256 px      | upscale against its baseline (identity)       | measured, upscale-restore                                      |
 | 1600 px, sRGB 8-bit     | preview long edge                             | toolkit default                                                |
-| 120 s                   | `ps_run` timeout per job                      | toolkit default                                                |
+| 120 s                   | `ps_run.run` timeout per job                  | its default; the toolkits pass 180 to 300 s                    |
 
 Authoring-time thresholds: check them on your own images.
 
@@ -131,6 +130,12 @@ Code gates, in order:
   edit, `A.step_back(h0, undo)`. No job without `undo=` edits pixels.
 - A take equal to its input (`edited` false) is still billed. Check the mask field and its polarity
   first; if both are right, change the member, not the prompt, and quote again.
+- **After a call raises or times out**, a partial named state may remain. After exit 4 (a modal
+  dialog: ask the user to close it) or a timeout, the job may still finish, so wait before reading
+  History. Then read `A.history()`: if the active state carries the call's `undo`, run
+  `A.step_back(h0, undo)`; the mark brings back the selection it held, so compare `IO.selection()`
+  with the capture's. Never retry on top of a partial state; if History shows anything else, stop
+  and tell the user.
 - Outside the mask: `G.diff(...)["worst"]["max"]` <= 2. On a stack with adjustments above the base,
   compare captured files instead.
 - Texture ratio, halo rims and skin line within Numbers; structure compared between candidates,
@@ -154,7 +159,6 @@ Visual gates:
 | Loose selection                     | subject grows, extra objects at the mask edge    | select only what should change                      |
 | Trusting a silent success           | a transform or resample that did nothing         | a gate or a preview after each new descriptor       |
 | Judging the downscaled preview      | seams and halos found by the client              | 100% crops of every seam and edge                   |
-| Generating again on the same layer  | the earlier take is gone                         | one layer per take; `IO.replace` only on request    |
 | Editing whatever document is active | the edit lands in another file                   | check `app.activeDocument.name` in every job        |
 | Playing a user's Action blind       | it saves, flattens, or merges a smart object     | read its steps; play it on a duplicate              |
 | Reading layer kinds from the DOM    | a shape reads `SOLIDFILL`; Clarity throws        | `ps_audit` (Action Manager `layerKind`)             |
@@ -164,41 +168,37 @@ Visual gates:
 
 Receives any Photoshop brief. Routes it:
 
-| Brief                                                                         | Owner                               |
-| ----------------------------------------------------------------------------- | ----------------------------------- |
-| Remove, replace, recolor or add inside a selection; extend the canvas; angles | scenario-photoshop-generative-edit  |
-| Our trained style (trained model, LoRA) inside a selection                    | scenario-photoshop-generative-edit  |
-| Our trained style as a new layer: game asset, texture, campaign art           | game-art or key-art                 |
-| Upscale for print, restore or colorize an old photo                           | scenario-photoshop-upscale-restore  |
-| Subject into a scene, cut-out edges, split into layers, skin after an edit    | scenario-photoshop-compositing      |
-| Campaign files, live type, sizes per channel, template variants               | scenario-photoshop-key-art          |
-| Design or logo onto a product photo, one export per design                    | scenario-photoshop-mockups          |
-| Seamless textures, sprites, icons, UI, paintover of a 3D render               | scenario-photoshop-game-art         |
-| The same edit over many files; the user's Actions                             | this skill (P10, P11)               |
-| Image to video                                                                | `scenario-video`, outside Photoshop |
+| Brief                                                                         | Owner                                                     |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Remove, replace, recolor or add inside a selection; extend the canvas; angles | scenario-photoshop-generative-edit                        |
+| Our trained style (trained model, LoRA) inside a selection                    | scenario-photoshop-generative-edit                        |
+| Our trained style as a new layer: game asset, texture, campaign art           | scenario-photoshop-game-art or scenario-photoshop-key-art |
+| Upscale for print, restore or colorize an old photo                           | scenario-photoshop-upscale-restore                        |
+| Subject into a scene, cut-out edges, split into layers, skin after an edit    | scenario-photoshop-compositing                            |
+| Campaign files, live type, sizes per channel, template variants               | scenario-photoshop-key-art                                |
+| Design or logo onto a product photo, one export per design                    | scenario-photoshop-mockups                                |
+| Seamless textures, sprites, icons, UI, paintover of a 3D render               | scenario-photoshop-game-art                               |
+| The same edit over many files; the user's Actions                             | this skill (P10, P11)                                     |
+| Layers for parallax or a background plate (animation, learning)               | scenario-photoshop-compositing, stage 9                   |
+| One character across a series of frames (animation, learning)                 | `scenario-consistency`, outside Photoshop                 |
+| Image to video                                                                | `scenario-video`, outside Photoshop                       |
 
 Connection, model choice and quoting go to `scenario`. A brief can chain: a packshot campaign is
 compositing (product into a generated scene), then mockups (label per variant), then key-art (sizes
 and type), then the audit per channel.
 
 **Handoff contract:** the receiving skill gets the document name, the layers made and their History
-state names, the gate numbers, the crops looked at, and the list of what was not verified. Nothing
-is saved over the user's file at any handoff.
+state names, the gate numbers, the crops looked at, and the list of what was not verified.
 
 ## Photoshop 2026 notes
 
 - Measured on 27.11. Read `app.version` every session: descriptors are undocumented and move.
-- 27.2 added Generative Upscale to UXP; 27.6 redesigned Actions and added Layer Cleanup; 27.9
-  changed the UI backend (re-test older code); 27.10 added Prompt to edit; 27.11 Enhance Edge.
-- Photoshop's generative tools have no toolkit call. Adobe documents no script call; a recorded
-  Action may replay one, and a forum reports an undocumented batchPlay descriptor (neither tested
-  here). Adobe's generative AI guidelines may cover automated use: offer these tools to the user as
-  manual steps, and play no Action that holds one. Name features, not models: Adobe's partner lineup
-  changes in point releases.
+- 27.6 redesigned Actions and added Layer Cleanup; 27.9 changed the UI backend (re-test older code);
+  27.10 added Prompt to edit; 27.11 Enhance Edge.
+- Photoshop's generative tools have no toolkit call and no documented script call (traps, section
+  1). Offer them to the user as manual steps, and play no Action that holds one.
 - AppleScript given a file alias fails with error 8800; `ps_run` inlines `$.evalFile`.
 - ExtendScript is ES3, and Java keywords are reserved: `{native: 1}` fails to compile.
-- Layer kinds measured: pixel 1, adjustment 2, text 3, shape 4, solid fill 11. Smart object 5, video
-  6 and group 7 are documented, not re-checked.
 - Free Transform by Action Manager needs `freeTransformCenterState`, or it can change nothing.
 - Image Size accepts any interpolation name silently; `deepUpscale` is likely Preserve Details 2.0,
   not proven. Check the output by its effect.
@@ -227,5 +227,5 @@ Scripts (each docstring lists every call and its return):
   `replace`, `layer_xmp`.
 - [scripts/ps_gates.py](scripts/ps_gates.py): `diff`, `stats`, `texture`, `halo`, `structure`.
 - [scripts/ps_review.py](scripts/ps_review.py): `preview`, `sheet`, `before_after`, `overlay`.
-- [scripts/ps_audit.py](scripts/ps_audit.py): `doc_state`, `layer_find`, `histogram_clip`,
-  `deliverable`.
+- [scripts/ps_audit.py](scripts/ps_audit.py): `doc_state`, `history`, `history_gate`, `step_back`,
+  `layer_find`, `histogram_clip`, `deliverable`.

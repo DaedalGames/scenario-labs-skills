@@ -53,8 +53,8 @@ Grayscale shows no color (Dinda [G5yuLhm0SdM 12:32]).
 ## P1. Prepare the input
 
 Status: `prepare_input` with `ratios` and `max_px` verified live (test 1): 16:9 padding with black,
-the source not shifted inside the padding (worst pixel 2 or less), the cap applied, History
-unchanged. `layer=` and `pad_color` are not tested.
+the source not shifted inside the padding (worst pixel 2 or less), the cap applied, and the active
+History state, pixels and layers as before. `layer=` and `pad_color` are not tested.
 
 ```python
 # Scenario MCP: read the member's schema for its accepted ratios and largest input side
@@ -62,7 +62,8 @@ prep = U.prepare_input(OUT + "/input.png", ratios=["1:1", "4:3", "3:4", "16:9", 
                        max_px=2048)
 json.dump(prep, open(OUT + "/prep.json", "w"))
 print(prep["ratio"], prep["padded"], prep["pad"], prep["scale"], prep["output"])
-assert A.history_gate(h0) == []   # History unchanged: h0's state is still the active one
+assert A.history_gate(h0) == []   # h0's state is still the active one (temporary states may
+                                  # follow it; at the History limit they drop the oldest steps)
 ```
 
 - `ratios=None` exports at the source ratio, with no padding. Use it only when the member accepts
@@ -118,6 +119,30 @@ Reading the numbers:
 - **`detail_vs_base`:** real upscales 0.95 to 1.00, bicubic 0.65, a 2 px blur 0.08. Far under 1
   means the member smoothed the image; over 1 can be new detail or invented detail. Only the crops
   tell which.
+
+## P2b. Cheapest proof first: baseline, then a crop, then the winner
+
+Status: not tested in this order. P2 (two candidates in one stack) and P3 are verified live;
+`build_stack` with no candidates and `place_result` into a stack document are not.
+
+```python
+box = [600, 260, 856, 516]                       # the face, text or texture most likely to fail
+IO.export_region(OUT + "/risk.png", bounds=box)  # on the source, before the stack exists
+st = U.build_stack([], 2)                        # the scripted baseline alone; now the active document
+base = U.crops(OUT + "/base", boxes=[[2 * v for v in box]])   # stack pixels: the box at 2x
+# Look at the baseline crop at 100%. If it holds, deliver it: no paid run.
+# Scenario MCP: two candidates on risk.png, one quote, the user's yes; download both.
+R.sheet(base["files"] + [OUT + "/risk_a.png", OUT + "/risk_b.png"], OUT + "/risk sheet.jpg",
+        labels=["baseline", "<member A>", "<member B>"])
+# The winner only, on the full frame (quoted): prep["path"] as in P1.
+L = U.place_result(OUT + "/up_win.png", "<member A>, 2x scale", prep=prep, base=st["base"])
+print(L["match"])                                # mean under 6 at 256 px
+```
+
+- The crop costs a fraction of the full frame and shows the failure that matters: a face, lettering
+  or a gradient. Pay for the full frame only when the baseline fails at 100% and one candidate beats
+  it there.
+- Each candidate is judged against the baseline's crop of the same area, at the same scale.
 
 ## P3. The crop grid
 
@@ -230,9 +255,10 @@ for t in takes:
 
 ## P8. Auto-Align, kept only on a gain
 
-Status: verified live (restore tests 2 and 3): the drifted copy was fixed and kept as "Drifted,
-aligned" with Background still a Background and no temporary layers left; on the aligned restore the
-align was not kept and the layers were unchanged.
+Status: verified live (restore tests 2 and 3): the drifted copy improved and was kept as "Drifted,
+aligned" (structure 22.7 down to 11.9, 12.8 and 19.2 over three runs) with Background still a
+Background and no temporary layers left; on the aligned restore the align was not kept and the
+layers were unchanged.
 
 ```python
 r = U.align("Restore, take 1", "Background")      # gain=0.9: keep on a 10% drop or more

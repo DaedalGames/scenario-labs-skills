@@ -22,11 +22,15 @@ lead skill, `scenario-photoshop-expert`.
 
 - 7 skills written from 208 transcribed videos (80.8% from 2025 to 2026) and Adobe documentation,
   each with cited references and a Python toolkit.
-- Every toolkit has a live suite run against Photoshop 27.11 on macOS: 97 tests across 12 suites,
+- Every toolkit has a live suite run against Photoshop 27.11 on macOS: 98 tests across 12 suites,
   several on real Scenario outputs (inpaint, upscale, restore, seamless texture repair), one that
-  fills History to its limit. All passed on 2026-10-19: the 55 tests in the seven suites that
-  exercise the latest toolkit changes ran after them; the other 42 exercise toolkits those changes
-  did not touch. Steps no script reaches are listed as GUI paths and marked not tested.
+  fills History to its limit. All passed on 2026-10-19. Last run of each suite, Paris time:
+  composite, mockup, History and generative-edit at 12:17 to 12:21, after the last toolkit change;
+  io 10:49, audit 10:42, upscale 10:50, restore 10:51, retouch and game-art tiling 09:25, gates
+  06:39, key-art 06:36 and game-art export 06:35, each after the last change to the code it runs
+  (since then, the io and gates toolkits changed in docstrings only, and the composite and mockup
+  changes add no DOM constant to the io suite's enum sweep). Steps no script reaches are listed as
+  GUI paths and marked not tested.
 - Blind grading on seven briefs, one per skill: the same model answered with the skills and from
   memory alone, and a separate grader scored the shuffled pairs without knowing which was which.
   With the skills: 102 of 105, six briefs won and one tie. Without: 91. The gain is mostly expert
@@ -36,7 +40,8 @@ lead skill, `scenario-photoshop-expert`.
 ## Requirements
 
 Adobe Photoshop 2026 (27.x) on macOS, Python 3 with Pillow, and the Scenario MCP server for the
-generative steps. The lead skill explains the execution channel: ExtendScript jobs sent through
+generative steps. Placing a vector logo in a mockup needs an SVG renderer, such as librsvg's
+`rsvg-convert`. The lead skill explains the execution channel: ExtendScript jobs sent through
 AppleScript `do javascript`, each wrapped in one named History state, with Photoshop left in the
 background.
 
@@ -62,6 +67,9 @@ The installer puts the skills side by side, which the specialists need: they imp
   domains as the other expert families do. Batch runs and the user's Actions stay in the lead: the
   sources teach them too thinly for a specialist, unlike the five families with an automation or
   pipeline specialist (Blender has none).
+- **One skeleton for the family:** the lead uses the specialists' sections (Stance, Establish first,
+  Workflow, Numbers, gates) rather than the numbered sections of the Maya, Blender and ZBrush leads,
+  so every skill in the family reads the same way.
 - **Toolkits first:** each specialist's script was written and run live before its skill body, so
   the skill teaches calls that work on 27.11. Traps found that way (a layer mask ignored by Load
   Transparency, histograms on hidden channels, warp quirks) are in the lead's

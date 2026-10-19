@@ -77,7 +77,8 @@ transparency, `tif` and 16-bit exports, every GUI path, Windows.
 `sys.path.insert(0, "<this skill>/scripts")`, then `import ps_gameart as GA` (it puts the lead's
 `scripts/` on the path) and `import ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A`. The
 seam repair also imports `ps_generative as GE` from scenario-photoshop-generative-edit. Each call is
-one `ps_run` job. Code: [procedures](references/procedures.md).
+one `ps_run` job; after one raises or times out, recover as the lead's Quality gates say. Code:
+[procedures](references/procedures.md).
 
 **A. Seamless texture with maps**
 
@@ -89,8 +90,9 @@ one `ps_run` job. Code: [procedures](references/procedures.md).
 3. **Repair the seam** when it fails and the texture must stay. `GA.offset()`, `GA.seam_band(width)`
    at about 5% of the side (48 on 1024), `cap = GE.capture(out, polarity=p)`. Scenario: an
    image-edit model with the offset tile as reference and a mask (`scenario-image`), a texture-only
-   prompt, 2 takes. Per take `GE.check`; then `GE.place_edit`, `GE.verify`. GATE: `check` flags
-   pass; `untouched`; `tile_check` passes; the cross read at 100% and the 3x3 preview at fit.
+   prompt, 2 takes, quoted as such: in the shoot-out one of two re-laid the stones. Per take
+   `GE.check`; then `GE.place_edit`, `GE.verify`. GATE: `check` flags pass; `untouched`;
+   `tile_check` passes; the cross read at 100% and the 3x3 preview at fit.
 4. **Re-render instead** when the look may change: a tiling material model at low img2img strength
    (`scenario-textures`), placed as its own layer. GATE: stage 2's gate; the user accepts the look.
 5. **Blotches** (`patch_ok` false): `t["cells"]` locates the dark or bright cell; Dinda paints a
@@ -115,9 +117,10 @@ one `ps_run` job. Code: [procedures](references/procedures.md).
    GATE: every pass the render's size, named.
 2. **Whole-frame pass.** `cap = IO.export_region(out)`; Scenario: an image-edit or trained style
    model with the render as input or reference and a keep-the-layout clause (`scenario-image`), 3 or
-   4 deliberately different takes; `IO.place(take, "Style pass, take 2", bounds=cap["bounds"])`, one
-   layer per take. GATE: take aspect equals the render's; `G.structure("Render", name)` compared
-   across takes; `R.overlay` shows no red or cyan fringe on silhouettes.
+   4 deliberately different takes, quoted as such (different approaches are the point);
+   `IO.place(take, "Style pass, take 2", bounds=cap["bounds"])`, one layer per take. GATE: take
+   aspect equals the render's; `G.structure("Render", name)` compared across takes; `R.overlay`
+   shows no red or cyan fringe on silhouettes.
 3. **One object.** `GA.id_select("ID", [r, g, b], fuzz=40)`, then generative-edit's capture, check,
    place and verify. GATE: `bounds` not None; `partial` only the edge; `untouched`.
 4. **Judge.** `R.sheet` of the takes beside the render (Frederick compares side by side [pAIYEsECSRw
@@ -138,8 +141,8 @@ style batches) goes to `scenario-game-assets`. Photoshop finishes:
 4. **Export** one named layer per asset as an unflattened PNG copy, padded past its shadow; atlases
    are packed in the engine. GATE: size, transparency present, rims checked on the file.
 
-Delivery rules (power of two, packing, sRGB, TGA, alpha, atlases) rest on Unity and Unreal
-documentation and the PNG specification, not on the video corpus ([sources](references/sources.md)).
+Delivery rules (power of two, packing, sRGB, TGA, alpha, atlases) rest on engine documentation and
+the PNG specification ([sources](references/sources.md)).
 
 ## Numbers
 
@@ -205,13 +208,11 @@ Toolkit thresholds are authoring-time: check them on your own images.
 
 ## Photoshop 2026 notes
 
-- Offset by Action Manager (`Ofst`, fill `Wrp `) runs headless; Pattern Preview has no toolkit call,
-  so `tile_preview` writes the repeat as a file.
+- Pattern Preview has no toolkit call, so `tile_preview` writes the repeat as a file.
 - Histograms read visible channels only: an alpha channel's raises an error until it is the only
   active channel.
 - PNG keeps transparency, not alpha channels; TGA at 32 bits with `alphaChannels` keeps a fourth.
 - Color Range on Lab bounds selects one flat ID color with its anti-aliased edge.
-- `export_texture`, `pack_channels` and `tile_preview` flatten a copy: opaque output only.
 - Match Color is grayed out on a smart object; rasterize a copy first [vU-_9R-Tq18 16:06].
 
 ## References

@@ -14,8 +14,8 @@ The picker's lineup changes between releases, so no rule here depends on one mod
 ## The measured round trip (one real Scenario inpaint)
 
 Setup: a 512 px owl photo, an ellipse selection around the left iris, and
-`GE.capture(polarity="alpha")`. A Scenario inpaint member took the context as input and an RGBA mask
-(transparent = edit), and returned 2 outputs at low quality for an ice-blue iris.
+`GE.capture(out_dir, polarity="alpha")`. A Scenario inpaint member took the context as input and an
+RGBA mask (transparent = edit), and returned 2 outputs at low quality for an ice-blue iris.
 
 - **Output size:** 1254 px square for a 222 px input. `check` and `place_edit` fit any size with the
   capture's aspect into the capture box.

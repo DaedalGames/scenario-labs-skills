@@ -29,12 +29,16 @@ tapered bottle, a pouch), and for the hand finish.
 
 ## Colorway by hand
 
+Start from a white or light-gray blank. A dark garment keeps its shallow fold contrast under a
+lighter color and reads flat; with only a dark plate, ask the user for a light blank or make one by
+instruction edit ([procedures.md](procedures.md) P9).
+
 1. Select the garment or product (Select > Subject, minus the print), then Layer > New Fill Layer >
    Solid Color: the selection becomes its mask.
 2. Set the fill layer's blend mode to Color, so folds and highlights stay (WeJustClickme
-   [i-hYHLXDheU 02:10]). Color keeps the garment's lightness: on a white or black garment, add a
-   Curves adjustment layer under the fill, with the same mask, and move the mid-tones to the
-   swatch's lightness, or navy stays pale blue on a white shirt.
+   [i-hYHLXDheU 02:10]). Color keeps the garment's lightness: on a light blank, add a Curves
+   adjustment layer under the fill, with the same mask, and pull the mid-tones down to the swatch's
+   lightness, or navy stays pale blue on a white shirt. Check a deep fold at 100%.
 3. Double-click its thumbnail to pick the next color (Quick Fix Up does it on a background
    [boONV-waIUk 02:47]), set the Curves again, and export each one (File > Export > Quick Export as
    PNG).

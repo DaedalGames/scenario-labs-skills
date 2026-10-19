@@ -2,7 +2,7 @@
 
 Each procedure names the calls it runs and its status. "Verified live" means `test_mockup_live.py`
 runs those calls on Photoshop 27.11 (macOS). Its first class uses a 1000x800 fixture of gray strips
-(luminance 60 to 230) under a printable quad; its second (`MockupFitLive`, tests F1 to F6 below)
+(luminance 60 to 230) under a printable quad; its second (`MockupFitLive`, tests F1 to F7 below)
 uses a white 1000x800 document. "Not tested" means the block was written from the toolkit's code and
 Adobe's documentation but never run as shown. Every call is one ExtendScript job through `ps_run`:
 read the error after each one.
@@ -26,6 +26,7 @@ DOC = "tote_shoot.psd"            # the document the brief names
 
 # History: h0 = A.history() right before a call; A.history_gate(h0, undo) == [] after it, or
 # A.history_gate(h0) == [] after a call that must leave History as it found it. Never the list length.
+# A call that raises or times out: recover as scenario-photoshop-expert's Quality gates say.
 
 def check_doc():
     assert A.doc_state()["name"] == DOC, "another document is active"
@@ -324,27 +325,48 @@ R.sheet([r["out"] for r in res], OUT + "/mockups sheet.jpg",
 
 ## P7b. Colorways
 
-Status: verified live (F6, F7). F6: navy and forest over eight gray strips, clipped to the product
-layer: two PNGs named "<name> colorway.png", each within Delta E 5 of its swatch with folds 0.9 or
-more, hue within 5 degrees, the strips' order of lightness kept, the background and a print above
-unchanged, the document rendering identically afterwards, `A.history_gate(h0) == []`. Color mode
-alone (`match=False`) keeps each strip's luminance within 2 and fails the check. With a selection
-active, a red colorway masked to it: only the selected strips change, and the selection is still
-active afterwards. F7: navy, red and sand on a white and a black shirt with folds, measured
-independently on the delivered PNGs: mid-tone means within Delta E 0.12 to 0.48 of the swatch, folds
-0.998 to 1.0 (the toolkit's own check: 0.11 to 0.46). Color mode alone turns navy on the white shirt
-into (221, 228, 255), Delta E 75.
+Status: verified live (F6, F7) on synthetic fixtures; no product photo was shot for the test. F6:
+navy and forest over eight gray strips, clipped to the product layer: two PNGs named "<name>
+colorway.png", each within Delta E 5 of its swatch with folds 0.9 or more, hue within 5 degrees, the
+strips' order of lightness kept, the background and a print above unchanged, the document rendering
+identically afterwards, `A.history_gate(h0) == []`. Color mode alone (`match=False`) keeps each
+strip's luminance within 2 and fails the check. With a selection active, a red colorway masked to
+it: only the selected strips change, and the selection is still active afterwards. F7: navy, red and
+sand on a white and a black shirt drawn with folds, measured independently on the delivered PNGs:
+mid-tones within Delta E 0.12 to 0.48 of the swatch, folds 0.998 to 1.0 (the toolkit's own check:
+0.11 to 0.46). On the white shirt the folds keep their depth (relative fold contrast 0.23 before,
+0.21 to 0.23 after). On the black shirt, a lighter colorway matches the swatch but keeps the black
+shirt's fold contrast in levels, so it reads flat: relative contrast 0.58 before, 0.41 after navy,
+0.28 after red, 0.11 after sand, all three flagged `flat` (the flag on sand is asserted). Color mode
+alone turns navy on the white shirt into (221, 228, 255), Delta E 75. The same math ran offline on
+two frames from Anders [rrxTM5AZALU]: a white tee kept its relative fold contrast (0.21) for navy,
+red and sand; a black sweatshirt fell from 1.13 to 0.57, 0.39 and 0.14, all flagged `flat`
+([sources.md](sources.md)).
 
 ```python
 check_doc()
+from PIL import Image
+# A swatch lighter than the garment needs a light blank: with only a dark plate, ask the user for a
+# white or light-gray blank, or make one (P9, an instruction edit, quoted). Run this block on it.
 # Select the garment or product without its background (P1's Select Subject, minus the print).
-h0 = A.history()
-colors = {"navy": "#1e3278", "red": (176, 32, 32), "sand": "#e6d2a0"}
-res = M.colorways("Product", colors, OUT + "/colorways")
+h0 = A.history()                      # after the selection, so the mark holds it
+colors = {"navy": "#1e3278", "red": (176, 32, 32), "sand": "#e6d2a0",
+          "brand blue": {"lab": [38, 12, -48]}}     # a Lab spec is checked against its own value
+FOLD = [420, 610, 620, 760]           # a deep fold, document px
+try:
+    res = M.colorways("Product", colors, OUT + "/colorways")
+except RuntimeError:
+    # The lead's recovery (Quality gates): after a timeout, wait before reading History.
+    if A.history()["name"] == "Scenario: Colorway":   # one colorway left half done
+        A.step_back(h0, "Scenario: Colorway")         # back to the mark, selection included
+    raise                                             # rerun only from the mark
 for r in res:
     c = r["check"]                    # mid-tones of the product against the swatch
-    print(r["colorway"], os.path.basename(r["out"]), r["curve"], c["mean"], c["delta_e"], c["folds"])
+    print(r["colorway"], os.path.basename(r["out"]), r["curve"], c["delta_e"], c["folds"],
+          c["spread"], c["contrast"], c["flat"])
     assert c["delta_e"] <= 5 and c["folds"] >= 0.9, (r["colorway"], c)
+    if c["flat"]:                     # show this crop to the user before delivering the colorway
+        Image.open(r["out"]).crop(FOLD).save(OUT + "/fold %s.png" % r["colorway"])
 assert A.history_gate(h0) == []
 R.sheet([r["out"] for r in res], OUT + "/colorways sheet.jpg", labels=list(colors))
 ```
@@ -358,18 +380,32 @@ R.sheet([r["out"] for r in res], OUT + "/colorways sheet.jpg", labels=list(color
   darken in proportion; a lighter swatch lifts it (an offset), its slope lowered so the brightest 1%
   stays at 250 or under. Mid-tones: the mean of the 25th to 75th percentile of the product's
   luminance under the mask. `M.tone_curve(tones, rgb)` returns the points, `None` within 3 levels.
+- Why a light blank: the offset keeps a dark garment's folds at their depth in levels, so against a
+  light swatch they read shallow (relative contrast falls to about mid-tones over swatch). A gain
+  instead clips the highlights and lifts noise out of the black. No curve turns a black blank into a
+  credible light colorway.
 - The check exports the product with only its colorway layers, reads the pixels under the mask at a
-  400 px long side, and returns `mean` (the mid-tones' color), `delta_e` (CIE76 against the swatch;
-  5 or less passes, authoring-time), `folds` (correlation of the luminance before and after; 0.9 or
-  more) and `spread` (fold contrast after over before: below 1 on a darker swatch). Look at the
-  folds on the sheet too.
+  400 px long side, and returns:
+  - `mean`, the mid-tones' color, and `delta_e`: CIE76 against the swatch, or against its Lab value
+    when one is given; 5 or less passes (authoring-time). It reads the same mid-tones the curve
+    targets, so it mainly proves the math and catches gamut clipping. A brand spec usually holds
+    about 2 in Delta E 2000, checked on a print or a calibrated photo, not here.
+  - `folds`: the correlation of the luminance pattern before and after (0.9 or more). 1 means the
+    folds sit in the same places; it is blind to their depth.
+  - `spread`: fold depth in levels, after over before. Below 1 on a darker swatch, about 1 on a
+    lighter one.
+  - `contrast`: fold depth relative to the mid-tones, (p90 - p10) / p50, before and after.
+  - `flat`: true when the swatch's luminance is more than 1.25 times the garment's mid-tones
+    (authoring-time). Then crop a deep fold of the PNG at 100% and show it to the user; on a dark
+    garment, go back to a light blank.
 - `match=False` keeps Color mode alone, for a hue-only change on a mid-tone product; `check=False`
   skips the measurement. Matching and the check need Pillow.
 - With a selection active, the selection is its mask. Without one it is clipped to the product
   layer, which recolors everything on that layer, background included: select the garment first when
   the product layer is the whole photo.
-- Each colorway is one History state, exported from a merged copy, then stepped back, like P7.
-  Designs times colorways is not one call: add the fill layer by hand
+- Each colorway is one History state, exported from a merged copy, then stepped back, like P7. At
+  the History limit the temporary states drop the user's oldest undo steps (the lead's traps,
+  section 5). Designs times colorways is not one call: add the fill layer by hand
   ([gui-paths.md](gui-paths.md)), run P7, then pick the next color (not tested).
 - A colorway that changes the material (heather, wash, another weave): an instruction edit per color
   on the plate (`scenario-product-shots`, quoted first), each result placed with `IO.place` under
@@ -403,6 +439,8 @@ Status: not tested (no Scenario job runs in the suite).
 #   no product photo: scenario-image, a blank product plate on a plain backdrop, or a lifestyle
 #     scene, straight-on to the printable face (a flat face is easier to fit)
 #   a real product to restage or relight: scenario-product-shots
+#   light colorways wanted and only a dark garment: scenario-product-shots, an instruction edit to
+#     a white or light-gray blank, same folds, light and framing; it becomes the product layer (P7b)
 #   a new design: scenario-image at the print size's ratio; a seamless repeat: scenario-textures
 #   a raster logo: scenario-image-editing (vectorize, recommend with the user's words)
 #     or scenario-brand-kit: trace an existing mark to editable SVG, do not regenerate it

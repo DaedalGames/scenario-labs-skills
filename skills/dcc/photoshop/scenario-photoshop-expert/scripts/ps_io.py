@@ -27,8 +27,10 @@ Shell:
   python3 ps_io.py selection | export OUT.png [--pad N] [--punch] | mask OUT.png [--pad N]
   python3 ps_io.py place FILE NAME [--bounds l,t,r,b] [--fit exact|contain|cover] [--mask]
 
-Read-only captures leave the document as they found it: the mask capture stores the selection in
-a temporary channel, then steps History back to the state it started from.
+Read-only captures leave pixels, layers and the active History state as they found them: the mask
+capture stores the selection in a temporary channel, then steps History back to the state it
+started from. Those temporary states still count: at the History limit each one drops one of the
+user's oldest undo steps.
 """
 
 import json

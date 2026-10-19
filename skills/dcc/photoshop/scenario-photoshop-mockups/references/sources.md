@@ -51,6 +51,12 @@ tested.
   object with Smart Filters. Fixtures: a 1000x800 document with 40 px gray strips, a white 1000x800
   document, and two 360x480 shirts with folds made with Pillow. Results in
   [expert-notes.md](expert-notes.md).
+- **Colorway math offline**, 2026-10-19: the toolkit's own `garment_tones`, `tone_curve` and
+  `swatch_check` plus Photoshop's Color blend, on a white tee and a black sweatshirt cut from frames
+  of Anders [rrxTM5AZALU]. No Photoshop and no product photo shot for the test. Relative fold
+  contrast, (p90 - p10) / p50: the white tee 0.21 before and after navy, red and sand; the black
+  sweatshirt 1.13 before, then 0.57 (navy), 0.39 (red), 0.14 (sand), all flagged `flat`. Delta E
+  0.04 to 0.09 and folds 0.998 to 1.0 for all six.
 - **One visual check** on a generated tote photo, 2026-10-19: a design flat, then lit, then
   displaced, judged on the whole frame and on a zoomed crop of the creases.
 - **Platform checks on 27.11:** the custom warp descriptor, the scale-up rule for custom warps,

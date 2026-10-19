@@ -23,6 +23,7 @@ OUT = "/path/to/a/work/folder"    # never the folder of the user's PSD
 
 # History: h0 = A.history() right before a call; A.history_gate(h0, undo) == [] after it (one new
 # state, named); A.step_back(h0, undo) to undo a trial. Never the list length or a bare index.
+# A call that raises or times out: recover as scenario-photoshop-expert's Quality gates say.
 
 def dist(a, b):
     return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
@@ -55,7 +56,7 @@ Status: `IO.place` verified live (`test_mockup_live.py`, `test_keyart_live.py`,
 #   element -> scenario-product-shots or scenario-image, lit from the same side as the plate
 #   cutout  -> scenario-image-editing: background removal returns a PNG with transparency
 L = IO.place(OUT + "/bottle_cut.png", EL, bounds=[820, 560, 1180, 1300], fit="contain",
-             xmp={"model": "<model id>", "asset": "<asset id>", "prompt": "<prompt>"})
+             xmp={"modelId": "<model id>", "assetId": "<asset id>", "prompt": "<prompt>"})
 R.preview(OUT + "/p1_canvas.png")   # scale against the plate, horizon, camera height
 ```
 
@@ -69,6 +70,22 @@ Status: verified live (`test_7_subject_mask`, on a photo of an owl). Not tested 
 ```python
 C.subject_mask(EL)       # Select Subject on that layer alone, as its layer mask; one History state
 # Refuses when the layer already has a mask. Hair: Select and Mask by the user (gui-paths.md).
+```
+
+Segmentation by a Scenario model (not tested). `scenario-image` (step 4) finds segmentation models
+through `recommend` with `capability="img2img"` and the need in words; they take a short noun phrase
+or a box and return one mask per object. Quote, then the user's yes.
+
+```python
+full = [0, 0, canvas[0], canvas[1]]
+IO.export_region(OUT + "/el.png", bounds=full, layer=EL)     # upload this file as the input
+# Scenario: the segmentation run on "the bottle"; download its mask as OUT + "/mask.png".
+from PIL import Image
+im = Image.open(OUT + "/el.png").convert("RGBA")
+m = Image.open(OUT + "/mask.png").convert("L").resize(im.size)  # white = object; check the schema
+im.putalpha(m)
+im.save(OUT + "/el_cut.png")
+IO.place(OUT + "/el_cut.png", EL + ", cut", bounds=full, fit="exact")   # then hide the original
 ```
 
 ## P3. Cutout by channel and Blend If, frozen in a smart object
@@ -105,10 +122,13 @@ third). The three-background preview is not tested.
 ```python
 h = G.halo(EL)                                  # light_rim, dark_rim over a 2 px band
 if max(h["light_rim"], h["dark_rim"]) > 8:
+    h0 = A.history()
     r = C.fix_halo(EL, px=1)                    # Minimum, roundness, on the mask; mask made from
     print(r["before"], r["after"])              # transparency when the layer has none
-    # Still above 8: step back that state, then px=2, then 3. Each call erodes the current mask, so
-    # passes left in place add up (1 then 2 is 3 px). Past 3 px the subject thins: fix the mask by hand.
+    assert A.history_gate(h0, "Scenario: Clean edge") == []
+    # Still above 8: A.step_back(h0, "Scenario: Clean edge"), then px=2, then 3. Each call erodes the
+    # current mask, so passes left in place add up (1 then 2 is 3 px). Past 3 px the subject thins:
+    # fix the mask by hand.
 
 BACKDROP = r"""
 var d = app.activeDocument, e = d.layers.getByName(%NAME%);
@@ -195,17 +215,21 @@ Curves by eye; White fixes too-dark variations that way.
 ## P8. Grain
 
 Status: verified live (`test_4_grain`: texture energy more than doubled and ended within 50% of the
-scene's).
+scene's; `test_4c`: a second element got its own layer, the first element's grain pixels unchanged,
+and a name clipped to another element raised). The patch call is the same call on another layer.
 
 ```python
-g = C.match_grain(EL)                            # clipped Overlay noise, "Grain match"
+g = C.match_grain(EL)              # clipped Overlay noise in "Grain match: Bottle", one per element
 if "action" not in g:
     assert abs(g["end"] - g["target"]) <= 0.5 * g["target"], g
 R.preview(OUT + "/p8_100.png", crop=box, max_px=0)  # then a 200% look at the edge
+PATCH = "Generative edit, sand"                  # a generated patch inside the plate
+g2 = C.match_grain(PATCH)                        # its own layer, "Grain match: Generative edit, sand"
 ```
 
-A generated patch inside the plate (a fill, a removed object) gets the same call with the patch's
-layer name. Never add grain to the whole frame to hide one smooth patch.
+Each element or patch gets its own grain layer, named `"Grain match: " + layer` unless `name=` says
+otherwise. A rerun on the same element reuses its layer. A layer of that name clipped to another
+element raises: pass another `name=`. Never add grain to the whole frame to hide one smooth patch.
 
 ## P9. Skin after a generative edit
 
@@ -313,7 +337,7 @@ Status: not tested.
 pieces = [("Sky", OUT + "/l0.png"), ("Castle", OUT + "/l1.png"), ("Hero", OUT + "/l2.png")]
 for name, path in pieces:                        # bottom first, so the last lands on top
     IO.place(path, name, bounds=[0, 0, canvas[0], canvas[1]], fit="exact",
-             xmp={"model": "<model id>", "asset": "<asset id>"})
+             xmp={"modelId": "<model id>", "assetId": "<asset id>"})
 GROUP = r"""
 var d = app.activeDocument, g = d.layerSets.add(); g.name = "Split layers";
 var names = %NAMES%;

@@ -33,10 +33,11 @@ to create production-ready content with [Scenario](https://scenario.com) through
 assets, and custom-trained models, for games, entertainment, and any creative vertical.
 
 The expert tools at the bottom of the list work differently: teams of skills that drive DCC (digital
-content creation) software and game engines installed on your machine (ZBrush, Blender, Maya, Unreal
-Engine, Unity, Godot), distilled from expert tutorials, conference talks, and official
-documentation. They need the application, not the Scenario MCP server, and each family folder's
-README records how it was built and how far it was verified.
+content creation) software and game engines installed on your machine (ZBrush, Blender, Maya,
+Photoshop, Unreal Engine, Unity, Godot), distilled from expert tutorials, conference talks, and
+official documentation. Most need only the application; the Photoshop family also uses the Scenario
+MCP server for its generative steps. Each family folder's README records how it was built and how
+far it was verified.
 
 Skills follow the [Agent Skills](https://agentskills.io) format.
 
