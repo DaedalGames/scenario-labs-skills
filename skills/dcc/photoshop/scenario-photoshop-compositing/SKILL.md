@@ -1,6 +1,6 @@
 ---
 name: scenario-photoshop-compositing
-description: "Use when placing a person, product or generated element into a new scene in Photoshop, or when a composite looks pasted on: hard, white or dark fringed cutout edges, hair, trees or sky to separate, Blend If or a channel mask, missing contact or cast shadows, light from the wrong side, a color cast or brightness that does not match, a generated patch smoother than the photo, Harmonize or a relight that changed the subject, or a flat image to split into editable layers. Also when skin looks plastic, waxy or smoothed after a generative edit or upscale, a face or eyes changed, skin turned orange, magenta or green, or a portrait needs frequency separation, dodge and burn or a High Pass smoother."
+description: "Use when placing a person, product or generated element into a new scene in Photoshop, or when a composite looks pasted on: hard, white or dark fringed cutout edges, hair, trees or sky to separate, Blend If or a channel mask, missing contact or cast shadows, light from the wrong side, a color cast or brightness that does not match, a generated patch smoother than the photo, Harmonize or a relight that changed the subject, or a flat image to split into editable layers. Also when skin on a generated, edited or upscaled face looks plastic, waxy or smoothed, a face or eyes changed after an edit, or generated skin turned orange, magenta or green and needs frequency separation, dodge and burn or a High Pass smoother."
 license: MIT
 ---
 
@@ -20,7 +20,7 @@ flag the gap.
 
 **Status (2026-10-19):** every call in [`scripts/ps_composite.py`](scripts/ps_composite.py)
 (`subject_mask`, `channel_pick`, `blend_if`, `fix_halo`, `shadows`, `match_tone`, `match_grain`) is
-verified live on Photoshop 27.11 (macOS) by `test_composite_live.py` (7 tests on a sample photo and
+verified live on Photoshop 27.11 (macOS) by `test_composite_live.py` (8 tests on a sample photo and
 a fringed disc). [`scripts/ps_retouch.py`](scripts/ps_retouch.py) is verified by
 `test_retouch_live.py` (frequency separation at 8 and 16 bits, radius pick, smoother, dodge and
 burn); `skin_tone` wraps the skin-line gate, verified on a flat patch. Not tested: a real portrait,
@@ -31,8 +31,9 @@ hair through `subject_mask`, Harmonize, any Scenario step, layer-split placement
 - **Harmonize and relighting regenerate the subject; keep the original under the result.** Harmonize
   generated the whole layer and masked what changed, at 1024 px in 2025 (Smith [dWiOA5YZXwc 03:19]);
   a hat lost detail at 200% (Smith [dWiOA5YZXwc 05:05]). New textures, edges and hair appear between
-  variations (Kloskowski [JGbvUOytwX0 02:46]). Scenario image-edit models measured the same: mean
-  difference 17 to 18 outside the edit. Mask the original back over faces, logos and fine edges.
+  variations (Kloskowski [JGbvUOytwX0 02:46]). One Scenario image-edit job, two takes, measured the
+  same: mean difference 17 to 18 outside the edit. Mask the original back over faces, logos and fine
+  edges.
 - **Take the light, control the color.** Smith sets a copy of the harmonized layer to Luminosity,
   which keeps the original color, then brings the full result back only partway (Smith [C2lo7ew8lHY
   06:33, 07:06]). When every variation is too dark, a clipped Levels layer fixes it, shadow included
@@ -130,24 +131,24 @@ lead's `scripts/` on the path; then
 
 ## Numbers
 
-| Value                                                  | Relative to                    | Source                           |
-| ------------------------------------------------------ | ------------------------------ | -------------------------------- |
-| Halo rim 8 or less                                     | `G.halo`, 2 px band            | authoring-time (lead gate)       |
-| Texture ratio at least 0.6                             | after over before, same region | authoring-time                   |
-| Skin line 123 degrees, within 10                       | vectorscope hue angle          | Kost [Aj_xqQI3gs0 07:24]         |
-| Frequency separation verify: max 2 or less             | 8-bit; 0 to 1 at 16-bit        | measured live                    |
-| Radius default: short side / 600, 2 to 12 px           | document pixels                | toolkit; always look             |
-| Radius pick: 25% of fine detail left                   | `suggest_radius` energy curve  | toolkit                          |
-| Around 10 px blur for a close portrait                 | one image                      | Williams [l2h3J0VDqDE 03:17]     |
-| Smoother: High Pass short side / 100 (min 8), blur / 8 | document pixels                | toolkit; Geller 40 then 5 px     |
-| Tone-layer brush flow 25%, built up                    | retouch layer in Lighten       | Ramirez [REt264jFvqE 07:07]      |
-| Cast shadow: 35% height, blur 3%, opacity 45           | element height                 | toolkit defaults                 |
-| Contact shadow: blur 0.8%, opacity 80                  | element height                 | toolkit defaults                 |
-| Tone match strength 0.5; ring 40 px past a 4 px gap    | element alpha                  | toolkit defaults                 |
-| Grain tries: amount 1.5, 3, 5, 8, 12; Gaussian, mono   | Overlay 50% gray               | toolkit                          |
-| Harmonization filter strength: 75 too strong, 50 used  | the older Neural Filter        | Gress [aawE1ZFxl78 14:39]        |
-| Harmonize: 3 variations, 5 credits each                | one generation                 | Smith [dWiOA5YZXwc 02:09]; Adobe |
-| Re-render outside an edit: mean 17 to 18               | aligned result vs source       | measured, Scenario models        |
+| Value                                                  | Relative to                    | Source                                                              |
+| ------------------------------------------------------ | ------------------------------ | ------------------------------------------------------------------- |
+| Halo rim 8 or less                                     | `G.halo`, 2 px band            | authoring-time (lead gate)                                          |
+| Texture ratio at least 0.6                             | after over before, same region | authoring-time                                                      |
+| Skin line 123 degrees, within 10                       | vectorscope hue angle          | Kost (123) [Aj_xqQI3gs0 07:24]; toolkit, authoring-time (within 10) |
+| Frequency separation verify: max 2 or less             | 8-bit; 0 to 1 at 16-bit        | measured live                                                       |
+| Radius default: short side / 600, 2 to 12 px           | document pixels                | toolkit; always look                                                |
+| Radius pick: 25% of fine detail left                   | `suggest_radius` energy curve  | toolkit                                                             |
+| Around 10 px blur for a close portrait                 | one image                      | Williams [l2h3J0VDqDE 03:17]                                        |
+| Smoother: High Pass short side / 100 (min 8), blur / 8 | document pixels                | toolkit; Geller 40 then 5 px                                        |
+| Tone-layer brush flow 25%, built up                    | retouch layer in Lighten       | Ramirez [REt264jFvqE 07:07]                                         |
+| Cast shadow: 35% height, blur 3%, opacity 45           | element height                 | toolkit defaults                                                    |
+| Contact shadow: blur 0.8%, opacity 80                  | element height                 | toolkit defaults                                                    |
+| Tone match strength 0.5; ring 40 px past a 4 px gap    | element alpha                  | toolkit defaults                                                    |
+| Grain tries: amount 1.5, 3, 5, 8, 12; Gaussian, mono   | Overlay 50% gray               | toolkit                                                             |
+| Harmonization filter strength: 75 too strong, 50 used  | the older Neural Filter        | Gress [aawE1ZFxl78 14:39]                                           |
+| Harmonize: 3 variations, 5 credits per generation      | one generation                 | Smith [dWiOA5YZXwc 02:09]; Adobe                                    |
+| Re-render outside an edit: mean 17 to 18               | aligned result vs source       | measured, one job, two takes                                        |
 
 Toolkit thresholds are authoring-time: check them on your own images.
 
@@ -192,8 +193,9 @@ Toolkit thresholds are authoring-time: check them on your own images.
 
 ## Photoshop 2026 notes
 
-- Harmonize needs a pixel layer, not a smart object, costs 5 generative credits per generation, and
-  has no script call: the user runs it ([gui-paths](references/gui-paths.md), not tested).
+- Harmonize is run on a pixel layer here (on a smart object it is not tested), costs 5 generative
+  credits per generation, and has no script call: the user runs it
+  ([gui-paths](references/gui-paths.md), not tested).
 - Blend If set through `blendRange` works, but `executeActionGet` never reports it: test by effect.
   A layer inserted inside a clipping chain releases the whole chain; the toolkit adds above the top.
 - Curves made with points are refused: make the default, then set. Adjustment layers are born with a

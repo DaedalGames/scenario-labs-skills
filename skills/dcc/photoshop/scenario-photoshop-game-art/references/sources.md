@@ -52,11 +52,12 @@ as fact in this skill. Godot's import documentation was not checked.
 
 ## Measured
 
-- **`test_gameart_live.py`** (14 tests, Photoshop 27.11, macOS, 2026-10-19): tile check on two real
+- **`test_gameart_live.py`** (15 tests, Photoshop 27.11, macOS, 2026-10-19): tile check on two real
   Scenario textures (a tiling material model's output and a texture model's output with no tiling
   control), the second one seam-repaired, under a light falloff and mirrored; offset and seam band;
-  gray data export; power-of-two resize; channel pack with alpha to TGA and PNG refused; 9-slice
-  check on flat, gradient and detailed frames; ID-color selection. Tiled previews read by eye.
+  gray data export; power-of-two resize; channel pack with alpha to TGA and PNG refused; exports
+  into a folder that does not exist yet; 9-slice check on flat, gradient and detailed frames;
+  ID-color selection. Tiled previews read by eye.
 - **Seam repair shoot-out** (real Scenario jobs on the plain texture, offset by half, 2026-10-19):
   four routes, results in [expert-notes.md](expert-notes.md). The kept take is the live suite's
   repaired fixture.

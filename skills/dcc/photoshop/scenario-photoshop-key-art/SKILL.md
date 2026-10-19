@@ -18,10 +18,10 @@ flag the gap.
 
 **Status (2026-10-19):** in [`scripts/ps_keyart.py`](scripts/ps_keyart.py), `new_canvas`,
 `type_layers` (fit, alignments, missing font), `check` and `export_under` are verified live on
-Photoshop 27.11 (macOS) by `test_keyart_live.py` (5 tests on a YouTube thumbnail, previews checked
-by eye). `cover_bounds` is tested offline only. Not tested: a cover plate past the canvas, layer
-styles on type, the contrast estimate, variant loops, Variables and Data Sets, the `social` profile,
-a paid plate, Windows.
+Photoshop 27.11 (macOS) by `test_keyart_live.py` (6 tests on a YouTube thumbnail, previews checked
+by eye, a canvas holding a Clarity layer included). `cover_bounds` is tested offline only. Not
+tested: a cover plate past the canvas, layer styles on type, the contrast estimate, variant loops,
+Variables and Data Sets, the `social` profile, a paid plate, Windows.
 
 ## Stance (the expert delta)
 
@@ -200,13 +200,16 @@ Visual gates:
   resolution.
 - ExtendScript groups chained ternaries from the left: a left alignment came out right. Use if/else
   in your own jobs.
-- Artboards are read-only in the scripting DOM; one document per channel replaces them.
+- The DOM has no artboard API; artboards by Action Manager are not tested here. One document per
+  channel replaces them.
 - Photoshop's Generate Image has no toolkit call (a recorded Action may replay it, not tested);
   scripted plates come from Scenario.
 - A text layer scaled with Free Transform may report its size before the scale (not tested here):
   change sizes through `type_layers`.
 - `export_under` saves a flattened duplicate through `psr_export`: JPEG quality 0 to 12; PNG skips
   the cap search.
+- A Clarity layer makes the DOM's `layer.kind` throw "Internal error": `check` reads the layer kind
+  through Action Manager, and so should your own jobs.
 
 ## References
 

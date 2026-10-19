@@ -23,10 +23,12 @@ Library:
   GE.place_edit(cap, result_path, name, feather=2, xmp=None)
       # the result as an embedded smart object on the capture box, with a layer mask built from
       # mask_edit.png (so a selection lost meanwhile does not matter), feathered, one History
-      # state. Returns {"id", "name", "bounds"}.
+      # state. A layer that lands inside a hidden group moves above it ("moved_out_of": its
+      # name). Returns {"id", "name", "bounds", "moved_out_of"}.
   GE.verify(cap, feather=2)
       # exports the composite at the capture box again and compares it with context.png:
-      # "untouched" is true when the max difference outside the mask (past the feather) is <= 2.
+      # "untouched" is true when the max difference outside the mask (past the feather) is <= 2;
+      # "edited" is true when the composite inside the mask changed (mean >= 3).
   GE.expand(out_dir, left=0, top=0, right=0, bottom=0, overlap=32, max_px=None)
       # Canvas Size by those pixels (one History state), then a capture of the whole canvas with
       # the new area plus an overlap band as the edit area; original.png holds the old canvas
@@ -238,6 +240,11 @@ var pd = new ActionDescriptor(); pd.putPath(pg_c("null"), new File(ARGS.path));
 pd.putEnumerated(pg_c("FTcs"), pg_c("QCSt"), pg_c("Qcsa"));
 executeAction(pg_c("Plc "), pd, DialogModes.NO);
 var L = d.activeLayer;
+// Place lands above the active layer, inside its group. A hidden group would hide the edit while
+// verify still passes, so the layer moves above the outermost hidden group.
+var moved = null, hid = null;
+for (var p = L.parent; p && p.typename === "LayerSet"; p = p.parent) if (!p.visible) hid = p;
+if (hid) { moved = hid.name; L.move(hid, ElementPlacement.PLACEBEFORE); d.activeLayer = L; }
 function box() {
   var r = new ActionReference(); r.putIdentifier(pg_c("Lyr "), L.id);
   var t = executeActionGet(r).getObjectValue(pg_s("smartObjectMore")).getList(pg_s("transform"));
@@ -260,7 +267,8 @@ ch.remove();
 d.activeChannels = d.componentChannels;
 if (ARGS.xmp) L.xmpMetadata.rawData = ARGS.xmp;
 c = box();
-return {id: L.id, name: L.name, bounds: [Math.round(c[0]), Math.round(c[1]), Math.round(c[2]), Math.round(c[3])]};
+return {id: L.id, name: L.name, bounds: [Math.round(c[0]), Math.round(c[1]), Math.round(c[2]), Math.round(c[3])],
+        moved_out_of: moved};
 """
 
 EXPAND_JS = r"""
@@ -378,8 +386,10 @@ def verify(cap, feather=2):
                              max_px=cap.get("max_px"))
     gap = int(round(feather * 2)) + 2
     r = _diff_files(cap["context"], after["path"], cap["mask_edit"], gap)
-    out = r.get("outside")
+    out, inside = r.get("outside"), r.get("inside")
     r["untouched"] = bool(out is None or out["max"] <= 2)
+    # A take that landed hidden (or under an opaque layer) leaves the composite as it was.
+    r["edited"] = bool(inside and inside["mean"] >= EDITED_MEAN)
     r["after"] = after["path"]
     return r
 

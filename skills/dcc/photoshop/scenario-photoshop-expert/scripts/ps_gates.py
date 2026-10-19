@@ -28,7 +28,8 @@ mask included), {"alpha": layer, "contract": px} (an inner core), {"alpha": laye
 Reading the numbers (authoring-time thresholds, check them on your own images):
   diff:     max <= 2 means identical up to rounding; outside-mask edits should stay there.
   stats:    hue_angle is the mean color's angle on a UV vectorscope; the skin-tone line sits near
-            123 degrees, so skin_line_delta within about +-10 reads as natural skin.
+            123 degrees, so skin_line_delta (-180 to 180; negative toward red, magenta and blue,
+            positive toward yellow, green and cyan) within about +-10 reads as natural skin.
   texture:  compare before and after: a ratio under about 0.6 on skin means texture was lost.
   halo:     light_rim > 8 means a bright fringe shows on dark backgrounds; dark_rim > 8 means a dark
             fringe shows on light ones.
@@ -260,7 +261,8 @@ try {
   var u = 0.492 * (m[2] - y), v = 0.877 * (m[0] - y);
   var ang = Math.atan2(v, u) * 180 / Math.PI; if (ang < 0) ang += 360;
   out.hue_angle = Math.round(ang * 10) / 10;
-  out.skin_line_delta = Math.round((ang - 123) * 10) / 10;
+  var dl = ang - 123; if (dl >= 180) dl -= 360;   // -180 to 180: minus toward red, magenta, blue
+  out.skin_line_delta = Math.round(dl * 10) / 10;
   out.chroma = Math.round(Math.sqrt(u * u + v * v) * 10) / 10;
   var mx = Math.max(m[0], m[1], m[2]), mn = Math.min(m[0], m[1], m[2]);
   out.saturation = mx > 0 ? Math.round(100 * (mx - mn) / mx) : 0;

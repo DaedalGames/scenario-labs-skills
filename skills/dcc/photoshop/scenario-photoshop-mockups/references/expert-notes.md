@@ -16,15 +16,30 @@ No rule here depends on one model: Photoshop's picker and the Scenario catalog b
 
 Setup: a 1000x800 document with one "product" layer of 40 px vertical gray strips (luminance 60 to
 230), a quad `[[300,200],[700,240],[690,600],[310,560]]`, and flat or two-color designs made with
-Pillow. Eight tests, all passing on macOS, plus one visual check of a flat, lit and displaced design
-on a generated tote photo.
+Pillow; a second white 1000x800 document for the fits, the cylinder and the colorways. Fourteen
+tests, all passing on macOS, plus one visual check of a flat, lit and displaced design on a
+generated tote photo.
 
 - **Fit.** `placeholder` lands every corner within 1 px of the quad, and `fit_check` stays under 0.5
   px. The rendered red was checked 5 px inside and 5 px outside each corner. A re-fit onto a second
   quad resets the warp first and passes the same thresholds.
+- **Print size.** `placeholder(size=[800, 500])` on a quad whose box is 400x400 lands every corner
+  within 1 px, then re-fits onto three more quads (one mirrored, one smaller) within 2.5 px
+  rendered. A 1600x500 design with a dark band in its middle eighth comes back, after a `cover`
+  replace, with the band from 0.375 to 0.625 of the face width: the 800x500 proportions held.
 - **Placed results.** A result placed with `IO.place(..., fit="contain")` is a smart object placed
-  from a file. Its warp is stored in content pixels, so a scripted warp lands about 10 px off at the
-  top-left. `fit_quad` wraps it once (`wrapped` true) and then passes the thresholds.
+  from a file. `fit_quad` lands it within the thresholds and returns its new `id`.
+- **Margins, clipping, selection.** A placed PNG with transparent margins keeps them through two
+  fits (inner corners within 3.5 px rendered); a layer clipped above it stays clipped; an active
+  selection is the same after the fit.
+- **Cylinder.** `fit_cylinder(quad, 24, top_bulge=12, angle=120)` on an 800x400 checkerboard:
+  corners within 2 px rendered, the bottom edge's middle 24 px below its corners and the top's 12
+  px, column widths 46, 60, 70, 74 from the side to the middle (0.61 of the middle at the edge, as
+  sin over a 120 degree arc predicts).
+- **Smart Filters.** A fit on a smart object with a Smart Filter is refused before any change.
+- **Colorways.** Navy and forest on eight gray strips: luminance within 2 of each strip, hue within
+  5 degrees of the swatch, the background and the print above unchanged, the document rendering
+  identically afterwards. With a selection, only the selected strips change.
 - **Replace.** A design swapped in moves no corner by more than 0.5 px; the content size does not
   change; Fill returns to 100; a left/right two-color design keeps its sides (no transposition).
 - **Lighting.** Under a flat gray design, the composite got darker by more than 15 over a dark strip
@@ -43,14 +58,29 @@ on a generated tote photo.
 
 - **Custom warp.** Without `freeTransformCenterState` on the transform, a custom warp records
   nothing and changes nothing, with no error. It also needs `bounds` equal to the current box, 16
-  mesh points (a 4 by 4 Bezier net in document pixels), and the box already moved onto the quad's
+  mesh points (a 4 by 4 Bezier net in document pixels), and the box already moved onto the mesh's
   bounding box. A box far from the quad renders garbage or nothing.
+- **Scale up, never down.** A custom warp lands on its points only when the smart object is scaled
+  up from the box it was converted at. At that box or below, corners drift by up to 60 px, more as
+  the quad's corners leave its bounding box. Each fit therefore wraps the object at 97% of the
+  target's box (Convert to Smart Object), then scales it onto the box and warps.
 - **Perspective.** The toolkit samples the perspective mapping of the unit square onto the quad at
   thirds for the 16 points. Corners land on the requested pixels.
-- **Re-fit.** A new warp is read through the current box and replaces the stored mesh, so a re-fit
-  starts with `warpNone`.
-- **Self-check.** After a good fit, `nonAffineTransform` equals the quad's bounding box. A displaced
+- **Cylinder mesh.** The 16 points are Bezier control points, not samples. Across the label, x
+  follows sin(theta) through a cubic Hermite whose inner controls sit 2a cos(a) / (3 sin(a))
+  half-widths in from each side (a = half the arc). The top and bottom rows bow with controls at 4/3
+  of the requested bulge, so each edge's middle lands exactly at it.
+- **Re-fit.** `warpNone` can leave a transform the next fit rejects ("Numeric value expected"). A
+  re-fit first applies a flat (identity) custom warp, which resets cleanly.
+- **Wrapping.** Convert to Smart Object keeps only the opaque box: the toolkit adds a hidden frame
+  layer the size of the box in a group first, so margins survive. Moving the layer into that group
+  releases its clipping chain, and the conversion drops an active selection: both are put back.
+- **Self-check.** After a good fit, `nonAffineTransform` equals the mesh's bounding box. A displaced
   corner shows there without reading pixels.
+- **Print size.** Each fit replaces the object, so the print size rides in the layer's XMP
+  (`scenario:printSize`) and `replace_design` reads it back.
+- **Color mode.** The DOM constant for the Color blend mode is `BlendMode.COLORBLEND`;
+  `BlendMode.COLOR` throws "Invalid enumeration value".
 - **Replace Contents.** The new contents inherit the layer's transform: after a 50% scale, a 300x200
   replacement shows at 150x100, same center. The layer is renamed after the file.
 - **Displace.** The Smart Filter keeps only the map's path and re-reads it on every re-render. Once
@@ -245,7 +275,8 @@ Tests an agent driving Adobe tools; no Photoshop document is built by hand.
 - **Preset, mesh or corners.** Cylinder and Arc Lower presets (Design Master [C3ZkcqB36xw 00:38];
   Hastie [70L2ngS8raY 03:21]), a 4 by 4 mesh (Geller [0l2Ma_2B-A8 03:45]), or Distort on four points
   (Mockup Art [SKYL0FCOO04 05:31]). Decider: a flat face takes four corners (`fit_quad`); a regular
-  cylinder takes a preset; a crushed or irregular surface takes the mesh.
+  cylinder takes `fit_cylinder`, or the preset by hand; a crushed, tapered or irregular surface
+  takes the mesh by hand.
 - **Displace or Liquify.** Dinda rejects Displace for an all-over pattern (Dinda [Z168F2BlAdA
   07:09]) and keeps it for a print's bumps (Dinda [sy1w5mTif-E 04:52]). Decider: a print on a face
   takes Displace; an all-over pattern across deep folds takes warp splits and Liquify by hand.
@@ -260,6 +291,10 @@ Tests an agent driving Adobe tools; no Photoshop document is built by hand.
   09:28]), a Camera Raw copy in Screen (Quick Fix Up [boONV-waIUk 03:21]), or several copies (Mockup
   Art [SKYL0FCOO04 15:12]). Decider: whatever reads the product, never the design (Dinda
   [sy1w5mTif-E 09:11]).
+- **Colorway: Photoshop or a model.** Builders recolor a background or a product with a Solid Color
+  layer they can re-pick later (Quick Fix Up [boONV-waIUk 02:47]). Decider: a dye or a flat color
+  stays a Solid Color layer in Color mode (`colorways`); a change of material (heather, wash, a
+  different weave) is an instruction edit per color on the plate.
 - **Logo cutout.** A channel for a large flat logo (Williams [tNrV1XdZX0o 00:31]); a vector for
   print (Hastie [70L2ngS8raY 02:47]). Decider: a small, blurry or photographed logo needs a vector
   trace.

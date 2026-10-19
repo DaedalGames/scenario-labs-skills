@@ -35,7 +35,7 @@ the method may differ.
 
 To compare it with Scenario candidates, drag its generated layer into the stack document from
 `build_stack`, Shift held, and name it "<model>, 2x scale". Its "Original" layer is not the
-baseline: the stack already has a Preserve Details 2.0 one.
+baseline: the stack already has a scripted one (likely Preserve Details 2.0).
 
 ## Bringing a result back into the master
 

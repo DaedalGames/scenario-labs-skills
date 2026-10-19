@@ -18,8 +18,10 @@ Library (each call is one ps_run job):
       # place a file as an embedded smart object, resize it into bounds ("exact" stretches,
       # "contain" fits inside, "cover" fills and overflows), optionally add a layer mask from
       # the current selection, write provenance XMP, all as ONE history state named `undo`.
-      # Returns {"id", "name", "bounds"}.
-  IO.replace(layer_name, path, undo="Scenario: Replace")   # new contents, same placed box
+      # An active selection is still active afterwards. Returns {"id", "name", "bounds",
+      # "masked", "selection_kept", "kind"}.
+  IO.replace(layer_name, path, undo="Scenario: Replace")
+      # new contents; the placed box stays only when the file has the old contents' pixel size
   IO.layer_xmp(layer_name)                       # the layer's provenance dict, or {}
 Shell:
   python3 ps_io.py selection | export OUT.png [--pad N] [--punch] | mask OUT.png [--pad N]
@@ -162,12 +164,17 @@ var doc = app.activeDocument, path = %PATH%, name = %NAME%, given = %BOUNDS%, fi
 var f = new File(path);
 if (!f.exists) throw new Error("file not found: " + path);
 var b = given ? given : [0, 0, doc.width.as("px"), doc.height.as("px")];
-var ch = null;
-if (useMask) {
-  try { doc.selection.bounds; } catch (e) { throw new Error("mask_selection needs an active selection"); }
+var ch = null, hasSel = true;
+try { doc.selection.bounds; } catch (e) { hasSel = false; }
+if (useMask && !hasSel) throw new Error("mask_selection needs an active selection");
+if (hasSel) {
+  // The selection is stored, then dropped while the layer is placed, resized and moved (a
+  // transform with a live selection is not what this call measures), and comes back at the end:
+  // the outside gate that follows a placement needs it.
   ch = doc.channels.add(); ch.name = "psr_place_sel"; doc.selection.store(ch);
   // channels.add() leaves only the new alpha channel active, which sends transforms to it.
   doc.activeChannels = doc.componentChannels;
+  doc.selection.deselect();
 }
 var pd = new ActionDescriptor();
 pd.putPath(charIDToTypeID("null"), f);
@@ -196,7 +203,7 @@ c = box(L);
 var tx = b[0] + (tw - (c[2] - c[0])) / 2 - c[0], ty = b[1] + (th - (c[3] - c[1])) / 2 - c[1];
 if (Math.abs(tx) > 1e-6 || Math.abs(ty) > 1e-6) L.translate(UnitValue(tx, "px"), UnitValue(ty, "px"));
 L.name = name;
-if (ch) {
+if (ch && useMask) {
   doc.selection.load(ch);
   var md = new ActionDescriptor();
   md.putClass(charIDToTypeID("Nw  "), charIDToTypeID("Chnl"));
@@ -205,12 +212,17 @@ if (ch) {
   md.putReference(charIDToTypeID("At  "), mr);
   md.putEnumerated(charIDToTypeID("Usng"), charIDToTypeID("UsrM"), charIDToTypeID("RvlS"));
   executeAction(charIDToTypeID("Mk  "), md, DialogModes.NO);
+}
+if (ch) {
+  // Making a mask from the selection consumes it; reload it so the caller still has it.
+  doc.selection.load(ch);
   ch.remove();
+  doc.activeChannels = doc.componentChannels;
 }
 if (xmp) L.xmpMetadata.rawData = xmp;
 var fb = box(L);
 return {id: L.id, name: L.name, bounds: [Math.round(fb[0]), Math.round(fb[1]), Math.round(fb[2]), Math.round(fb[3])],
-        masked: !!ch, kind: String(L.kind)};
+        masked: !!(ch && useMask), selection_kept: !!ch, kind: String(L.kind)};
 """
 
 REPLACE_JS = r"""
@@ -253,7 +265,7 @@ def _esc(v):
             .replace('"', "&quot;"))
 
 
-# One schema with the Scenario Photoshop plugin's layer metadata: camelCase keys, schema 1.
+# One schema for Scenario layer metadata: camelCase keys, schema 1.
 # Older snake_case names are accepted and renamed, so a layer reads the same whoever placed it.
 XMP_ALIASES = {"asset_id": "assetId", "asset": "assetId", "job_id": "jobId", "model": "modelId",
                "model_id": "modelId", "date": "createdAt", "cost": "cuCharged",

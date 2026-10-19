@@ -16,7 +16,7 @@ flag the gap.
 **REQUIRED BACKGROUND:** scenario-photoshop-expert (execution channel, round trip, gates).
 
 **Status (2026-10-19):** every call in [`scripts/ps_gameart.py`](scripts/ps_gameart.py) is verified
-live on Photoshop 27.11 (macOS) by `test_gameart_live.py` (14 tests; tile checks on real Scenario
+live on Photoshop 27.11 (macOS) by `test_gameart_live.py` (15 tests; tile checks on real Scenario
 textures, one of them seam-repaired), and `ps_audit.deliverable("game-texture")` by
 `test_audit_live.py`. Not tested: a style pass on a render, maps landed in a PSD, sprite export with
 transparency, `tif` and 16-bit exports, every GUI path, Windows.

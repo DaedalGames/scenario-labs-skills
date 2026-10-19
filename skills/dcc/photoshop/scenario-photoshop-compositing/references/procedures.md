@@ -21,12 +21,15 @@ import ps_retouch as RT
 import ps_run, ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A
 OUT = "/path/to/a/work/folder"    # never the folder of the user's PSD
 
-def history():
-    return ps_run.run("return app.activeDocument.historyStates.length;")["result"]
+def history():                    # the active state, never the list length (redo states stay in it)
+    h = A.doc_state()["history"]
+    return h["index"], h["name"]
 
-def back_to(mark):                # step History back; the trial states are discarded on the next edit
-    ps_run.run("var d = app.activeDocument; d.activeHistoryState = d.historyStates[%d - 1];"
-               " return true;" % mark)
+def back_to(mark):                # step back to a state from history(); later states go on the next edit
+    js = ("var d = app.activeDocument, s = d.historyStates[%d];"
+          " if (s.name !== %s) throw new Error('History moved: ' + s.name);"
+          " d.activeHistoryState = s; return true;" % (mark[0], json.dumps(mark[1])))
+    assert ps_run.run(js)["ok"]
 
 def dist(a, b):
     return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
@@ -111,7 +114,8 @@ h = G.halo(EL)                                  # light_rim, dark_rim over a 2 p
 if max(h["light_rim"], h["dark_rim"]) > 8:
     r = C.fix_halo(EL, px=1)                    # Minimum, roundness, on the mask; mask made from
     print(r["before"], r["after"])              # transparency when the layer has none
-    # Still above 8: px=2, then 3. Past 3 px the subject thins: fix the mask by hand instead.
+    # Still above 8: step back that state, then px=2, then 3. Each call erodes the current mask, so
+    # passes left in place add up (1 then 2 is 3 px). Past 3 px the subject thins: fix the mask by hand.
 
 BACKDROP = r"""
 var d = app.activeDocument, e = d.layers.getByName(%NAME%);
@@ -122,7 +126,7 @@ d.selection.selectAll(); d.selection.fill(c); d.selection.deselect(); return tru
 box = [800, 540, 1200, 1320]                     # element bounds plus a margin
 mark = history()
 for tag, v in (("black", 0), ("white", 255), ("gray", 128)):
-    ps_run.run(BACKDROP.replace("%NAME%", json.dumps(EL)).replace("%V%", str(v)))
+    ps_run.run(BACKDROP.replace("%NAME%", json.dumps(EL)).replace("%V%", str(v)), undo="Scenario: Edge check")
     R.preview(OUT + "/p4_%s.png" % tag, crop=box, max_px=0, layers_only=[EL, "Edge check"])
     back_to(mark)
 R.sheet([OUT + "/p4_%s.png" % t for t in ("black", "white", "gray")], OUT + "/p4_edges.jpg",
@@ -142,6 +146,10 @@ uses `G.texture`, verified live on noise against flat (`test_gates_live.py`).
 # Route B, Scenario: quote, yes, then a relight tool model through scenario-image-editing on the
 #   cutout with the light direction in words; IO.place the result over EL as "Bottle, relit".
 LIT = "Bottle, harmonized"
+# Texture before the split: G.texture reads a layer at its own opacity, so at 50% it reads half.
+ratio = (G.texture(LIT, {"alpha": EL, "contract": 3})["energy"]
+         / G.texture(EL, {"alpha": EL, "contract": 3})["energy"])
+assert ratio >= 0.6, ratio          # under 0.6: mask the original back over the soft parts
 LUMA = r"""
 var d = app.activeDocument, h = d.layers.getByName(%LIT%);
 var y = h.duplicate(); y.name = h.name + " (luminosity)"; y.blendMode = BlendMode.LUMINOSITY;
@@ -149,9 +157,6 @@ h.opacity = 50;                      // color from the result, partway (Smith br
 return {luma: y.name, color: h.name};
 """
 ps_run.run(LUMA.replace("%LIT%", json.dumps(LIT)), undo="Scenario: Light split")
-ratio = (G.texture(LIT, {"alpha": EL, "contract": 3})["energy"]
-         / G.texture(EL, {"alpha": EL, "contract": 3})["energy"])
-assert ratio >= 0.6, ratio          # under 0.6: mask the original back over the soft parts
 ```
 
 Then mask the original back over the `keep` list (P9 `RESTORE`). Moving the element afterward means

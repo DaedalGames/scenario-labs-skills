@@ -1,6 +1,6 @@
 ---
 name: scenario-photoshop-upscale-restore
-description: "Use when enlarging or repairing an image open in Photoshop with a Scenario model: upscaling a small photo, crop, scan or generated image for print or a larger display, comparing upscalers side by side against Photoshop's Preserve Details 2.0 or Generative Upscale, mixing two upscales by mask, restoring a scratched, faded or torn old photo, colorizing a black-and-white photo while keeping it the same photo, or upscaling one changed layer to rejoin the image. Also when an upscale changes a face, smooths skin, invents texture, garbles product text or bands a sky, a restore or colorize comes back shifted or reframed, Auto-Align makes the alignment worse, Difference blend lights up everywhere after a colorize, a padded result lands offset, or an Image Size resample method seems ignored."
+description: "Use when enlarging or repairing an image open in Photoshop with a Scenario model: upscaling a small photo, crop, scan or generated image for print or a larger display, comparing upscalers side by side against Photoshop's own enlargement (Image Size, Preserve Details 2.0) or Generative Upscale, mixing two upscales by mask, restoring a scratched, faded or torn old photo, colorizing a black-and-white photo while keeping it the same photo, or upscaling one changed layer to rejoin the image. Also when an upscale changes a face, smooths skin, invents texture, garbles product text or bands a sky, a restore or colorize comes back shifted or reframed, Auto-Align makes the alignment worse, Difference blend lights up everywhere after a colorize, a padded result lands offset, or an Image Size resample method seems ignored."
 license: MIT
 ---
 
@@ -18,19 +18,20 @@ flag the gap.
 **REQUIRED BACKGROUND:** scenario-photoshop-expert (execution channel, round trip, gates).
 
 **Status (2026-10-19):** every call in [`scripts/ps_upscale.py`](scripts/ps_upscale.py) is verified
-live on Photoshop 27.11 (macOS), except `lock` in Color mode. `test_upscale_live.py` (5 tests, two
-real Scenario 2x upscales as fixtures) runs `prepare_input`, `build_stack`, `crops`, `lock` in
-Luminosity mode and `place_result`. `test_restore_live.py` (5 tests, one real colorized Scenario
-restore) runs `align`, `region_blend`, `G.structure` and `R.overlay`. Not tested:
-`prepare_input(layer=)`, custom crop boxes, the shell commands, the changed-layer rejoin,
-Photoshop's Generative Upscale and Neural Filters, Windows.
+live on Photoshop 27.11 (macOS). `test_upscale_live.py` (6 tests, two real Scenario 2x upscales as
+fixtures) runs `prepare_input`, `build_stack`, `crops`, `lock` in Luminosity and Color modes and
+`place_result`. `test_restore_live.py` (5 tests, one real colorized Scenario restore) runs `align`,
+`region_blend`, `G.structure` and `R.overlay`. Not tested: `prepare_input(layer=)`, custom crop
+boxes, the shell commands, the changed-layer rejoin, Photoshop's Generative Upscale and Neural
+Filters, Windows.
 
 ## Stance (the expert delta)
 
 - **Rebuild the baseline; Photoshop's "Original" layer is not one.** Generative Upscale stacks an
   "Original" under its result; a Preserve Details 2.0 enlargement of the same source showed more
   detail: "that's not a very good version of the original" (Smith [UorIb_rGZuc 05:00]). A paid
-  upscale has to beat the best free enlargement, which `build_stack` makes itself.
+  upscale has to beat the best free enlargement, which `build_stack` makes itself (by script, likely
+  Preserve Details 2.0; not proven).
 - **Judge identity small and texture at 100%, separately.** At full size, two real Scenario 2x
   upscales differed from the baseline by 9.4 and 9.5, near a 2 px blur (11.6), because the texture
   is redrawn. At a 256 px long side they scored 4.9, while an 8 px shift scored 16.8 and a color
@@ -94,12 +95,14 @@ Each call is one `ps_run` job. `import ps_upscale as U` puts the lead's `scripts
 3. **Quote and generate.** Scenario MCP steps: `scenario` for the connection, `recommend`, the price
    quote and the user's yes before the run; `scenario-image-editing` for upscale tool models;
    `scenario-image` for an instruction restore or colorize, with a keep-clause such as "without
-   changing anything about the image" (Dinda [knYusnpB9zI 00:33]). Two candidates, one quote. GATE:
-   quote approved; every output on disk; a failed job reported, not silently retried.
+   changing anything about the image" (Dinda [knYusnpB9zI 00:33]). Two candidates, one quote: the
+   lead defaults to one take, but an upscale is judged by comparison, since members differ most in
+   the texture they invent. GATE: quote approved; every output on disk; a failed job reported, not
+   silently retried.
 4. **Upscale stack.** `st = U.build_stack([{"path": p, "label": name}, ...], 2)`: a new document at
-   source x factor, the Preserve Details 2.0 baseline, one masked layer per candidate named
-   "<label>, 2x scale". GATE per layer: `size_ok`, `aspect_ok`, `match["matches"]` (mean under 6 at
-   256 px), `detail_vs_base` near 1 or above. `texture_change` has no threshold.
+   source x factor, the scripted baseline (likely Preserve Details 2.0), one masked layer per
+   candidate named "<label>, 2x scale". GATE per layer: `size_ok`, `aspect_ok`, `match["matches"]`
+   (mean under 6 at 256 px), `detail_vs_base` near 1 or above. `texture_change` has no threshold.
 5. **Crop grid.** `g = U.crops(OUT + "/crops", boxes=[face, text, sky])`: the same 100% crops of
    every layer and `crops grid.png`, one labeled row per layer. Without `boxes`: the center and the
    1/3 and 2/3 points. GATE: every row read against [critique](references/critique.md); losers
@@ -112,10 +115,10 @@ Each call is one `ps_run` job. `import ps_upscale as U` puts the lead's `scripts
    visible drift, `r = U.align(layer, "Background")`. GATE: no fringe on the eyes; `r["kept"]` read;
    `r["uncovered"]` all zero or cropped back.
 7. **Lock and blend.** `U.lock(layer, "color", base="Background")` keeps the original's tones under
-   a colorize (not tested); `"luminosity"` keeps the original's color under an upscale. For a region
-   mix, select it (Select Subject, a marquee, or the user), then `U.region_blend(layer, feather=8)`.
-   GATE: `after` under `before` (tested in Luminosity); inside the region the chosen take, outside
-   it the layer below; the edge checked at 100%.
+   a colorize; `"luminosity"` keeps the original's color under an upscale. For a region mix, select
+   it (Select Subject, a marquee, or the user), then `U.region_blend(layer, feather=8)`. GATE:
+   `after` under `before` (tested in both modes); inside the region the chosen take, outside it the
+   layer below; the edge checked at 100%.
 8. **Finish and deliver.** Downloads can come over-sharpened: blur 0.8 to 1 px, sharpen once, add
    grain (Dinda [knYusnpB9zI 08:29]; [knYusnpB9zI 09:35]). Tone down hot color with Vibrance or
    Saturation (Geller [jIvcJtPsJss 02:56]). `A.deliverable(profile)` returns `[]`. GATE: no halo or
@@ -132,7 +135,7 @@ reads black, and reuses its mask (Smith [iy0IxTpT4OY 03:15]; [iy0IxTpT4OY 03:47]
 | Value                                                        | Relative to                     | Source                                              |
 | ------------------------------------------------------------ | ------------------------------- | --------------------------------------------------- |
 | Match: worst-channel mean under 6                            | baseline, 256 px long side      | toolkit, calibrated live                            |
-| Real 2x upscales: 4.9 at 256 px; 9.4 to 9.5 at source        | Preserve Details 2.0 baseline   | measured, two Scenario upscales                     |
+| Real 2x upscales: 4.9 at 256 px; 9.4 to 9.5 at source        | the scripted baseline           | measured, two Scenario upscales                     |
 | 8 px shift at 2x: 16.8; color cast: 38.5; 2 px blur: 7.1     | same, at 256 px                 | measured, made defects                              |
 | `detail_vs_base`: 0.95 to 1.00 real, 0.08 blurred            | baseline high-pass energy       | measured                                            |
 | Colorize: plain difference 29 on an aligned restore          | damaged original, 256 px        | measured, one restore                               |
@@ -159,7 +162,7 @@ Toolkit thresholds are authoring-time, from one 512 px photo: check them on your
 
 | Mistake                                      | Looks like                                | Fix                                                |
 | -------------------------------------------- | ----------------------------------------- | -------------------------------------------------- |
-| Photoshop's "Original" as the baseline       | every upscale looks like a big win        | `build_stack`'s Preserve Details 2.0 baseline      |
+| Photoshop's "Original" as the baseline       | every upscale looks like a big win        | `build_stack`'s scripted baseline                  |
 | Identity difference at full size             | good upscales fail like a shift           | `match` at 256 px; `texture_change` is information |
 | Plain Difference after a colorize            | an aligned restore lights up everywhere   | `G.structure` and `R.overlay`                      |
 | Auto-Align by default                        | an aligned restore moves several pixels   | `U.align`, kept only on a 10% gain                 |
@@ -176,11 +179,11 @@ Toolkit thresholds are authoring-time, from one 512 px photo: check them on your
 - **Receives** from scenario-photoshop-expert: routing and document state; from
   scenario-photoshop-generative-edit: soft takes to upscale before placing; from
   scenario-photoshop-compositing: changed layers to rejoin at full resolution.
-- **Delivers** a stack document of named, masked candidates over the Preserve Details 2.0 baseline,
-  or restore layers aligned and locked over the untouched original, with the gate numbers and the
-  crop grid. Skin texture, grain and tone matching after an upscale go to
-  scenario-photoshop-compositing; enlarged art for posters and thumbnails to
-  scenario-photoshop-key-art; the final audit to scenario-photoshop-expert.
+- **Delivers** a stack document of named, masked candidates over the scripted baseline, or restore
+  layers aligned and locked over the untouched original, with the gate numbers and the crop grid.
+  Skin texture, grain and tone matching after an upscale go to scenario-photoshop-compositing;
+  enlarged art for posters and thumbnails to scenario-photoshop-key-art; the final audit to
+  scenario-photoshop-expert.
 - **Scenario siblings:** `scenario` (connection, `recommend`, price quote, job waiting),
   `scenario-image-editing` (upscale and enhance tool models), `scenario-image` (instruction restore
   and colorize), `scenario-asset-analysis` (a written verdict against the brief),

@@ -15,7 +15,7 @@ No rule here depends on one model: the picker and the Scenario catalog both chan
 
 Setup: a detail-dense 512 px photo (an owl close-up), two Scenario upscale members at factor 2, plus
 copies with a known defect each, made with Pillow. Figures are the worst-channel mean difference to
-the Preserve Details 2.0 baseline that `build_stack` makes.
+the scripted baseline that `build_stack` makes (likely Preserve Details 2.0).
 
 | Candidate                      | At a 256 px long side | At source size | Detail vs baseline |
 | ------------------------------ | --------------------- | -------------- | ------------------ |

@@ -67,12 +67,21 @@ var ARGS = %ARGS%;
 if (app.documents.length === 0 && !ARGS.allow_no_doc) throw new Error("no document open");
 function pk_box(L) { var b = L.bounds; return [b[0].as("px"), b[1].as("px"), b[2].as("px"), b[3].as("px")]; }
 function pk_hits(a, b) { return a[0] < b[2] && b[0] < a[2] && a[1] < b[3] && b[1] < a[3]; }
+// Action Manager layerKind (3 = text): the DOM's layer.kind throws "Internal error" on a
+// Clarity adjustment layer (27.11).
+function pk_is_text(l) {
+  if (l.typename !== "ArtLayer") return false;
+  try {
+    var r = new ActionReference(); r.putIdentifier(charIDToTypeID("Lyr "), l.id);
+    return executeActionGet(r).getInteger(stringIDToTypeID("layerKind")) === 3;
+  } catch (e) { return false; }
+}
 function pk_texts(c, out) {
   for (var i = 0; i < c.layers.length; i++) {
     var l = c.layers[i];
     if (!l.visible) continue;
     if (l.typename === "LayerSet") pk_texts(l, out);
-    else if (l.kind === LayerKind.TEXT) out.push(l);
+    else if (pk_is_text(l)) out.push(l);
   }
   return out;
 }

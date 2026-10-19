@@ -70,9 +70,9 @@ Text boxes do not refit per record. Long copy overflows or runs past its area. T
 - Create: File > New with the Artboards box checked, the Artboard tool (grouped with Move), or
   right-click selected layers > Artboard from Layers.
 - Export: File > Export > Artboards to Files, or Export As per artboard.
-- The scripting DOM reads artboards but does not create them. The toolkit makes one document per
-  channel instead; a user who wants one file with every size can drag the canvases' layers into
-  artboards by hand.
+- The DOM has no artboard API; artboards by Action Manager are not tested here. The toolkit makes
+  one document per channel instead; a user who wants one file with every size can drag the canvases'
+  layers into artboards by hand.
 
 ## Export
 

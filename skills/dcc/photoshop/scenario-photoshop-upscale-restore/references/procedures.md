@@ -19,8 +19,9 @@ import ps_upscale as U            # also puts scenario-photoshop-expert/scripts 
 import ps_run, ps_gates as G, ps_review as R, ps_audit as A, ps_io as IO
 OUT = "/path/to/a/work/folder"    # never the folder of the user's PSD
 
-def history():
-    return ps_run.run("return app.activeDocument.historyStates.length;")["result"]
+def history():                    # the active state, never the list length
+    h = A.doc_state()["history"]
+    return h["index"], h["name"]
 
 def select_box(b):                # a rectangular selection [l, t, r, b] on the active document
     js = ("var b = %s; app.activeDocument.selection.select([[b[0], b[1]], [b[2], b[1]], "
@@ -247,6 +248,9 @@ if r["kept"] and any(r["uncovered"]):
 
 - Run it only when P7 shows drift. On an already aligned restore it moved the layer 2.5 to 17 px
   over three runs and worsened the score every time; the call then steps History back.
+- Run it on a take without padding. A take placed through the padding (P6) has bounds past the
+  canvas, which Auto-Align reads as a shift and a scale, so it is not kept. Crop the padding off the
+  downloaded result first (P2) and place it with the source's bounds.
 - When kept, "Restore, take 1, aligned" lands above the result and the result is hidden.
 - `uncovered` is the bare margin, in canvas pixels, that the aligned layer leaves on each side. Crop
   back (Dinda [G5yuLhm0SdM 10:55]) or let the original show there.
@@ -255,9 +259,9 @@ if r["kept"] and any(r["uncovered"]):
 
 ## P9. Lock the original's tones and blend the face
 
-Status: Color mode not tested (the toolkit sets it the same way as Luminosity, which is verified
-live). Select Subject (`autoCutout`) verified live in the compositing suite. `region_blend` verified
-live (restore test 4).
+Status: `lock` in Color mode verified live (upscale test 4b: luminance from the base within 3
+levels, hue from the candidate within 5 degrees). Select Subject (`autoCutout`) verified live in the
+compositing suite. `region_blend` verified live (restore test 4).
 
 ```python
 r = U.lock("Restore, take 1", "color", base="Background")

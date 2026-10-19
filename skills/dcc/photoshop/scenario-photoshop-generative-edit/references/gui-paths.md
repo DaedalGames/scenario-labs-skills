@@ -1,8 +1,10 @@
 # GUI paths (for the user or a computer-use agent)
 
-Steps no script reaches: hand-drawn selections and Photoshop's own generative tools. None of these
-paths was run in testing; they come from the expert videos and Adobe's help pages, on Photoshop 2026
-(27.x). Menu names can move between releases. Shortcuts are macOS first, Windows second.
+Steps no script reaches: hand-drawn selections and Photoshop's own generative tools (Adobe documents
+no script call; a forum reports an undocumented batchPlay descriptor, not tested; Adobe's generative
+AI guidelines may cover automated use). None of these paths was run in testing; they come from the
+expert videos and Adobe's help pages, on Photoshop 2026 (27.x). Menu names can move between
+releases. Shortcuts are macOS first, Windows second.
 
 ## Selections
 

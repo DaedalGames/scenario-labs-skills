@@ -341,14 +341,20 @@ for name, ch in PLAN.items():
 
 ## P10. Variants from one master
 
-Status: not tested. `IO.replace` is not live-tested in any suite.
+Status: `REMOVE` beside a Clarity layer verified live (`test_keyart_live.py`); `IO.replace` keeping
+the box at the same pixel size verified live (the lead's `test_io_live.py`); the whole loop not
+tested.
 
 ```python
 REMOVE = r"""
 var d = app.activeDocument, names = %NAMES%, n = 0;
+function isText(l) {   // layer.kind throws "Internal error" on a Clarity layer (27.11)
+  try { var r = new ActionReference(); r.putIdentifier(charIDToTypeID("Lyr "), l.id);
+        return executeActionGet(r).getInteger(stringIDToTypeID("layerKind")) === 3; } catch (e) { return false; }
+}
 for (var i = d.layers.length - 1; i >= 0; i--) {
   var l = d.layers[i];
-  if (l.typename !== "ArtLayer" || l.kind !== LayerKind.TEXT) continue;
+  if (l.typename !== "ArtLayer" || !isText(l)) continue;
   for (var j = 0; j < names.length; j++) if (l.name === names[j]) { l.remove(); n++; break; }
 }
 return n;
@@ -366,6 +372,9 @@ for v, copy in VARIANTS.items():
 
 - One change per variant: the copy, the plate, or one layer's visibility. Badis Designs tests a
   version with text and one without [TuF4RMJtq-4 06:30].
+- `type_layers` makes new layers, so P5's styles (`FX`) are gone: re-run `FX` on them before
+  `check`. A variant with no copy also hides P5's band (`Band, subline`), or it shows as an empty
+  stripe.
 - A new plate of the same pixel size: `IO.replace("Plate, owl", path)` keeps the placed box, since
   Replace Contents keeps the layer's transform. Any other size: a new canvas (P3, P4) for that
   variant, so no hidden plate stays in the delivered PSD.

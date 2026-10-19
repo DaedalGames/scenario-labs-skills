@@ -1,22 +1,27 @@
 """
 ps_mockup: put a flat design (a Scenario result, a logo, a label) onto a product photo the way
-mockup builders do it by hand: a placeholder smart object fitted to four corners, the design
-swapped in at the placeholder's exact content size, lighting rebuilt from the product's own
-pixels, creases through Displace, and a batch export per design. Every edit is one named History
-state; every fit reports where the corners actually landed.
+mockup builders do it by hand: a placeholder smart object fitted to four corners or wrapped
+around a cylinder, the design swapped in at the placeholder's proportions, lighting rebuilt from
+the product's own pixels, creases through Displace, and a batch export per design or per
+colorway. Every edit is one named History state; every fit reports where the corners landed.
 
 Library:
   import ps_mockup as M
   M.placeholder(quad, name="Place Design Here", size=None, fill=60, mask_selection=True)
-      # quad = [[x,y] TL, TR, BR, BL] in document px. A solid smart object of `size` (default:
-      # the quad's mean edge lengths) inside group "Mockup: <name>", warped onto the quad, Fill
-      # lowered so the product shows through while fitting. With a selection active, the
-      # selection becomes the GROUP mask (the printable area).
+      # quad = [[x,y] TL, TR, BR, BL] in document px. A solid smart object inside group
+      # "Mockup: <name>", warped onto the quad, Fill lowered so the product shows through while
+      # fitting. `size` = the design's print size (default: the quad's mean edge lengths); it sets
+      # the proportions replace_design crops to and rides in the layer's XMP. With a selection
+      # active, the selection becomes the GROUP mask (the printable area).
   M.fit_quad(layer, quad)        # perspective warp of a smart object onto four corners
+  M.fit_cylinder(layer, quad, bulge, top_bulge=None, angle=120)
+      # a label around a can, bottle or mug: corners as in fit_quad, the bottom edge's middle
+      # `bulge` px below the line between its corners (top edge: `top_bulge`, default the same),
+      # `angle` = the label's visible arc in degrees (columns narrow toward the sides)
   M.corners(layer)               # where the corners are now: [[x,y] TL, TR, BR, BL]
   M.replace_design(layer, path, fit="cover")
-      # the file resized and cropped ("cover"), padded ("contain") or stretched ("exact") to the
-      # smart object's content size, then swapped in: the warp is kept, Fill goes back to 100
+      # the file cropped ("cover"), padded ("contain") or stretched ("exact") to the print
+      # proportions, then swapped in at the content size: the warp is kept, Fill goes back to 100
   M.lighting(layer, product, shade=85, light=50)
       # two copies of the product pixels clipped above the design: Multiply keeps only what is
       # darker than the product's mean under the design, Screen only what is brighter
@@ -27,11 +32,18 @@ Library:
       # displace maps/. Returns its path; never delete it while the filter exists.
   M.batch(layer, designs, out_dir, fit="cover")
       # one merged PNG per design file; the document ends as it started
+  M.colorways(product, colors, out_dir)
+      # one merged PNG per product color: a Solid Color fill in Color mode above `product`
+      # (luminance kept), masked by the active selection, else clipped to the product layer;
+      # colors = {"name": (r, g, b) or "#rrggbb"}; the document ends as it started
+Every fit wraps the object once more (Convert to Smart Object) at the target's size: fit before
+displace (Smart Filters refuse a fit), and keep layer masks on the group.
 Shell:
   python3 ps_mockup.py placeholder X,Y,X,Y,X,Y,X,Y [--name N] [--size W,H] [--fill 60]
-      | fit LAYER X,Y,X,Y,X,Y,X,Y | corners LAYER | replace LAYER FILE [--fit cover]
+      | fit LAYER X,Y,X,Y,X,Y,X,Y | cylinder LAYER X,Y,X,Y,X,Y,X,Y --bulge N [--top N] [--angle 120]
+      | corners LAYER | replace LAYER FILE [--fit cover]
       | light LAYER PRODUCT [--shade 85] [--light 50] | displace LAYER PRODUCT [--scale 8]
-      | batch LAYER OUT_DIR FILE [FILE ...]
+      | batch LAYER OUT_DIR FILE [FILE ...] | colorways PRODUCT OUT_DIR NAME=#RRGGBB [...]
 
 Sources: mockup videos summarized in the skill (placeholder smart object first, lighting from
 the product's own pixels, group mask for the printable area, Displace as a Smart Filter).
@@ -107,8 +119,7 @@ function pm_warp_bounds(m) {
   } catch (e) { return null; }
 }
 // A smart object placed from a file keeps its warp in content pixels (bounds 0,0,w,h); one
-// converted from a layer keeps it in document pixels. On the first kind, a custom warp sent by
-// script renders with one corner displaced (measured on 27.11), so it gets wrapped first.
+// converted from a layer keeps it in document pixels.
 function pm_placed_frame(l) {
   var m = pm_more(l), b = pm_warp_bounds(m), s = pm_size(l), box = pm_box(l);
   if (!b || b[0] !== 0 || b[1] !== 0 || Math.abs(b[2] - s[0]) > 0.01 || Math.abs(b[3] - s[1]) > 0.01) return false;
@@ -127,17 +138,23 @@ function pm_target(l) {
   t.putEnumerated(pm_s("freeTransformCenterState"), pm_s("quadCenterState"), pm_s("QCSAverage"));
   return t;
 }
-function pm_unwarp(l) {
-  var w = new ActionDescriptor(), t = pm_target(l);
-  w.putEnumerated(pm_s("warpStyle"), pm_s("warpStyle"), pm_s("warpNone"));
-  t.putObject(pm_s("warp"), pm_s("warp"), w);
-  executeAction(pm_s("transform"), t, DialogModes.NO);
-}
-function pm_wrap(l) {
-  var name = l.name;
-  app.activeDocument.activeLayer = l;
+// Convert to Smart Object keeps only the opaque pixels, so a transparent margin would be lost: a
+// hidden layer filling `box` keeps the new object's box. Moving the layer into a group releases
+// the layers clipped to it, so they are clipped again.
+function pm_wrap(l, box) {
+  var d = app.activeDocument, name = l.name, chain = [], p = l.parent, idx = -1;
+  for (var i = 0; i < p.layers.length; i++) if (p.layers[i].id === l.id) { idx = i; break; }
+  for (var j = idx - 1; j >= 0; j--) { var g0 = false; try { g0 = p.layers[j].grouped; } catch (e) {} if (!g0) break; chain.push(p.layers[j]); }
+  var g = d.layerSets.add(); g.move(l, ElementPlacement.PLACEBEFORE); l.move(g, ElementPlacement.INSIDE);
+  var fr = g.artLayers.add(); fr.name = "Frame";
+  d.selection.select([[box[0], box[1]], [box[2], box[1]], [box[2], box[3]], [box[0], box[3]]]);
+  var c = new SolidColor(); c.rgb.red = 0; c.rgb.green = 0; c.rgb.blue = 0;
+  d.selection.fill(c); d.selection.deselect(); fr.visible = false;
+  d.activeLayer = g;
   executeAction(pm_s("newPlacedLayer"), undefined, DialogModes.NO);
-  var w = app.activeDocument.activeLayer; w.name = name;
+  var w = d.activeLayer; w.name = name;
+  for (var k = 0; k < chain.length; k++) chain[k].grouped = true;
+  d.activeLayer = w;
   return w;
 }
 function pm_align(l, b) {
@@ -146,18 +163,46 @@ function pm_align(l, b) {
   c = pm_box(l);
   l.translate(UnitValue(b[0] - c[0], "px"), UnitValue(b[1] - c[1], "px"));
 }
-// Homography from the unit square onto the quad, sampled at thirds: the 4x4 control net of a
-// custom warp, in document pixels, read through `bounds` = the layer's current box.
-function pm_warp(l, q) {
+// A custom warp is a bicubic Bezier patch: 16 control points, row by row from the top-left.
+// Homography from the unit square onto the quad, sampled at thirds.
+function pm_quad_mesh(q) {
   var x0=q[0][0],y0=q[0][1],x1=q[1][0],y1=q[1][1],x2=q[2][0],y2=q[2][1],x3=q[3][0],y3=q[3][1];
   var dx1=x1-x2,dx2=x3-x2,dy1=y1-y2,dy2=y3-y2,sx=x0-x1+x2-x3,sy=y0-y1+y2-y3,den=dx1*dy2-dx2*dy1;
   if (Math.abs(den) < 1e-9) throw new Error("degenerate quad");
-  var g=(sx*dy2-dx2*sy)/den, h=(dx1*sy-sx*dy1)/den;
-  var mesh = new ActionList();
+  var g=(sx*dy2-dx2*sy)/den, h=(dx1*sy-sx*dy1)/den, o = [];
   for (var j = 0; j < 4; j++) for (var i = 0; i < 4; i++) {
-    var u = i / 3, v = j / 3, z = 1 + g*u + h*v, pd = new ActionDescriptor();
-    pd.putUnitDouble(pm_s("horizontal"), pm_s("pixelsUnit"), (x0 + (x1-x0+g*x1)*u + (x3-x0+h*x3)*v) / z);
-    pd.putUnitDouble(pm_s("vertical"), pm_s("pixelsUnit"), (y0 + (y1-y0+g*y1)*u + (y3-y0+h*y3)*v) / z);
+    var u = i / 3, v = j / 3, z = 1 + g*u + h*v;
+    o.push([(x0 + (x1-x0+g*x1)*u + (x3-x0+h*x3)*v) / z, (y0 + (y1-y0+g*y1)*u + (y3-y0+h*y3)*v) / z]);
+  }
+  return o;
+}
+// A label around a cylinder seen from slightly above. Across: x = sin(theta) for theta in
+// [-a/2, a/2], as the cubic Hermite with the same end slopes, so columns narrow toward the sides.
+// Top and bottom edges: arcs whose middle sits `top` and `bottom` px below the line between their
+// corners (control points at 4/3 of the bulge put the curve's middle exactly there).
+function pm_cyl_mesh(q, angle, top, bottom) {
+  var a = angle * Math.PI / 360, k = 2 * a * Math.cos(a) / Math.sin(a) / 3;
+  var X = [-1, -1 + k, 1 - k, 1], B = [0, 4 / 3, 4 / 3, 0], T = [], D = [], o = [];
+  for (var i = 0; i < 4; i++) {
+    var s = (X[i] + 1) / 2;
+    T.push([q[0][0] + (q[1][0] - q[0][0]) * s, q[0][1] + (q[1][1] - q[0][1]) * s + top * B[i]]);
+    D.push([q[3][0] + (q[2][0] - q[3][0]) * s, q[3][1] + (q[2][1] - q[3][1]) * s + bottom * B[i]]);
+  }
+  for (var j = 0; j < 4; j++) for (var c = 0; c < 4; c++)
+    o.push([T[c][0] + (D[c][0] - T[c][0]) * j / 3, T[c][1] + (D[c][1] - T[c][1]) * j / 3]);
+  return o;
+}
+function pm_ctl_box(p) {
+  var b = [p[0][0], p[0][1], p[0][0], p[0][1]];
+  for (var i = 1; i < p.length; i++) b = [Math.min(b[0], p[i][0]), Math.min(b[1], p[i][1]), Math.max(b[2], p[i][0]), Math.max(b[3], p[i][1])];
+  return b;
+}
+function pm_apply(l, pts) {
+  var mesh = new ActionList();
+  for (var k = 0; k < 16; k++) {
+    var pd = new ActionDescriptor();
+    pd.putUnitDouble(pm_s("horizontal"), pm_s("pixelsUnit"), pts[k][0]);
+    pd.putUnitDouble(pm_s("vertical"), pm_s("pixelsUnit"), pts[k][1]);
     mesh.putObject(pm_s("rationalPoint"), pd);
   }
   var b = pm_box(l), w = new ActionDescriptor(), bd = new ActionDescriptor(), t = pm_target(l);
@@ -170,29 +215,72 @@ function pm_warp(l, q) {
   t.putObject(pm_s("warp"), pm_s("warp"), w);
   executeAction(pm_s("transform"), t, DialogModes.NO);
 }
-// Fit a smart object onto the quad. Measured on 27.11, the only sequence that lands every corner:
-// reset any warp (a new warp is read through the current box, so an old one skews it), wrap a
-// placed-from-file object, scale and move the box onto the quad's bounding box (a box far from
-// the quad renders garbage), then warp. Returns the layer (a new id after a wrap) and
-// `check`: the largest gap between nonAffineTransform and the quad's bounding box, which is
-// near 0 after a good fit and several px when a corner is displaced.
-function pm_fit(l, q) {
-  var out = {reset: false, wrapped: false};
-  if (pm_warp_style(pm_more(l)) !== "warpNone") { pm_unwarp(l); out.reset = true; }
-  if (pm_placed_frame(l)) { l = pm_wrap(l); out.wrapped = true; }
-  var qb = pm_qbox(q);
-  pm_align(l, qb);
-  pm_warp(l, q);
-  var na = pm_more(l).getList(pm_s("nonAffineTransform")), bc = [qb[0], qb[1], qb[2], qb[1], qb[2], qb[3], qb[0], qb[3]], e = 0;
+// Reset a warp with a flat custom warp: warpNone leaves a NaN transform on some objects (27.11).
+function pm_flat(l) {
+  var b = pm_box(l);
+  pm_apply(l, pm_quad_mesh([[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]]]));
+}
+// The design's print size rides in the layer's XMP (scenario:printSize="WxH"), because after a fit
+// the content is the quad's on-canvas size and replace_design needs the design's proportions.
+function pm_xmp(l) { try { return l.xmpMetadata.rawData || ""; } catch (e) { return ""; } }
+function pm_print_get(raw) {
+  var m = /scenario:printSize="([\d.]+)x([\d.]+)"/.exec(raw || "");
+  return m ? [Number(m[1]), Number(m[2])] : null;
+}
+function pm_xmp_put(l, raw, ps) {
+  var a = 'scenario:printSize="' + Math.round(ps[0]) + "x" + Math.round(ps[1]) + '"';
+  var ns = 'xmlns:scenario="https://scenario.com/ns/photoshop/1.0/"';
+  if (/scenario:printSize="[^"]*"/.test(raw)) raw = raw.replace(/scenario:printSize="[^"]*"/, a);
+  else if (/xmlns:scenario="[^"]*"/.test(raw)) raw = raw.replace(/xmlns:scenario="[^"]*"/, function (s) { return s + " " + a; });
+  else if (raw.indexOf("</rdf:RDF>") >= 0) raw = raw.replace("</rdf:RDF>", '<rdf:Description rdf:about="" ' + ns + " " + a + "/></rdf:RDF>");
+  else raw = '<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">' +
+    '<rdf:Description rdf:about="" ' + ns + " " + a + "/></rdf:RDF></x:xmpmeta>";
+  l.xmpMetadata.rawData = raw;
+}
+function pm_plain(l) {
+  var r = new ActionReference(); r.putIdentifier(pm_c("Lyr "), l.id);
+  var x = executeActionGet(r);
+  if (x.getObjectValue(pm_s("smartObject")).hasKey(pm_s("filterFX")))
+    throw new Error("has Smart Filters: fit before displace (a fit would nest them under the new warp)");
+  if (x.getBoolean(pm_s("hasUserMask")) || x.getBoolean(pm_s("hasVectorMask")))
+    throw new Error("has a layer mask: put the mask on the group instead (a fit would warp it)");
+}
+// Fit a smart object onto a 16-point net. Measured on 27.11: a custom warp lands exactly only on
+// an object scaled UP from the box it was converted at; at scale 1 or below, corners drift by up
+// to 60 px depending on the quad's shape. So the object is reset with a flat warp, scaled to 97%
+// of the net's box, wrapped (Convert to Smart Object), scaled onto the box, then warped. Each fit
+// nests one level and keeps the box's resolution. Returns the layer (new id) and `check`: the
+// largest gap between nonAffineTransform and the net's box, near 0 after a good fit.
+var PM_SCALE = 0.97;
+function pm_fit(l, pts) {
+  pm_plain(l);
+  var d = app.activeDocument, out = {reset: false}, ch = null;
+  // The wrap and the warp drop an active selection: it is stored and loaded back.
+  if (pm_has_selection(d)) { ch = d.channels.add(); d.selection.store(ch); d.selection.deselect(); d.activeChannels = d.componentChannels; }
+  if (pm_warp_style(pm_more(l)) !== "warpNone") { pm_flat(l); out.reset = true; }
+  var keep = {name: l.name, fill: l.fillOpacity, opacity: l.opacity, blend: l.blendMode, raw: pm_xmp(l)};
+  out.print_size = pm_print_get(keep.raw) || pm_size(l);
+  var box = pm_ctl_box(pts), w = Math.round(PM_SCALE * (box[2] - box[0])), h = Math.round(PM_SCALE * (box[3] - box[1]));
+  var x0 = Math.round((box[0] + box[2] - w) / 2), y0 = Math.round((box[1] + box[3] - h) / 2), fr = [x0, y0, x0 + w, y0 + h];
+  pm_align(l, fr);
+  l.fillOpacity = 100; l.opacity = 100; l.blendMode = BlendMode.NORMAL;
+  l = pm_wrap(l, fr);
+  l.fillOpacity = keep.fill; l.opacity = keep.opacity; l.blendMode = keep.blend;
+  pm_xmp_put(l, keep.raw, out.print_size);
+  pm_align(l, box);
+  pm_apply(l, pts);
+  if (ch) { d.selection.load(ch); ch.remove(); d.activeChannels = d.componentChannels; d.activeLayer = l; }
+  var na = pm_more(l).getList(pm_s("nonAffineTransform")), bc = [box[0], box[1], box[2], box[1], box[2], box[3], box[0], box[3]], e = 0;
   for (var i = 0; i < 8; i++) e = Math.max(e, Math.abs(na.getDouble(i) - bc[i]));
   out.layer = l;
   out.check = Math.round(e * 100) / 100;
+  out.target = [pts[0], pts[3], pts[15], pts[12]];
   return out;
 }
-// Corners TL, TR, BR, BL in document pixels. The stored mesh sits in the frame of the box the
-// object had when it was converted, so its corners are mapped from their own bounding box onto
-// the current box. `consistent` is false when that mapping does not hold: a hand-made warp whose
-// edges bulge past the corners, or a content-pixel warp on a placed object.
+// Corners TL, TR, BR, BL in document pixels. The stored net sits in the frame of the box the
+// object had when it was converted, so it is mapped from its own bounding box onto the current
+// box. `consistent` is false when that mapping does not hold: nonAffineTransform disagrees with
+// the box (a hand-made warp), or a content-pixel warp on a placed object.
 function pm_corners(l) {
   var m = pm_more(l);
   if (pm_warp_style(m) !== "warpCustom") {
@@ -200,13 +288,12 @@ function pm_corners(l) {
     return {corners: [[t.getDouble(0), t.getDouble(1)], [t.getDouble(2), t.getDouble(3)],
                       [t.getDouble(4), t.getDouble(5)], [t.getDouble(6), t.getDouble(7)]], consistent: true};
   }
-  var mesh = pm_mesh(m), n = mesh.length, side = Math.round(Math.sqrt(n)), idx = [0, side - 1, n - 1, n - side], c = [];
-  for (var i = 0; i < 4; i++) c.push(mesh[idx[i]]);
-  var cb = pm_qbox(c), ab = pm_qbox([mesh[0], mesh[0], mesh[0], mesh[0]]), box = pm_box(l), e = 0;
-  for (var j = 0; j < n; j++) ab = [Math.min(ab[0], mesh[j][0]), Math.min(ab[1], mesh[j][1]), Math.max(ab[2], mesh[j][0]), Math.max(ab[3], mesh[j][1])];
-  for (var k = 0; k < 4; k++) e = Math.max(e, Math.abs(ab[k] - cb[k]));
-  var sx = (box[2] - box[0]) / (cb[2] - cb[0]), sy = (box[3] - box[1]) / (cb[3] - cb[1]), out = [];
-  for (var q = 0; q < 4; q++) out.push([box[0] + (c[q][0] - cb[0]) * sx, box[1] + (c[q][1] - cb[1]) * sy]);
+  var mesh = pm_mesh(m), n = mesh.length, side = Math.round(Math.sqrt(n)), idx = [0, side - 1, n - 1, n - side];
+  var ab = pm_ctl_box(mesh), box = pm_box(l), na = m.getList(pm_s("nonAffineTransform")), e = 0, out = [];
+  var bc = [box[0], box[1], box[2], box[1], box[2], box[3], box[0], box[3]];
+  for (var k = 0; k < 8; k++) e = Math.max(e, Math.abs(na.getDouble(k) - bc[k]));
+  var sx = (box[2] - box[0]) / (ab[2] - ab[0]), sy = (box[3] - box[1]) / (ab[3] - ab[1]);
+  for (var q = 0; q < 4; q++) out.push([box[0] + (mesh[idx[q]][0] - ab[0]) * sx, box[1] + (mesh[idx[q]][1] - ab[1]) * sy]);
   return {corners: out, consistent: e < 1 && !pm_placed_frame(l)};
 }
 function pm_err(a, q) {
@@ -263,7 +350,7 @@ d.activeLayer = grp;
 var L = pm_place(ARGS.path);
 L.move(grp, ElementPlacement.INSIDE);
 L.name = ARGS.name;
-var fit = pm_fit(L, ARGS.quad);
+var fit = pm_fit(L, pm_quad_mesh(ARGS.quad));
 L = fit.layer;
 L.fillOpacity = ARGS.fill;
 if (ch) {
@@ -271,31 +358,38 @@ if (ch) {
   ch.remove(); d.activeChannels = d.componentChannels;
 }
 var c = pm_corners(L).corners;
-return {id: L.id, name: L.name, group: grp.name, size: pm_size(L), corners: pm_round(c),
+return {id: L.id, name: L.name, group: grp.name, size: pm_size(L), print_size: fit.print_size, corners: pm_round(c),
         corner_error: pm_err(c, ARGS.quad), fit_check: fit.check, group_mask: !!ch};
 """
 
 FIT_JS = r"""
-var fit = pm_fit(pm_so(ARGS.layer), ARGS.quad), L = fit.layer, c = pm_corners(L).corners;
-return {id: L.id, corners: pm_round(c), corner_error: pm_err(c, ARGS.quad), fit_check: fit.check,
-        reset: fit.reset, wrapped: fit.wrapped};
+var L = pm_so(ARGS.layer);
+var pts = ARGS.angle ? pm_cyl_mesh(ARGS.quad, ARGS.angle, ARGS.top, ARGS.bottom) : pm_quad_mesh(ARGS.quad);
+var fit = pm_fit(L, pts), c = pm_corners(fit.layer);
+L = fit.layer;
+return {id: L.id, corners: pm_round(c.corners), target: pm_round(fit.target), corner_error: pm_err(c.corners, fit.target),
+        consistent: c.consistent, fit_check: fit.check, reset: fit.reset, print_size: fit.print_size};
 """
 
 CORNERS_JS = r"""
 var L = pm_so(ARGS.layer), c = pm_corners(L);
-return {id: L.id, corners: pm_round(c.corners), consistent: c.consistent, size: pm_size(L), fill: L.fillOpacity};
+return {id: L.id, corners: pm_round(c.corners), consistent: c.consistent, size: pm_size(L),
+        print_size: pm_print_get(pm_xmp(L)) || pm_size(L), fill: L.fillOpacity};
 """
 
 REPLACE_JS = r"""
 var L = pm_so(ARGS.layer);
-var sz = pm_size(L), before = pm_corners(L).corners;
+var sz = pm_size(L), raw = pm_xmp(L), ps = pm_print_get(raw) || sz, before = pm_corners(L).corners;
 var src = app.open(new File(ARGS.path));
 __psr_created.push(src.id);
 if (src.layers.length > 1) src.mergeVisibleLayers();
 if (src.activeLayer.isBackgroundLayer) src.activeLayer.isBackgroundLayer = false;
-var W = src.width.as("px"), H = src.height.as("px"), sx = sz[0] / W, sy = sz[1] / H;
+// Cropped or padded to the print proportions, then stretched to the content size: the fit maps
+// the content box onto the quad, so the print proportions come back on the product.
+var W = src.width.as("px"), H = src.height.as("px"), sx = ps[0] / W, sy = ps[1] / H;
 if (ARGS.fit === "cover") sx = sy = Math.max(sx, sy);
 else if (ARGS.fit === "contain") sx = sy = Math.min(sx, sy);
+sx *= sz[0] / ps[0]; sy *= sz[1] / ps[1];
 var rw = Math.max(1, Math.round(W * sx)), rh = Math.max(1, Math.round(H * sy));
 if (rw !== W || rh !== H)
   src.resizeImage(UnitValue(rw, "px"), UnitValue(rh, "px"), null, ResampleMethod.BICUBICAUTOMATIC);
@@ -310,9 +404,10 @@ pm_replace(ARGS.tmp);
 L = d.activeLayer;
 // Replace Contents renames the layer after the file; scripts find layers by name.
 L.name = keep;
+if (raw && pm_xmp(L) !== raw) L.xmpMetadata.rawData = raw;
 if (ARGS.reset_fill) L.fillOpacity = 100;
 var after = pm_corners(L).corners;
-return {id: L.id, content_size: sz, source_size: [W, H], scale: [Math.round(sx * 1000) / 1000, Math.round(sy * 1000) / 1000],
+return {id: L.id, content_size: sz, print_size: ps, source_size: [W, H], scale: [Math.round(sx * 1000) / 1000, Math.round(sy * 1000) / 1000],
         corners: pm_round(after), drift: pm_err(after, before), fill: L.fillOpacity};
 """
 
@@ -384,6 +479,25 @@ dd.putEnumerated(pm_c("UndA"), pm_c("UndA"), pm_c("RptE"));
 dd.putPath(pm_c("DspF"), map);
 executeAction(pm_c("Dspl"), dd, DialogModes.NO);
 return {id: L.id, map: map.fsName, map_box: b, blur: r, scale: ARGS.scale};
+"""
+
+COLORWAY_JS = r"""
+var P = pm_layer(ARGS.product), sel = pm_has_selection(d);
+d.activeLayer = P;
+// A fill layer made while a selection is active takes the selection as its mask.
+var desc = new ActionDescriptor(), ref = new ActionReference(), lay = new ActionDescriptor(),
+    fill = new ActionDescriptor(), col = new ActionDescriptor();
+ref.putClass(pm_s("contentLayer")); desc.putReference(pm_c("null"), ref);
+col.putDouble(pm_c("Rd  "), ARGS.rgb[0]); col.putDouble(pm_c("Grn "), ARGS.rgb[1]); col.putDouble(pm_c("Bl  "), ARGS.rgb[2]);
+fill.putObject(pm_c("Clr "), pm_c("RGBC"), col);
+lay.putObject(pm_c("Type"), pm_s("solidColorLayer"), fill);
+desc.putObject(pm_c("Usng"), pm_s("contentLayer"), lay);
+executeAction(pm_c("Mk  "), desc, DialogModes.NO);
+var F = d.activeLayer;
+F.name = "Colorway: " + ARGS.name;
+F.blendMode = BlendMode.COLORBLEND;
+if (!sel) F.grouped = true;
+return {id: F.id, masked: sel, clipped: !sel};
 """
 
 # One design = one replace state; the export works on a temporary copy and adds none. Stepping
@@ -461,7 +575,15 @@ def placeholder(quad, name="Place Design Here", size=None, fill=60, color=(214, 
 
 
 def fit_quad(layer, quad, undo="Scenario: Fit to corners"):
-    return _run(FIT_JS, {"layer": _key(layer), "quad": _check_quad(quad)}, undo=undo)
+    return _run(FIT_JS, {"layer": _key(layer), "quad": _check_quad(quad), "angle": None}, undo=undo)
+
+
+def fit_cylinder(layer, quad, bulge, top_bulge=None, angle=120, undo="Scenario: Fit to cylinder"):
+    if not 0 < float(angle) <= 180:
+        raise ValueError("angle is the label's visible arc in degrees, above 0 and up to 180")
+    top = bulge if top_bulge is None else top_bulge
+    return _run(FIT_JS, {"layer": _key(layer), "quad": _check_quad(quad), "angle": float(angle),
+                         "top": float(top), "bottom": float(bulge)}, undo=undo)
 
 
 def corners(layer):
@@ -507,6 +629,30 @@ def batch(layer, designs, out_dir, fit="cover"):
     return results
 
 
+def _rgb(c):
+    if isinstance(c, str):
+        h = c.lstrip("#")
+        if len(h) != 6:
+            raise ValueError("color needs #rrggbb or (r, g, b): " + c)
+        return [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+    if len(c) != 3:
+        raise ValueError("color needs (r, g, b)")
+    return [int(v) for v in c]
+
+
+def colorways(product, colors, out_dir):
+    os.makedirs(out_dir, exist_ok=True)
+    state = "Scenario: Colorway"
+    results = []
+    for name, color in colors.items():
+        r = _run(COLORWAY_JS, {"product": _key(product), "name": name, "rgb": _rgb(color)}, undo=state)
+        out = os.path.abspath(os.path.join(out_dir, "%s colorway.png" % name))
+        r["out"] = _run(EXPORT_JS, {"out": out, "state": state})
+        r["colorway"] = name
+        results.append(r)
+    return results
+
+
 def _opt(argv, flag, cast=str, default=None):
     if flag in argv:
         i = argv.index(flag)
@@ -536,6 +682,9 @@ def main(argv):
                               _pair(_opt(argv, "--size")), _opt(argv, "--fill", float, 60))
         elif cmd == "fit":
             out = fit_quad(argv[1], _quad(argv[2]))
+        elif cmd == "cylinder":
+            out = fit_cylinder(argv[1], _quad(argv[2]), _opt(argv, "--bulge", float, 0),
+                               _opt(argv, "--top", float), _opt(argv, "--angle", float, 120))
         elif cmd == "corners":
             out = corners(argv[1])
         elif cmd == "replace":
@@ -547,6 +696,8 @@ def main(argv):
             out = displace(argv[1], argv[2], _opt(argv, "--scale", int, 8))
         elif cmd == "batch":
             out = batch(argv[1], argv[3:], argv[2])
+        elif cmd == "colorways":
+            out = colorways(argv[1], dict(a.split("=", 1) for a in argv[3:]), argv[2])
         else:
             print("unknown command: " + cmd, file=sys.stderr)
             return 2

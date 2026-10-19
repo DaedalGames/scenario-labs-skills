@@ -57,11 +57,12 @@ display width are authoring-time values, not checked against those platforms' do
 
 ## Measured
 
-- **`test_keyart_live.py`** (5 tests, Photoshop 27.11, macOS): canvas and guides from the
+- **`test_keyart_live.py`** (6 tests, Photoshop 27.11, macOS): canvas and guides from the
   `youtube-thumbnail` preset; type fit with left, center and right alignment; a missing font
   reported; `check` clean, then flagging the badge zone, tiny text and text off the canvas; export
   under 2 MB, 150 KB and an impossible 20 KB cap; resize on export; previews at 1280 and 360 px read
-  by eye.
+  by eye; `check` and P10's `REMOVE` on a canvas holding a Clarity layer. The lead's
+  `test_io_live.py` runs `IO.replace` at the same and at another pixel size.
 - **Offline unit tests** for `cover_bounds`: aspect kept, canvas covered, focus clamped at the
   edges.
 - Fit, legibility and JPEG size numbers in expert-notes come from these runs on one fixture plate.

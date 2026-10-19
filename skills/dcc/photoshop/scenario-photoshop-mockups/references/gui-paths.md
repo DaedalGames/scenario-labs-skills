@@ -2,8 +2,8 @@
 
 Menu paths for Photoshop 2026 on macOS (Ctrl for Cmd and Alt for Option on Windows). None of these
 is run by the toolkit, and none was tested here; they come from the expert videos cited and
-Photoshop's menus. Use them when the user works by hand, for curved surfaces the toolkit does not
-warp, and for the hand finish.
+Photoshop's menus. Use them when the user works by hand, for shapes `fit_cylinder` does not model (a
+tapered bottle, a pouch), and for the hand finish.
 
 ## Placeholder by hand
 
@@ -18,14 +18,22 @@ warp, and for the hand finish.
 5. Opacity or Fill back to 100 once the design is in (Design Master [C3ZkcqB36xw 01:11];
    WeJustClickme [-VM3ee1O_8U 01:49]).
 
-## Curved surfaces: cans, bottles, mugs
+## Curved surfaces by hand (fallback to `fit_cylinder`)
 
 - **Preset:** Edit > Transform > Warp, then the Warp menu in the Options bar: Cylinder for a can
   (Design Master [C3ZkcqB36xw 00:38]), Arc Lower for a bottle label (Hastie [70L2ngS8raY 03:21]).
 - **Custom mesh:** in Warp, set the Grid to 4 x 4 and pull the mesh "without going inside the can"
   (Geller [0l2Ma_2B-A8 03:45]); the mesh follows the curve (Quick Fix Up [boONV-waIUk 01:05]).
   Mockup Art adds grid lines for the curved area (Mockup Art [SKYL0FCOO04 06:16]).
-- Run any scripted fit before the curve, never after: `fit_quad` resets the warp.
+- Warp by hand after the last scripted fit: `fit_quad` and `fit_cylinder` replace any warp.
+
+## Colorway by hand
+
+1. Select the garment or product (Select > Subject, minus the print), then Layer > New Fill Layer >
+   Solid Color: the selection becomes its mask.
+2. Set the fill layer's blend mode to Color, so folds and highlights stay.
+3. Double-click its thumbnail to pick the next color (Quick Fix Up [boONV-waIUk 02:47]), and export
+   each one (File > Export > Quick Export as PNG).
 
 ## The printable area as a group mask
 

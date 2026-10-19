@@ -1,6 +1,6 @@
 ---
 name: scenario-photoshop-generative-edit
-description: "Use when changing only part of an image open in Photoshop with a Scenario model: inpainting or replacing an object inside a selection, removing a person, object or text, recoloring, swapping clothing or a product from a reference image, extending the canvas (expand, outpaint, uncrop, a new aspect ratio), filling a large area in tiles, turning an object to a new angle, markup or annotation-driven edits, or a trained style applied inside a selection. Also when a generative fill shows a seam, a soft low-resolution patch or a halo, changes pixels outside the selection, grows past what was selected, comes back stretched or shifted, or when choosing between Photoshop's Generative Fill or Remove tool and a Scenario model."
+description: "Use when changing only part of an image open in Photoshop with a Scenario model: inpainting or replacing an object inside a selection, removing a person, object or text, recoloring, swapping clothing or a product from a reference image, extending the canvas (expand, outpaint, uncrop, a new aspect ratio), filling a large area in tiles, turning an object to a new angle, markup or annotation-driven edits, or our style from a trained model or LoRA applied inside a selection. Also when a generative fill shows a seam, a soft low-resolution patch or a halo, changes pixels outside the selection, grows past what was selected, comes back stretched or shifted, or when choosing between Photoshop's Generative Fill or Remove tool and a Scenario model."
 license: MIT
 ---
 
@@ -18,9 +18,10 @@ flag the gap.
 
 **Status (2026-10-19):** every call in [`scripts/ps_generative.py`](scripts/ps_generative.py)
 (`capture` in four mask polarities, `check`, `place_edit`, `verify`, `expand`, `tile_plan`) is
-verified live on Photoshop 27.11 (macOS) by `test_generative_live.py` (8 tests, two on a real
-Scenario inpaint). Not tested: a tile loop end to end, where an expand model puts the source,
-trained-model alignment, annotation edits, gray (partial) selections, Windows.
+verified live on Photoshop 27.11 (macOS) by `test_generative_live.py` (9 tests, two on a real
+Scenario inpaint, one placing out of a hidden markup group). Not tested: a tile loop end to end,
+where an expand model puts the source, trained-model alignment, annotation edits, gray (partial)
+selections, Windows.
 
 ## Stance (the expert delta)
 
@@ -73,7 +74,7 @@ trained-model alignment, annotation edits, gray (partial) selections, Windows.
 | Selection             | footprint of the result                                       | the active one; none: ask, or Select Subject when the brief names it |
 | Engine                | Scenario model, or Photoshop's own tool run by the user       | Scenario; suggest the Remove tool for small cleanups                 |
 | References            | layers or files sent beside the capture                       | none; each pre-cut to one object                                     |
-| Takes per run         | how many results to compare                                   | 3 (Ramirez cycles three [Ot_h4s1mXas 02:11])                         |
+| Takes per run         | how many results to compare                                   | 1; 3 when the user wants a choice, quoted as such                    |
 | Mask polarity         | `capture(polarity=...)`                                       | from the model's `mask` field (`scenario-image`)                     |
 | Model sizes           | `max_px`, tiles                                               | from the schema; capture box no larger than the output               |
 | Master depth, profile | nothing in the master                                         | capture writes sRGB 8-bit; the master keeps its own                  |
@@ -99,18 +100,20 @@ then `import ps_io as IO`, `ps_audit as A`, `ps_review as R`. Code:
 4. **Generate.** Scenario MCP steps: `scenario` for the connection, the price quote and the user's
    yes before the run; `scenario-image` for the member (`recommend` with the capability and the
    user's words), its mask field and references. Upload `cap["input"]`, `cap["mask_model"]` and
-   references, ask for 3 outputs, download them. GATE: quote approved; every output on disk.
+   references, ask for the agreed number of outputs, download them. GATE: quote approved; every
+   output on disk.
 5. **Check each take.** `r = GE.check(cap, path)`. GATE: `aspect_ok`, `edited`, not
    `polarity_suspect`, `seam_ok` (bias under 12, residual under 6), and result width at least the
    box width. Then open each passing take and judge it inside the mask at 100% with
    [critique](references/critique.md). A take that fails a code gate is never placed.
 6. **Place.** `GE.place_edit(cap, path, "Iris ice blue, take 2", feather=2, xmp={...})`: embedded
    smart object on the capture box, a layer mask rebuilt from `mask_edit.png`, model, asset id and
-   prompt in the layer's XMP, one History state. GATE: returned bounds equal `cap["bounds"]`.
+   prompt in the layer's XMP, one History state. A target inside a hidden group (a markup group) is
+   moved out of it first (`moved_out_of`). GATE: returned bounds equal `cap["bounds"]`.
 7. **Verify and look.** `v = GE.verify(cap)`; `R.preview(path)` of the canvas and
    `R.preview(path, crop=box_plus_32, max_px=0)` of the seam. On a borderline residual,
-   `R.overlay(out, layer, base, crop=box)`. GATE: `v["untouched"]` (outside max 2 or less); no seam
-   at 100% and 200%; grain and sharpness continuous across the edge.
+   `R.overlay(out, layer, base, crop=box)`. GATE: `v["untouched"]` (outside max 2 or less) and
+   `v["edited"]`; no seam at 100% and 200%; grain and sharpness continuous across the edge.
 8. **Large areas (not tested end to end).** `GE.tile_plan(box, tile, overlap=64)` with `tile` the
    model's output side minus twice the margin. Per tile, nearest the real pixels first: the stored
    edit selection intersected with the tile, then stages 3 to 7. Prompt: empty or a texture
@@ -184,9 +187,11 @@ Toolkit thresholds are authoring-time: check them on your own images.
 
 ## Photoshop 2026 notes
 
-- No script reaches Generative Fill, Generative Expand, the Remove tool or Prompt to Edit on the
-  desktop; Generative Upscale is the one generative call in the scripting DOM (since 27.2). These
-  stay manual alternatives for the user ([gui-paths](references/gui-paths.md), not tested here).
+- Generative Fill, Generative Expand, the Remove tool and Prompt to Edit: Adobe documents no script
+  call; a forum reports an undocumented batchPlay descriptor, not tested; Adobe's generative AI
+  guidelines may cover automated use. Generative Upscale is the one generative call in the scripting
+  DOM (since 27.2). These stay manual alternatives for the user
+  ([gui-paths](references/gui-paths.md), not tested here).
 - Photoshop's newest fill model uses the selection as a native mask (Adobe help, 2026-08), so
   protection outside the selection is parity, not a Scenario edge. The partner-model lineup in the
   picker changes between releases (27.11 dropped one); never route by a Photoshop model name.

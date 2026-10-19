@@ -47,6 +47,7 @@ these sources.
 | Layers overview                            | https://helpx.adobe.com/photoshop/desktop/create-manage-layers/get-started-layers/layers-overview.html                           | layer types                                               |
 | Video layers overview                      | https://helpx.adobe.com/photoshop/desktop/create-manage-layers/get-started-layers/video-layers-overview.html                     | video layers (placing a clip not tested)                  |
 | Transform an image to video                | https://helpx.adobe.com/photoshop/desktop/app-integrations/transform-image-to-video.html                                         | Photoshop's own image-to-video route                      |
+| Adobe Generative AI User Guidelines        | https://www.adobe.com/legal/licenses-terms/adobe-gen-ai-user-guidelines.html                                                     | automated or scripting use of Adobe's generative features |
 | UXP Photoshop API reference                | https://developer.adobe.com/photoshop/uxp/2022/ps-reference/                                                                     | DOM coverage, what has no class                           |
 | UXP changelog                              | https://developer.adobe.com/photoshop/uxp/2022/ps-reference/changelog/                                                           | `generativeUpscale` (27.2), new layer kinds               |
 | UXP Document class                         | https://developer.adobe.com/photoshop/uxp/2022/ps-reference/classes/document/                                                    | `Document.generativeUpscale`                              |
@@ -58,3 +59,17 @@ these sources.
 | Using Automator to run scripts (community) | https://community.adobe.com/t5/photoshop-ecosystem-discussions/using-automator-to-run-scripts-inside-photoshop/m-p/15539697      | AppleScript `do javascript` on 2025                       |
 | UXP batchPlay for beginners (forum)        | https://forums.creativeclouddeveloper.com/t/photoshop-uxp-batchplay-for-beginners/2156                                           | batchPlay and Action Manager gotchas                      |
 | Convert an Action into UXP code (forum)    | https://forums.creativeclouddeveloper.com/t/convert-an-action-into-uxp-code-equivalent-of-xtools-actionfiletojavascript/2395     | loading and converting `.atn` (2021, unverified on 27.11) |
+
+## Measured
+
+Live suites on Photoshop 27.11 (macOS), 2026-10-19:
+
+- **`test_io_live.py`** (7 tests): Workflow stage 5 as written (a selection, `export_region`, a
+  masked placement with `xmp=` and `undo=`, then the selection still active, one named History
+  state, the outside unchanged, the provenance read back with `layer_xmp`); the History gate on the
+  active state after a step back; zero UnitValues through the JSON encoder; `replace` at the same
+  and at another pixel size; `preview`, `sheet` and `before_after`; every DOM enum constant the
+  toolkits name, read and, for blend modes, assigned.
+- **`test_gates_live.py`** (9 tests) and **`test_audit_live.py`** (4 tests): the gates and the
+  delivery profiles.
+- The specialists' suites run `ps_run`, `ps_io` and `ps_review` inside their own procedures.

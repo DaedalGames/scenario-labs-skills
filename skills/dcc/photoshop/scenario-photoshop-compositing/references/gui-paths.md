@@ -1,9 +1,11 @@
 # GUI paths (for the user or a computer-use agent)
 
 Steps no script reaches: hand refinement of masks, Photoshop's own generative tools, and brush work
-on the masks the toolkit leaves black. None of these paths was run in testing; they come from the
-expert videos and Adobe's help pages, on Photoshop 2026 (27.x). Menu names can move between
-releases. Shortcuts are macOS first, Windows second.
+on the masks the toolkit leaves black. For the generative tools, Adobe documents no script call; a
+forum reports an undocumented batchPlay descriptor, not tested; Adobe's generative AI guidelines may
+cover automated use. None of these paths was run in testing; they come from the expert videos and
+Adobe's help pages, on Photoshop 2026 (27.x). Menu names can move between releases. Shortcuts are
+macOS first, Windows second.
 
 ## Cutouts
 
@@ -37,8 +39,8 @@ releases. Shortcuts are macOS first, Windows second.
 ## Light
 
 - **Harmonize:**
-  1. Target the pasted pixel layer (not a smart object). Contextual Task Bar > Harmonize; if the bar
-     is hidden, Window > Contextual Task Bar [JGbvUOytwX0 01:36].
+  1. Target the pasted pixel layer (a smart object is not tested). Contextual Task Bar > Harmonize;
+     if the bar is hidden, Window > Contextual Task Bar [JGbvUOytwX0 01:36].
   2. Pick one of three variations in the Properties panel [dWiOA5YZXwc 02:09]. Each generation costs
      5 generative credits (Adobe's credits page).
   3. Duplicate the result, set the copy to Luminosity, lower the other's opacity partway

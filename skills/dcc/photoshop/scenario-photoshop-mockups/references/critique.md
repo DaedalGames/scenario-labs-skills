@@ -39,18 +39,20 @@ looks pasted on, a printable area that spills onto a lid, or a logo with a wrong
 | `lighting` `layers`      | two, named Shading and Highlights | a copy skipped, or the product layer wrong       |
 | `displace` `map`         | the file exists                   | a map folder that cannot be written              |
 | History                  | one new state per call            | a stray edit on the user's document              |
-| `batch` History          | length and active state as before | a batch that left the last design in             |
+| `batch` History          | active state index and name kept  | a batch that left the last design in             |
+| `colorways` History      | active state index and name kept  | a colorway left on the document                  |
 | `A.deliverable(profile)` | returns `[]`                      | size, mode, profile, hidden layers in a handoff  |
 
-Thresholds are authoring-time, from one striped fixture. A fit that passes them can still sit on the
-wrong corners when the quad itself is wrong: the corner crops decide.
+Thresholds are authoring-time, from striped and checkered fixtures. A fit that passes them can still
+sit on the wrong corners when the quad itself is wrong: the corner crops decide.
 
 ## 3. Corners at 100%
 
 - Each corner of the placeholder meets the face's corner: no gap of product color, no overlap past
   the rim.
 - Edges run parallel to the face's edges along their whole length, not only at the corners. On a
-  face that bulges, a straight edge between correct corners means the face needs a curve by hand.
+  face that bulges, a straight edge between correct corners means the face needs `fit_cylinder` or a
+  curve by hand.
 - The perspective reads right: a design's grid lines converge where the product's edges converge.
 
 ## 4. The test design under light and creases
@@ -85,6 +87,10 @@ folds and the stretching will be more accurate" (Dinda [Z168F2BlAdA 15:36]), and
 - **Letters:** every letter readable where the original is readable; nothing doubled by Displace.
 - **Orientation:** the design is not mirrored or rotated; the top of the artwork is the top of the
   face.
+- **Cylinder:** columns of a check or grid design narrow toward both sides; the bottom edge bows
+  with the product's base and the top edge with its rim.
+- **Colorway:** the folds and highlights of each colorway match the original plate; only the hue
+  changed, and the print and the background did not.
 
 ## 6. Edges and frame
 
@@ -111,5 +117,6 @@ folds and the stretching will be more accurate" (Dinda [Z168F2BlAdA 15:36]), and
 - `lighting` `neutral` and opacities; `displace` scale, blur and the map path (it must stay on disk
   while the filter exists).
 - Each design with its `drift` and output path; the sheet path.
-- What was not verified: curved warps, hand finishing, `contain` fits, anything judged only at
+- Each colorway with its output path, when the brief has colorways.
+- What was not verified: hand warps, hand finishing, `contain` fits, anything judged only at
   fit-to-screen.

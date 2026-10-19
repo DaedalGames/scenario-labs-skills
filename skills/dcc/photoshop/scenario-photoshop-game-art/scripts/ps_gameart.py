@@ -350,26 +350,18 @@ for (var i = 0; i < 3; i++) {
 p.flatten();
 if (ARGS.a !== null) {
   var A = source_layer(ARGS.a);
-  // The alpha source's luminance as a selection, filled white into a new channel.
+  // The alpha source's luminance, copied over as a channel. Loading it as a selection instead
+  // fails ("Set is not currently available") when no pixel is above 50%, a constant 128 included.
   var t2 = psr_dup(p, "ga_pack_a", false);
   app.activeDocument = t2;
   ga_solo(t2, t2.layers[0]);
   t2.flatten();
-  app.activeDocument = p;
-  A.remove();
-  var r = new ActionReference(); r.putProperty(ga_c("Chnl"), ga_c("fsel"));
-  var ld = new ActionDescriptor(); ld.putReference(ga_c("null"), r);
-  var s = new ActionReference(); s.putEnumerated(ga_c("Chnl"), ga_c("Chnl"), ga_c("Rd  "));
-  s.putName(ga_c("Dcmn"), t2.name);
-  ld.putReference(ga_c("T   "), s);
-  executeAction(ga_c("setd"), ld, DialogModes.NO);
-  var ac = p.channels.add(); ac.name = "Alpha 1";
-  p.activeChannels = [ac];
-  p.selection.fill(gray(255));
-  p.selection.deselect();
-  p.activeChannels = p.componentChannels;
+  var ac = t2.channels[0].duplicate(p);
   psr_close(t2);
   app.activeDocument = p;
+  A.remove();
+  ac.name = "Alpha 1";
+  p.activeChannels = p.componentChannels;
 }
 if (ARGS.size) p.resizeImage(UnitValue(ARGS.size[0], "px"), UnitValue(ARGS.size[1], "px"), null,
                              ResampleMethod[ARGS.resample]);
@@ -498,6 +490,12 @@ def _resample(name):
     return RESAMPLE[name]
 
 
+def _out(path):
+    path = os.path.abspath(path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    return path
+
+
 def tile_check(layer=None, blur=0, grid=4):
     r = _run(CHECK_JS, {"layer": layer, "blur": blur, "grid": int(grid)})
     r["ratio_x"] = round(r["seam_x"] / max(r["base_x"], 0.5), 2)
@@ -522,7 +520,7 @@ def seam_band(width=64, dx=None, dy=None, undo="Scenario: Select tile seams"):
 def tile_preview(out, n=3, max_px=1600, layer=None):
     if n < 2:
         raise ValueError("n must be at least 2 to show the seams")
-    return _run(PREVIEW_JS, {"out": out, "n": int(n), "max_px": int(max_px), "layer": layer})
+    return _run(PREVIEW_JS, {"out": _out(out), "n": int(n), "max_px": int(max_px), "layer": layer})
 
 
 def export_texture(out, size=None, fmt="png", resample="bicubic-auto", data=False, gray=False,
@@ -532,7 +530,7 @@ def export_texture(out, size=None, fmt="png", resample="bicubic-auto", data=Fals
     if bits not in (8, 16) or (bits == 16 and fmt == "tga"):
         raise ValueError("bits must be 8, or 16 for png and tif")
     size = _size(size)
-    r = _run(EXPORT_JS, {"out": out, "size": size, "fmt": fmt, "resample": _resample(resample),
+    r = _run(EXPORT_JS, {"out": _out(out), "size": size, "fmt": fmt, "resample": _resample(resample),
                          "data": bool(data), "gray": bool(gray), "bits": bits, "layer": layer})
     r["pow2"] = pow2(r["size"][0]) and pow2(r["size"][1])
     return r
@@ -553,7 +551,7 @@ def pack_channels(out, r, g, b, a=None, size=None, fmt=None, resample="bicubic-a
         raise ValueError("PNG keeps no alpha channel: use tga or tif for a 4-channel pack")
     if fmt not in ("png", "tga", "tif"):
         raise ValueError("fmt must be png, tga or tif")
-    res = _run(PACK_JS, {"out": out, "r": _source(r), "g": _source(g), "b": _source(b),
+    res = _run(PACK_JS, {"out": _out(out), "r": _source(r), "g": _source(g), "b": _source(b),
                          "a": _source(a), "size": _size(size), "fmt": fmt,
                          "resample": _resample(resample)})
     res["pow2"] = pow2(res["size"][0]) and pow2(res["size"][1])

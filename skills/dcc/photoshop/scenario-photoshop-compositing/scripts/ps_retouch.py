@@ -266,7 +266,8 @@ def dodge_burn(dodge_mid=150, burn_mid=106, undo="Scenario: Dodge and burn layer
 def skin_tone(region="selection", layer=None):
     s = ps_gates.stats(layer, region)
     s["reading"] = ("on the skin line" if abs(s["skin_line_delta"]) <= 10 else
-                    "too red or magenta" if s["skin_line_delta"] < -10 else "too yellow or green")
+                    "toward red, magenta or blue" if s["skin_line_delta"] < -10 else
+                    "toward yellow, green or cyan")
     return s
 
 

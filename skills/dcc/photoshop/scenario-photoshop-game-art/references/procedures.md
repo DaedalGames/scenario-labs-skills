@@ -236,8 +236,8 @@ from the tile as it wraps, so re-extract rather than repair it.
 
 Status: verified live: a gray data export keeps 10, 64, 128, 200, 250 exactly; a 100x60 image
 resized to 128x64 with `nearest`; a pack with alpha to TGA reads back (40, 128, 77) and 220 within
-1; PNG with an alpha source is refused. Color export runs in the offset test. Not tested: `tif`,
-`bits=16`, normal maps.
+1; PNG with an alpha source is refused; `export_texture` and `pack_channels` create a missing output
+folder. Color export runs in the offset test. Not tested: `tif`, `bits=16`, normal maps.
 
 ```python
 print(A.deliverable("game-texture"))         # [] on the master: RGB 8-bit, 256-8192, power of two

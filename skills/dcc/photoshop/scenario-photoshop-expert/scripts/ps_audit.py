@@ -5,7 +5,9 @@ Every scenario-photoshop-* skill gates its stages on these numbers before lookin
 Library (each call is one ps_run job, read only, no history state):
   import ps_audit as A
   A.doc_state()                    # active document: size, ppi, mode, bits, profile, layer tree,
-                                   # selection bounds, active layer, saved state, path
+                                   # selection bounds, active layer, saved state, path, and
+                                   # history {index, name, count}: the active History state
+                                   # (gate on index and name; a step back keeps the count)
   A.doc_state(max_layers=400)      # cap on layers walked (big documents)
   A.layer_find(name)               # [{id, name, path, kind, bounds, visible}] for an exact name
   A.histogram_clip()               # % of pixels at 0 and 255 per channel on the merged image
@@ -72,12 +74,16 @@ try { var sb = d.selection.bounds; sel = [sb[0].as("px"), sb[1].as("px"), sb[2].
 var prof = null; try { prof = d.colorProfileName; } catch (e) { prof = "untagged"; }
 var path = null; try { path = d.fullName.fsName; } catch (e) {}
 var al = null; try { al = {id: d.activeLayer.id, name: d.activeLayer.name}; } catch (e) {}
+// Steps backward leave redo states in the list, so the length is no gate: the active state is.
+var hs = d.historyStates, hi = -1;
+for (var q = hs.length - 1; q >= 0; q--) if (hs[q] == d.activeHistoryState) { hi = q; break; }
+var hist = {index: hi, name: d.activeHistoryState.name, count: hs.length};
 return {open: true, name: d.name, id: d.id, path: path, saved: d.saved, width: d.width.as("px"),
         height: d.height.as("px"), ppi: d.resolution, mode: String(d.mode).replace("DocumentMode.", "")
           .toLowerCase(), bits: ({"BitsPerChannelType.ONE": 1, "BitsPerChannelType.EIGHT": 8,
           "BitsPerChannelType.SIXTEEN": 16, "BitsPerChannelType.THIRTYTWO": 32})[String(d.bitsPerChannel)],
         profile: prof, layers: walk(d, ""), layer_count_walked: count, truncated: truncated,
-        selection: sel, active_layer: al, documents_open: app.documents.length};
+        selection: sel, active_layer: al, history: hist, documents_open: app.documents.length};
 """
 
 FIND_JS = KIND_JS + r"""

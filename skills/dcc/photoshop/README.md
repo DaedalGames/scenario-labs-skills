@@ -22,9 +22,11 @@ lead skill, `scenario-photoshop-expert`.
 
 - 7 skills written from 208 transcribed videos (80.8% from 2025 to 2026) and Adobe documentation,
   each with cited references and a Python toolkit.
-- Every toolkit has a live suite run against Photoshop 27.11 on macOS: 68 tests across 10 suites,
-  several on real Scenario outputs (inpaint, upscale, restore, seamless texture repair). Steps no
-  script reaches are listed as GUI paths and marked not tested.
+- Every toolkit has a live suite run against Photoshop 27.11 on macOS: 86 tests across 11 suites,
+  several on real Scenario outputs (inpaint, upscale, restore, seamless texture repair). The last
+  run, on 2026-10-19, covered 56 of them after the latest toolkit changes; the other 30 (the audit,
+  retouch, compositing and restore suites, and 10 game-art tests) passed before those changes and
+  were not re-run. Steps no script reaches are listed as GUI paths and marked not tested.
 - Blind grading on seven briefs, one per skill: the same model answered with the skills and from
   memory alone, and a separate grader scored the shuffled pairs without knowing which was which.
   With the skills: 102 of 105, six briefs won and one tie. Without: 91. The gain is mostly expert
@@ -55,9 +57,14 @@ The installer puts the skills side by side, which the specialists need: they imp
   how painful they are, and where Scenario adds something Photoshop's built-in generative features
   do not. A specialist exists only where at least 10 notes back it, so retouching folded into
   compositing.
+- **Split by Scenario use case:** the specialists follow the steps where a Scenario model does the
+  work (local edits, upscale and restore, compositing, key art, mockups, game art), not Photoshop's
+  domains as the other expert families do. Batch runs and the user's Actions stay in the lead: the
+  sources teach them too thinly for a specialist, unlike the five families with an automation or
+  pipeline specialist (Blender has none).
 - **Toolkits first:** each specialist's script was written and run live before its skill body, so
   the skill teaches calls that work on 27.11. Traps found that way (a layer mask ignored by Load
   Transparency, histograms on hidden channels, warp quirks) are in the lead's
   `references/photoshop-2026-traps.md`.
-- **Reviews:** each phase went through fresh reviewer agents (skeptic, consistency, product) scored
-  on a rubric, with every blocking issue fixed before the next round.
+- **Reviews:** fresh reviewer agents (skeptic, QA, consistency, product) score each phase on a
+  rubric; a phase passes when no blocking issue remains and every criterion scores 4 of 5 or more.

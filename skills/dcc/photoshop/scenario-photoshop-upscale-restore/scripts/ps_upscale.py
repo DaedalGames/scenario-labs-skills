@@ -89,9 +89,9 @@ function pu_srgb8(d) {
   if (d.bitsPerChannel !== BitsPerChannelType.EIGHT) d.bitsPerChannel = BitsPerChannelType.EIGHT;
   try { d.convertProfile("sRGB IEC61966-2.1", Intent.RELATIVECOLORIMETRIC, true, false); } catch (e) {}
 }
-// Image Size by Action Manager: "deepUpscale" is Preserve Details 2.0 (its output differs from
-// bicubic and nearest neighbor). Photoshop silently accepts an unknown interpolation name, so a
-// typo here would not fail: keep the string exact.
+// Image Size by Action Manager: "deepUpscale" is likely Preserve Details 2.0 (its output differs
+// from bicubic, nearest neighbor and an unknown name; not proven). Photoshop silently accepts an
+// unknown interpolation name, so a typo here would not fail: keep the string exact.
 function pu_resize(d, w, h, method) {
   var desc = new ActionDescriptor();
   desc.putUnitDouble(pu_c("Wdth"), pu_c("#Pxl"), w);
@@ -263,7 +263,9 @@ return {rows: names, boxes: boxes, files: files, grid: grid};
 LOCK_JS = r"""
 var L = pu_find(d, ARGS.layer);
 if (!L) throw new Error("layer not found: " + ARGS.layer);
-L.blendMode = ARGS.mode === "luminosity" ? BlendMode.LUMINOSITY : BlendMode.COLOR;
+// The layer blend constant for Color is COLORBLEND: reading BlendMode.COLOR throws "Invalid
+// enumeration value" on 27.11 (COLOR belongs to ColorBlendMode, the enum for fills).
+L.blendMode = ARGS.mode === "luminosity" ? BlendMode.LUMINOSITY : BlendMode.COLORBLEND;
 return {id: L.id, blend: String(L.blendMode)};
 """
 

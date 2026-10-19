@@ -26,8 +26,9 @@ Job protocol:
                                          ppi: 72}
     psr_dup(doc, name, merged)           duplicate the job owns (merged=true flattens the copy)
     psr_close(doc)                       close WITHOUT saving, only a document this job created
-    psr_export(doc, path, fmt, opts)     save a COPY as png|jpg|tif|psd|tga (never the doc's own file);
-                                         tga with opts.alpha writes 32-bit with the alpha channel
+    psr_export(doc, path, fmt, opts)     save a COPY as png|jpg|tif|psd|tga (never the doc's own file),
+                                         creating the folder; tga with opts.alpha writes 32-bit
+                                         with the alpha channel
     psr_owned(doc)                       true when this job created the document
     __json(value)                        JSON text of a value (UnitValue becomes a number of px)
   The result dict: {"ok", "result", "error", "line", "log", "ms", "exit"}.
@@ -79,13 +80,14 @@ function __json(v) {
   }
   function enc(x, depth) {
     if (depth > 40) return '"<depth>"';
+    // UnitValue first: a zero UnitValue compares equal to null in ExtendScript.
+    if (typeof UnitValue !== "undefined" && x instanceof UnitValue) {
+      try { return String(Number(x.as("px"))); } catch (e) { return esc(x.toString()); }
+    }
     if (x === null || x === undefined) return "null";
     if (typeof x === "number") return isFinite(x) ? String(x) : "null";
     if (typeof x === "boolean") return x ? "true" : "false";
     if (typeof x === "string") return esc(x);
-    if (typeof UnitValue !== "undefined" && x instanceof UnitValue) {
-      try { return String(Number(x.as("px"))); } catch (e) { return esc(x.toString()); }
-    }
     if (x instanceof Array) {
       var a = [];
       for (var i = 0; i < x.length; i++) a.push(enc(x[i], depth + 1));
@@ -139,6 +141,8 @@ function psr_export(doc, path, fmt, opts) {
       throw new Error("psr_export refused: target is the document's own file");
     }
   } catch (e) { if (String(e).indexOf("refused") >= 0) throw e; }
+  // A missing folder fails as "General Photoshop error ... not available in this version".
+  if (!f.parent.exists && !f.parent.create()) throw new Error("psr_export: cannot create folder " + f.parent.fsName);
   var so;
   fmt = String(fmt || "png").toLowerCase();
   if (fmt === "png") { so = new PNGSaveOptions(); so.compression = opts.compression || 6; }

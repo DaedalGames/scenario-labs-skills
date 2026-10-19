@@ -31,7 +31,7 @@ Status: `doc_state` verified live (`test_audit_live.py`); `IO.selection` runs in
 s = A.doc_state()
 assert s["name"] == "street.psd", s["name"]      # the document the brief names
 canvas = [s["width"], s["height"]]
-h0 = ps_run.run("return app.activeDocument.historyStates.length;")["result"]
+h0 = s["history"]                                # the active state {index, name}; never the list length
 sel = IO.selection()["bounds"]                   # None: build one (P1)
 change = "the parked car and its shadow"
 keep = "the cyclist, the curb, the light"
@@ -85,8 +85,9 @@ r = ps_run.run(SEL.replace("%ARGS%", json.dumps(args)), undo="Scenario: Select c
 
 ## P2. Inpaint or instruction edit: the round trip
 
-Status: `capture`, `check`, `place_edit` and `verify` verified live (8 tests; the seam gate on two
-takes of a real Scenario inpaint). The take loop and sheet are not tested as written.
+Status: `capture`, `check`, `place_edit` and `verify` verified live (`test_generative_live.py`; the
+seam gate on two takes of a real Scenario inpaint). `R.sheet` verified live in the lead's
+`test_io_live.py`. The take loop is not tested as written.
 
 ```python
 cap = GE.capture(OUT + "/car", polarity="white")
@@ -106,8 +107,8 @@ white and nothing else does.
 #   upload cap["input"] and, unless polarity is "punch", cap["mask_model"]; references (P4)
 #   prompt: the change, then the keep: "Remove the parked car and its shadow. Keep the cyclist,
 #   the curb and the light unchanged."
-#   quote the exact payload, get the user's yes, run with 3 outputs, wait, download
-#   OUT + "/car/take_1.png" to take_3.png
+#   quote the exact payload, get the user's yes, run, wait, download: 1 output by default,
+#   3 here because the user asked for a choice, OUT + "/car/take_1.png" to take_3.png
 passed = []
 for i in (1, 2, 3):
     p = OUT + "/car/take_%d.png" % i
@@ -146,7 +147,7 @@ L = GE.place_edit(cap, best, "Car removed, take 1", feather=2,
                        "createdAt": "2026-10-19"})
 assert L["bounds"] == box
 v = GE.verify(cap)                                # composite at the box against context.png
-assert v["untouched"], v["outside"]               # outside max 2 or less, past 2 x feather + 2 px
+assert v["untouched"] and v["edited"], v          # outside max 2 or less past 2 x feather + 2 px; inside changed
 R.preview(OUT + "/car/canvas.png")
 seam = R.preview(OUT + "/car/seam_100.png", crop=around(box, 32, canvas), max_px=0)
 ```
@@ -318,11 +319,15 @@ GATE: perspective follows the scene's horizon; contact shadows and reflections m
 
 ## P8. Annotation-driven edit
 
-Status: not tested.
+Status: not tested as a whole. Verified live (`test_4b_markup_group_and_edited`): with a hidden
+"Scenario markup" group holding the active layer, `place_edit` moves the take out of the group
+(`moved_out_of`, parent the document), and `verify` returns `edited` true for a changed inside and
+false for an unchanged one.
 
 ```python
+cap = GE.capture(OUT + "/markup", polarity="white")   # first: making text layers drops the selection
 MARKUP = r"""
-var d = app.activeDocument, a = %ARGS%;
+var d = app.activeDocument, a = %ARGS%, was = d.activeLayer;
 var red = new SolidColor(); red.rgb.red = 230; red.rgb.green = 20; red.rgb.blue = 20;
 var g = d.layerSets.add(); g.name = "Scenario markup";
 for (var i = 0; i < a.notes.length; i++) {
@@ -332,11 +337,11 @@ for (var i = 0; i < a.notes.length; i++) {
   l.textItem.position = [UnitValue(n.x, "px"), UnitValue(n.y, "px")];
 }
 g.visible = false;
+d.activeLayer = was;              // the next placement lands beside it, not in the markup group
 return g.name;
 """
 notes = [{"text": "leather jacket", "pt": 36, "x": 820, "y": 410}]
 ps_run.run(MARKUP.replace("%ARGS%", json.dumps({"notes": notes})), undo="Scenario: Markup")
-cap = GE.capture(OUT + "/markup", polarity="white")              # notes hidden
 ps_run.run('app.activeDocument.layerSets.getByName("Scenario markup").visible = true; return 1;')
 IO.export_region(OUT + "/markup/annotated.png", bounds=cap["bounds"])   # same box, notes visible
 ps_run.run('app.activeDocument.layerSets.getByName("Scenario markup").visible = false; return 1;')
@@ -348,6 +353,8 @@ ps_run.run('app.activeDocument.layerSets.getByName("Scenario markup").visible = 
 - A member that takes one image only gets `annotated.png` as its input, with "Follow the red notes,
   then remove every red mark". `check` still compares against the clean context.
 - The user may draw the notes and arrows instead; the capture order stays the same.
+- Place and verify as P2. `place_edit` refuses nothing here: a take aimed inside the hidden group is
+  moved out (`moved_out_of`). `verify` must return `edited` true as well as `untouched`.
 - GATE: P2's gates, and no red mark or letter survives inside the mask.
 - The markup group stays hidden; `A.deliverable("psd-handoff")` flags it. Ask the user whether to
   keep it.

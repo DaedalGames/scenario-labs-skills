@@ -23,13 +23,14 @@ coordinates, or open a modal dialog.
 | Histograms, difference, texture, halo, skin line, structure         | `ps_gates`, on duplicates the job owns                                       |                                                         | measured                              |
 | Pixels and masks in or out                                          | through files: `ps_io.export_region`, `export_mask`, `place`                 | the UXP imaging API (pixel buffers) is not reachable    | measured                              |
 | Place a file as an embedded smart object in a box                   | `ps_io.place`                                                                |                                                         | measured                              |
-| Replace a smart object's contents                                   | `ps_io.replace`                                                              |                                                         | behavior measured; `replace` no test  |
+| Replace a smart object's contents                                   | `ps_io.replace`                                                              |                                                         | measured (same pixel size keeps box)  |
 | One undo step per job, layer provenance                             | `suspendHistory` per job; XMP written by `place`                             |                                                         | measured                              |
 | Masks, adjustment and fill layers, Blend If, clipping               | Action Manager (compositing toolkit)                                         |                                                         | measured                              |
 | Warp, four-corner fit, Displace, other smart filters                | Action Manager (mockups, compositing toolkits)                               |                                                         | measured                              |
 | Select Subject                                                      | `autoCutout`                                                                 | Select and Mask refine brush                            | measured; refine documented           |
 | Remove Background, Camera Raw Filter                                | Action Manager, a subset                                                     | most Camera Raw controls                                | documented                            |
-| Generative Fill, Expand, Harmonize, Rotate Object, Prompt to edit   | no toolkit call; a recorded Action played with `app.doAction` may replay one | Adobe documents running them through Actions            | not tested                            |
+| Generative Fill, Expand, Prompt to edit                             | no toolkit call; a recorded Action played with `app.doAction` may replay one | Adobe documents these steps in Actions                  | not tested                            |
+| Harmonize, Relight Layer, Rotate Object, Enhance edge               | no toolkit call                                                              | GUI; no Action step documented                          | not tested                            |
 | Generative Upscale                                                  | no toolkit call                                                              | GUI; UXP `Document.generativeUpscale` (27.2 and later)  | documented                            |
 | Brush work: painting, healing, Remove strokes, Mixer Brush, Liquify | scaffold layers only                                                         | the strokes                                             | documented                            |
 | Actions                                                             | `app.doAction(action, set)` plays a loaded action                            | loading an `.atn` from a script is unverified on 27.11  | not tested                            |
@@ -39,10 +40,12 @@ coordinates, or open a modal dialog.
 | 3D layers                                                           | none                                                                         | removed from Photoshop in July 2024                     | documented                            |
 | Video layers                                                        | `LayerKind.VIDEO` is detectable                                              | the timeline has no DOM; Render Video is a menu command | documented; placing a clip not tested |
 
-Adobe's generative features also exist in Adobe's cloud APIs, under an enterprise contract with
-server credentials and no access to the document open on the desktop (documented). Skills route
-generation to the Scenario MCP and describe Adobe's features as manual alternatives in
-[gui-paths.md](gui-paths.md).
+Adobe documents no script call for its generative tools; a forum reports an undocumented batchPlay
+descriptor, not tested. Adobe's generative AI guidelines may cover automated use, so these tools
+stay manual steps for the user, and an agent plays no Action that holds one. Adobe's generative
+features also exist in Adobe's cloud APIs, under an enterprise contract with server credentials and
+no access to the document open on the desktop (documented). Skills route generation to the Scenario
+MCP and describe Adobe's features as manual alternatives in [gui-paths.md](gui-paths.md).
 
 ## 2. The channel itself
 
@@ -69,7 +72,10 @@ generation to the Scenario MCP and describe Adobe's features as manual alternati
 - **Chained ternaries group from the left.** `a ? b : c ? d : e` runs as `(a ? b : c) ? d : e`. A
   left alignment came out right-aligned (measured). Parenthesize every nested ternary.
 - **Units.** `ps_run` sets rulers to pixels and type to points for the job, then restores them. At
-  72 ppi a point equals a pixel; at other resolutions convert.
+  72 ppi a point equals a pixel; at other resolutions convert. Path anchors read back in pixels; a
+  path drawn through the DOM's `PathPointInfo` takes points.
+- **`UnitValue(0) == null` is true.** Test `instanceof UnitValue` before a null check; `ps_run`'s
+  JSON encoder does, so zero comes back as 0 (measured).
 - **Windows.** COM `DoJavaScript` runs ExtendScript on Windows (documented). The toolkit targets
   macOS only and is not tested on Windows.
 
@@ -101,11 +107,18 @@ generation to the Scenario MCP and describe Adobe's features as manual alternati
   and change nothing, with no error (measured). With it, `height`, `width` and `skew` percentages
   work (used for cast shadows).
 - **Custom warp** (`warpStyle: warpCustom`): `bounds` equal to the layer's current box, 16
-  `rationalPoint` mesh points (row-major 4x4), and the box already scaled and moved onto the quad's
-  bounding box. Reset with a `warpNone` transform before re-fitting. After a good fit,
-  `nonAffineTransform` equals the quad's bounding box, a pixel-free self-check (measured).
-- **Smart objects placed from a file** store warps in content pixels; a scripted custom warp on one
-  renders with its top-left corner about 10 px off. Wrap it with `newPlacedLayer` first (measured).
+  `rationalPoint` mesh points (row-major 4x4, Bezier control points), and the box already scaled and
+  moved onto the mesh's bounding box. After a good fit, `nonAffineTransform` equals that bounding
+  box, a pixel-free self-check (measured).
+- **A custom warp lands only on an object scaled up** from the box it was converted at. At that box
+  or below, corners drift by up to 60 px, more as the quad leaves its bounding box. Convert to Smart
+  Object (`newPlacedLayer`) at a slightly smaller box, then scale up and warp; this also covers a
+  smart object placed from a file, which otherwise lands about 10 px off (measured).
+- **`warpNone` can leave a transform the next warp rejects** ("Numeric value expected"). Reset with
+  a flat custom warp (the box's own grid) instead (measured).
+- **Convert to Smart Object keeps only the opaque box** and drops the active selection; moving a
+  layer into a group first releases its clipping chain. A hidden layer filling the box keeps the
+  margins; store the selection and re-clip the chain after (measured, mockups toolkit).
 - **Image Size accepts any interpolation name** (`ImgS` with `Intr`), even a made-up one, without an
   error (measured). Keep names exact (`bicubicAutomatic`, `nearestNeighbor`) and check the output by
   effect. `deepUpscale` gives pixels distinct from bicubic, nearest neighbor and a made-up name, so
@@ -125,6 +138,15 @@ generation to the Scenario MCP and describe Adobe's features as manual alternati
 - **`channels.add()` leaves only the new alpha channel active**, which sends later transforms and
   fills to it. Set `doc.activeChannels = doc.componentChannels` right after (found building
   `ps_io`).
+- **Loading a channel as a selection fails when no pixel is above 50%** ("Set is not currently
+  available"), for example a constant alpha of 128. Copy a channel to another document with
+  `Channel.duplicate(doc)` instead (measured, game-art packing).
+- **Enum names.** The Color blend mode is `BlendMode.COLORBLEND`; `BlendMode.COLOR` throws "Invalid
+  enumeration value" when assigned. Check a new DOM constant by reading and assigning it in a
+  try/catch on a scratch layer (measured: 60 constants in the toolkits).
+- **Exports into a missing folder** fail with "General Photoshop error occurred. This functionality
+  may not be available in this version of Photoshop". `psr_export` creates the folder first
+  (measured).
 - **Clipping chains.** A layer inserted between a base and its clipped layers unclips the whole
   chain. Add above the chain top, then set `grouped = true` (measured).
 - **Select Subject** is `executeAction(stringIDToTypeID("autoCutout"))` with
@@ -153,18 +175,23 @@ generation to the Scenario MCP and describe Adobe's features as manual alternati
   switch back before stepping the source's History (found building `ps_io`).
 - **Deleting the active History snapshot** sends the document back to its opening state. Step back
   one state instead (measured).
+- **Gate on the active state, never the list length.** Captures, previews and exports step History
+  back and leave redo states in the list; making a selection is a state of its own; at the History
+  limit the oldest state drops and the index holds still. `doc_state()["history"]` returns the
+  active state's index and name (measured). A job with `undo` that throws still leaves its named
+  state, possibly empty.
 - **History stepping does not restore layer visibility** under the default preference, which leaves
   visibility out of History (measured). Restore visibility explicitly.
 - **Layer XMP** written on a layer survives save, close and reopen (measured). `ps_io.place` writes
-  provenance there; reading it back with `layer_xmp` has no live test.
+  provenance there, and `layer_xmp` reads it back (verified live).
 - **A job that throws closes the documents it created** (`ps_run`), so no temporary copy is left in
   front of the user.
 
 ## 6. Generated pixels (measured with real Scenario jobs)
 
-- An image-edit model re-rendered the whole frame: mean difference 17 to 18 outside the mask on an
-  aligned result, texture redrawn and tone 6 to 7 levels darker. Masked placement hid it: outside
-  max 0 after placement, no seam at 100% or 4x.
+- One image-edit job, two takes, re-rendered the whole frame: mean difference 17 to 18 outside the
+  mask on an aligned result, texture redrawn and tone 6 to 7 levels darker. Masked placement hid it:
+  outside max 0 after placement, no seam at 100% or 4x.
 - The model fills the mask. An ellipse wider than an iris made the generated iris grow to fill it.
 - A seam shows when tone or alignment is off, not when texture differs. On blurred images in a ring
   outside the mask: real takes scored tone bias 6.4 and 7.3, residual 3.5 and 3.4; a 3 px shift 12.4
@@ -190,8 +217,8 @@ All figures are authoring-time, from one image per check; check them on your own
   replaced by 27.9.1 for a color bug. Re-test anything built on an earlier version (documented).
 - 27.10 (August 2026): Prompt to edit and Markup; recording Prompt to edit in an Action is listed as
   a fixed bug, so an Action can replay it from the UI (documented).
-- 27.11 (October 2026): Enhance Edge on Remove Background masks (documented). The toolkit was built
-  and measured on this release.
+- 27.11 (the September 2026 release): Enhance Edge on Remove Background masks (documented). The
+  toolkit was built and measured on this release.
 - Adobe's partner model lineup changes in point releases without a scripting signal. Name the
   Photoshop feature, never the partner model, and log `app.version` with every report.
 - The next major is expected around Adobe MAX in November 2026 (inferred). Re-run the live checks on

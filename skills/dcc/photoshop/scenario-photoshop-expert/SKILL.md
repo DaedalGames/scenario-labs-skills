@@ -14,9 +14,10 @@ ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`
 proceed from tool schemas and flag the gap.
 
 **Status (2026-10-19):** every toolkit call in Workflow is verified live on Photoshop 27.11 (macOS)
-by the gates, audit and restore suites, and through the specialists' suites that run `ps_run`,
-`ps_io` and `ps_review`. Not tested: `ps_io.replace`, `layer_xmp` read-back, `ps_review.sheet` and
-`before_after`, the `social` profile, `app.doAction`, the batch loop, and Windows.
+by the io, gates, audit and restore suites and the specialists' suites. `test_io_live.py` runs stage
+5 as written (a masked placement with provenance, then the outside gate), `ps_io.replace`,
+`layer_xmp`, `ps_review.sheet` and `before_after`. Not tested: the `social` profile, `app.doAction`,
+the batch loop, and Windows.
 
 ## Stance (the expert delta)
 
@@ -28,14 +29,15 @@ by the gates, audit and restore suites, and through the specialists' suites that
   the sky a smart object so its blur stayed editable [ZGsgdObKOZA 06:51]; Unmesh Dinda's complaint
   about built-in actions is effects "burned into the pixels" [6vsnsS92gKc 11:57].
 - **One job, one named History state, one named layer.** Dinda plays long actions as a single
-  History state [6vsnsS92gKc 11:24]; the Art, Life & Photography channel renames every layer an
-  action creates [MQDF-UW5-Uk 06:38].
+  History state [6vsnsS92gKc 11:24]; the Art, Life & Photography channel calls renaming an action's
+  layers good practice [MQDF-UW5-Uk 06:38].
 - **Select tight, capture with padding.** The model fills the selection it gets: Julieanne Kost
   [1bFcFVbbzjc 07:13]. A model shown only the crop lacks context: Jesús Ramirez [Ot_h4s1mXas 01:36],
   Kost [1bFcFVbbzjc 07:46]. The selection marks the change; `pad` gives the context.
 - **The mask in Photoshop, not the model, keeps the outside exact.** Colin Smith shows Harmonize
-  regenerating the whole image and masking it [dWiOA5YZXwc 03:19]. Measured with Scenario image-edit
-  models: outside mean difference 17 to 18 before masking, max 0 after masked placement.
+  regenerating the whole image and masking it [dWiOA5YZXwc 03:19]. Measured on one Scenario
+  image-edit job, two takes: outside mean difference 17 to 18 before masking, max 0 after masked
+  placement.
 - **Measure before trusting a call or a take.** Dinda and Colin Smith check alignment with the
   Difference blend mode [mSgSaisb6Kg 04:55] [iy0IxTpT4OY 03:47]. [added] On 27.11 a transform, a
   warp or an interpolation name can return success and change nothing, so each new descriptor gets a
@@ -54,7 +56,7 @@ by the gates, audit and restore suites, and through the specialists' suites that
 | What must not change | the mask, the gates, the prompt         | faces, products, logos, text                   |
 | Scope                | selection, one layer, or the canvas     | the active selection; none: ask                |
 | Deliverable          | the audit profile and the export format | `psd-handoff` at the document's size and depth |
-| Takes and budget     | how many paid runs to quote             | one take, quoted first                         |
+| Takes and budget     | how many paid runs to quote             | one take; 2 or 3 when the user wants a choice  |
 | One file or many     | one round trip, or the batch procedure  | one file                                       |
 | Work folder          | where captures, results and copies go   | a new folder, never the PSD's own folder       |
 
@@ -67,7 +69,7 @@ bring Photoshop to the front, click the screen, or open a modal dialog.
 
 1. **Connect and read.** `ps_run.find_photoshop()`, `ps_run.run("return app.version;")` (exit 3:
    `ps_run.py --launch`; exit 6: the user allows automation), then `A.doc_state()`. GATE: exit 0;
-   the document name matches the brief; `saved`, bits, profile and History length recorded.
+   the document name matches the brief; `saved`, bits and profile recorded.
 2. **Route.** Pick the owner in Handoffs and write down any chain. GATE: one owner per brief before
    the first edit.
 3. **Capture.** `IO.selection()`, `cap = IO.export_region(out, pad=32)`,
@@ -77,10 +79,12 @@ bring Photoshop to the front, click the screen, or open a modal dialog.
    capability, upload, price the exact payload, get the user's yes, run, wait, download. A saved
    Scenario workflow runs through `scenario-workflows`. GATE: the user approved this payload's
    price; the result has the capture's aspect.
-5. **Land.**
+5. **Land.** `h0 = A.doc_state()["history"]` right before, then
    `IO.place(result, name, bounds=cap["bounds"], mask_selection=True, xmp={...}, undo="Scenario: <action>")`:
-   an embedded smart object, fitted, masked, with provenance. One layer per take. GATE: returned
-   `bounds` equal the capture's; History grew by one state; the original is visible underneath.
+   an embedded smart object, fitted, masked, with provenance; the selection stays active for
+   stage 6. One layer per take. GATE: returned `bounds` equal the capture's; the active History
+   state is `h0["index"] + 1` and named as `undo` (never compare the list length: captures step back
+   and leave redo states); the original is visible underneath.
 6. **Gate.** `G.diff(None, base, region="outside")`, `G.texture`, `G.halo`, `G.stats`, and
    `G.structure` after a tone change. GATE: the numbers in Quality gates.
 7. **Look.** `R.preview(path)` for the whole canvas, `R.preview(path, crop=box, max_px=0)` for each
@@ -99,19 +103,19 @@ frame, generate with `scenario-video`, outside Photoshop (P12).
 
 ## Numbers
 
-| Value                   | Relative to                                   | Source                    |
-| ----------------------- | --------------------------------------------- | ------------------------- |
-| `pad` 32 px or more     | capture around a selection                    | [added], model context    |
-| diff max <= 2           | outside the mask, composite against the base  | measured                  |
-| mean 17 to 18           | outside the mask, model output before masking | measured, real jobs       |
-| bias < 12, residual < 6 | seam ring just outside the mask               | measured, generative-edit |
-| texture ratio >= 0.6    | after over before, same region                | authoring-time            |
-| rim <= 8                | `light_rim`, `dark_rim` of a cut-out          | authoring-time            |
-| 123 degrees, +-10       | vectorscope skin line, `skin_line_delta`      | Kost [Aj_xqQI3gs0 07:24]  |
-| drop >= 10%             | structure score, to keep an Auto-Align        | measured, restore         |
-| mean < 6 at 256 px      | upscale against its baseline (identity)       | measured, upscale-restore |
-| 1600 px, sRGB 8-bit     | preview long edge                             | toolkit default           |
-| 120 s                   | `ps_run` timeout per job                      | toolkit default           |
+| Value                   | Relative to                                   | Source                                                         |
+| ----------------------- | --------------------------------------------- | -------------------------------------------------------------- |
+| `pad` 32 px or more     | capture around a selection                    | [added], model context                                         |
+| diff max <= 2           | outside the mask, composite against the base  | measured                                                       |
+| mean 17 to 18           | outside the mask, model output before masking | measured, one job, 2 takes                                     |
+| bias < 12, residual < 6 | seam ring just outside the mask               | measured, generative-edit                                      |
+| texture ratio >= 0.6    | after over before, same region                | authoring-time                                                 |
+| rim <= 8                | `light_rim`, `dark_rim` of a cut-out          | authoring-time                                                 |
+| 123 degrees, +-10       | vectorscope skin line, `skin_line_delta`      | Kost (123) [Aj_xqQI3gs0 07:24]; toolkit, authoring-time (+-10) |
+| drop >= 10%             | structure score, to keep an Auto-Align        | measured, restore                                              |
+| mean < 6 at 256 px      | upscale against its baseline (identity)       | measured, upscale-restore                                      |
+| 1600 px, sRGB 8-bit     | preview long edge                             | toolkit default                                                |
+| 120 s                   | `ps_run` timeout per job                      | toolkit default                                                |
 
 Authoring-time thresholds: check them on your own images.
 
@@ -121,7 +125,8 @@ Code gates, in order:
 
 - Document name equals the brief at every editing job.
 - Capture and mask bounds equal; placed bounds equal the capture.
-- One History state per named edit; no job without `undo=` edits pixels.
+- One History state per named edit, read as the active state's index and name; no job without
+  `undo=` edits pixels.
 - Outside the mask: `G.diff(...)["worst"]["max"]` <= 2. On a stack with adjustments above the base,
   compare captured files instead.
 - Texture ratio, halo rims and skin line within Numbers; structure compared between candidates,
@@ -157,6 +162,8 @@ Receives any Photoshop brief. Routes it:
 | Brief                                                                         | Owner                               |
 | ----------------------------------------------------------------------------- | ----------------------------------- |
 | Remove, replace, recolor or add inside a selection; extend the canvas; angles | scenario-photoshop-generative-edit  |
+| Our trained style (trained model, LoRA) inside a selection                    | scenario-photoshop-generative-edit  |
+| Our trained style as a new layer: game asset, texture, campaign art           | game-art or key-art                 |
 | Upscale for print, restore or colorize an old photo                           | scenario-photoshop-upscale-restore  |
 | Subject into a scene, cut-out edges, split into layers, skin after an edit    | scenario-photoshop-compositing      |
 | Campaign files, live type, sizes per channel, template variants               | scenario-photoshop-key-art          |
@@ -178,8 +185,11 @@ is saved over the user's file at any handoff.
 - Measured on 27.11. Read `app.version` every session: descriptors are undocumented and move.
 - 27.2 added Generative Upscale to UXP; 27.6 redesigned Actions and added Layer Cleanup; 27.9
   changed the UI backend (re-test older code); 27.10 added Prompt to edit; 27.11 Enhance Edge.
-- Photoshop's generative tools have no toolkit call; a recorded Action may replay them (not tested
-  here). Adobe's partner model lineup changes in point releases: name features, not models.
+- Photoshop's generative tools have no toolkit call. Adobe documents no script call; a recorded
+  Action may replay one, and a forum reports an undocumented batchPlay descriptor (neither tested
+  here). Adobe's generative AI guidelines may cover automated use: offer these tools to the user as
+  manual steps, and play no Action that holds one. Name features, not models: Adobe's partner lineup
+  changes in point releases.
 - AppleScript given a file alias fails with error 8800; `ps_run` inlines `$.evalFile`.
 - ExtendScript is ES3, and Java keywords are reserved: `{native: 1}` fails to compile.
 - Layer kinds measured: pixel 1, adjustment 2, text 3, shape 4, solid fill 11. Smart object 5, video

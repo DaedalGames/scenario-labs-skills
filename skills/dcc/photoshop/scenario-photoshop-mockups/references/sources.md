@@ -41,13 +41,17 @@ tested.
 
 ## Measured
 
-- **`test_mockup_live.py`** (8 tests, Photoshop 27.11, macOS, 2026-10-19): `placeholder` without and
-  with a group mask, `fit_quad` on a re-fit and on a placed result, `corners`, `quad_size`,
-  `replace_design` in `exact` and `cover`, `lighting`, `displace`, `batch`. Fixture: a 1000x800
-  document with 40 px gray strips. Results in [expert-notes.md](expert-notes.md).
+- **`test_mockup_live.py`** (14 tests, Photoshop 27.11, macOS, 2026-10-19): `placeholder` without
+  and with a group mask and with `size=`, `fit_quad` on four quads in a row, on a placed result, on
+  a PNG with transparent margins, a clipped layer and an active selection, `fit_cylinder` on a
+  checkerboard, `corners`, `quad_size`, `replace_design` in `exact` and `cover` (print proportions
+  kept), `lighting`, `displace`, `batch`, `colorways` (clipped and masked), and a fit refused on a
+  smart object with Smart Filters. Fixtures: a 1000x800 document with 40 px gray strips and a white
+  1000x800 document. Results in [expert-notes.md](expert-notes.md).
 - **One visual check** on a generated tote photo, 2026-10-19: a design flat, then lit, then
   displaced, judged on the whole frame and on a zoomed crop of the creases.
-- **Platform checks on 27.11:** the custom warp descriptor, the placed-from-file offset, the
-  `nonAffineTransform` self-check, Replace Contents scale and renaming, the Displace map re-read,
-  History snapshots, clipping chains, Blend If read-back. Details in
+- **Platform checks on 27.11:** the custom warp descriptor, the scale-up rule for custom warps,
+  `warpNone` against a flat reset, Convert to Smart Object margins, the `nonAffineTransform`
+  self-check, Replace Contents scale and renaming, the Displace map re-read, History snapshots,
+  clipping chains, Blend If read-back, the Color blend constant. Details in
   [expert-notes.md](expert-notes.md).

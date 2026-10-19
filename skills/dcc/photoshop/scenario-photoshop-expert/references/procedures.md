@@ -23,13 +23,18 @@ ps = ps_run.find_photoshop()            # {"path", "name", "version"}, or None (
 r = ps_run.run("return {version: app.version, active: app.documents.length ? app.activeDocument.name : null};")
 # r["exit"]: 3 not running (ps_run.py --launch starts it without stealing focus), 6 automation refused
 s = A.doc_state()                       # name, path, saved, width, height, ppi, mode, bits, profile,
-                                        # layers (tree with kind), selection, active_layer
+                                        # layers (tree with kind), selection, active_layer, history
 ```
 
 - Check `s["name"]` against the brief before any edit. If the user names another document, ask them
   to bring it to the front; never switch documents under them.
-- Record `s["saved"]`, `s["bits"]`, `s["profile"]` and the History length. At the end, `saved` must
-  be unchanged by the agent, and History must have grown by one state per edit.
+- Record `s["saved"]`, `s["bits"]` and `s["profile"]`. At the end, `saved` must be unchanged by the
+  agent.
+- `s["history"]` is the active History state: `{index, name, count}`. Gate an edit on it, taken
+  right before the call: afterwards the index is one higher and the name is the job's `undo` name.
+  Never gate on `count`: captures, previews and exports step History back and leave redo states in
+  the list, and a selection is a state of its own. At the History limit the oldest state drops and
+  the index holds still: the name decides (verified live, `test_io_live.py`).
 - `A.layer_find("Sky")` returns every layer with that exact name, with its path and kind. Two hits
   mean the name is ambiguous: rename or use the id.
 
@@ -51,7 +56,8 @@ if not r["ok"]:
     print(r["error"], r.get("body_line"), r.get("jsx"))   # body_line counts from the body's first line
 ```
 
-- The body is a function body: `return` a JSON-able value. UnitValues come back as pixels.
+- The body is a function body: `return` a JSON-able value. UnitValues come back as pixels, zero
+  included (verified live).
 - One `undo` name per user-visible edit, starting "Scenario: ". Read-only jobs take none.
 - Try a new Action Manager descriptor on a document the job creates first:
   `var d = psr_new_doc(512, 512, "scratch", {fill: "white"}); try { ... } finally { psr_close(d); }`.
@@ -63,8 +69,11 @@ if not r["ok"]:
 
 ## P3. The local edit round trip
 
-Status: verified live (`ps_io` capture and placement run inside the generative-edit, key-art, mockup
-and restore suites). For a selection-scoped edit with seam and outside checks, the generative-edit
+Status: verified live. `test_io_live.py` runs this block as written on a fixture photo: a selection,
+`export_region`, a brightened result placed with `mask_selection=True`, `xmp=` and `undo=`, then
+`masked` and `selection_kept` true, the capture's bounds, one History state with that name, the
+outside unchanged (`G.diff` max 2 or less), the inside changed, and `layer_xmp` reading the
+provenance back. For a selection-scoped edit with seam and outside checks, the generative-edit
 specialist's `capture`, `check`, `place_edit` and `verify` wrap these calls.
 
 ```python
@@ -73,16 +82,21 @@ cap = IO.export_region(OUT + "/input.png", pad=32)        # merged pixels, selec
 msk = IO.export_mask(OUT + "/mask.png", bounds=cap["bounds"])   # same box: the files line up
 # Scenario MCP (the scenario skill): recommend for the capability, upload input.png and mask.png,
 # price the exact payload, get the user's yes, run, wait, download OUT + "/result.png".
+h0 = A.doc_state()["history"]           # right before the call
 L = IO.place(OUT + "/result.png", "Window, tiki hut, take 1", bounds=cap["bounds"],
              mask_selection=True, undo="Scenario: Edit window",
              xmp={"assetId": "...", "jobId": "...", "prompt": "...", "createdAt": "2026-10-19"})
-assert L["bounds"] == cap["bounds"]
+assert L["bounds"] == cap["bounds"] and L["masked"] and L["selection_kept"]
+h1 = A.doc_state()["history"]
+assert (h1["index"], h1["name"]) == (h0["index"] + 1, "Scenario: Edit window")
+print(IO.layer_xmp(L["name"]))          # the provenance, read back from the layer
 ```
 
 - `pad`: context for the model. The selection stays tight to what should change, because the model
   fills the mask.
-- `mask_selection=True` needs the selection still active. If the user may have changed it, place
-  without the mask and use the generative-edit `place_edit`, which rebuilds the mask from the file.
+- `mask_selection=True` needs the selection still active, and leaves it active for P4's outside gate
+  (`selection_kept`). If the user may have changed it, place without the mask and use the
+  generative-edit `place_edit`, which rebuilds the mask from the file.
 - `export_region(layer="Hero")` captures one layer instead of the composite; `max_px=` caps the long
   side for a model's input limit; `punch_selection=True` makes the selected area transparent for
   models that edit where the input is transparent.
@@ -93,7 +107,8 @@ assert L["bounds"] == cap["bounds"]
 
 ## P4. Gates after landing
 
-Status: verified live (`test_gates_live.py`, `test_restore_live.py`).
+Status: verified live (`test_gates_live.py`, `test_restore_live.py`; the outside gate right after
+P3's placement in `test_io_live.py`).
 
 ```python
 out = G.diff(None, "Background", region="outside")       # composite vs the base, outside the selection
@@ -121,21 +136,23 @@ st = G.structure(L["name"], "Background")["score"]   # tone-blind; compare candi
 
 ## P5. A new take on the same layer
 
-Status: Replace Contents behavior verified live; `IO.replace` itself has no live test.
+Status: verified live (`test_io_live.py`): a file of the same pixel size keeps the box; a file of
+another size changes it.
 
 ```python
-IO.replace("Window, tiki hut, take 1", OUT + "/result_2.png")   # same box, name restored
+IO.replace("Window, tiki hut, take 1", OUT + "/result_2.png")   # same pixel size: same box; name restored
 ```
 
-- The new contents inherit the layer's transform: a 50% scaled layer shows a 300x200 file at
-  150x100, same center.
+- The new contents inherit the layer's transform, not its box: a 50% scaled layer shows a 300x200
+  file at 150x100, same center. A take of another pixel size lands at another size: place it as a
+  new layer (P6) or fit it again.
 - Replace only when the user wants the old take gone. To compare takes, place each as its own layer
   (P6): generating again on a generated layer replaces the earlier take.
 
 ## P6. Candidates as layers, then a sheet
 
-Status: placement and `preview` verified live; `sheet` and `before_after` have no live test (they
-need Pillow).
+Status: verified live (`test_io_live.py` runs `preview`, `sheet` and `before_after`: tile sizes,
+labels band, and the edited area differing between the two tiles; Pillow is required).
 
 ```python
 paths, labels = [], []
@@ -248,6 +265,9 @@ return name;
 ## P11. Play one of the user's Actions
 
 Status: not tested.
+
+Skip an Action that holds one of Photoshop's generative steps (Generative Fill, Expand, Prompt to
+edit): Adobe's generative AI guidelines may cover automated use, so the user plays it by hand.
 
 ```python
 ps_run.run('app.doAction("Sharpen for web", "Studio"); return true;', undo="Scenario: Action Sharpen for web")
