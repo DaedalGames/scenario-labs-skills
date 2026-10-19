@@ -34,10 +34,10 @@ transparency, `tif` and 16-bit exports, every GUI path, Windows.
 - **Repair the seam in a narrow band, keep every other pixel, check every take.** Generative fill
   loses resolution on a wide seam, so Dinda fills small pieces [9_36YihB8I4 03:17]; a prompted
   object repeats "in every single box" [CyJgXBJVHkU 09:47]. Measured on one plain texture: a 48 px
-  cross (about 5% of 1024) through an image-edit model with a reference image and a mask passed the
-  seam gate and the tile check, with the source unchanged past 32 px from the seam. A 96 px cross
-  through a tiling material model's inpaint drifted in style; a mask-edit model returned its input
-  unchanged. Band and model changed together: narrow is the default, not a law.
+  cross (about 5% of 1024) through an image-edit model with a reference and a mask passed both
+  gates, with the source unchanged past 32 px from the seam. A 96 px cross through a tiling material
+  model's inpaint drifted in style; a mask-edit model returned its input unchanged. Band and model
+  changed together, so narrow is only a default.
 - **Re-render through a tiling material model only when the look may change.** Measured: at img2img
   strength 0.35 it tiled (ratios 0.97 and 0.93) but changed every pixel (mean 16) and softened the
   stones.
@@ -90,9 +90,10 @@ one `ps_run` job; after one raises or times out, recover as the lead's Quality g
 3. **Repair the seam** when it fails and the texture must stay. `GA.offset()`, `GA.seam_band(width)`
    at about 5% of the side (48 on 1024), `cap = GE.capture(out, polarity=p)`. Scenario: an
    image-edit model with the offset tile as reference and a mask (`scenario-image`), a texture-only
-   prompt, 2 takes, quoted as such: in the shoot-out one of two re-laid the stones. Per take
-   `GE.check`; then `GE.place_edit`, `GE.verify`. GATE: `check` flags pass; `untouched`;
-   `tile_check` passes; the cross read at 100% and the 3x3 preview at fit.
+   prompt, 2 takes (in the shoot-out one of two re-laid the stones). Per take `GE.check`,
+   `GE.place_edit`, `GE.verify`, then `GA.offset` the repaired layer back, or `tile_check` reads its
+   interior and always passes. GATE: `check` flags pass; `untouched`; `tile_check` passes; the cross
+   read at 100% and the 3x3 preview at fit.
 4. **Re-render instead** when the look may change: a tiling material model at low img2img strength
    (`scenario-textures`), placed as its own layer. GATE: stage 2's gate; the user accepts the look.
 5. **Blotches** (`patch_ok` false): `t["cells"]` locates the dark or bright cell; Dinda paints a
