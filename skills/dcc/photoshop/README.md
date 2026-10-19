@@ -31,11 +31,12 @@ lead skill, `scenario-photoshop-expert`.
   (since then, the io and gates toolkits changed in docstrings only, and the composite, mockup and
   upscale changes add no DOM constant to the io suite's enum sweep). Steps no script reaches are
   listed as GUI paths and marked not tested.
-- Blind grading of the first draft, before the review fixes, on seven briefs, one per skill: the
-  same model answered with the skills and from memory alone, and a separate grader scored the
-  shuffled pairs without knowing which was which. With the skills: 102 of 105, six briefs won and
-  one tie. Without: 91. The gain is mostly expert technique and fewer wrong claims (one against
-  three). Seven briefs and one grader are a small sample.
+- Blind grading on seven briefs, one per skill: the same model answered with the skills and from
+  memory alone, and a separate grader scored the shuffled pairs without knowing which was which. On
+  the final skills: 103 of 105 with the skills (four briefs won, three ties), 95 without. The gain
+  is mostly Photoshop traps and runnable code, with no wrong claim against one. A first run on the
+  draft gave 102 against 91 from the same memory-only answers, so a few points are grader variance.
+  Seven briefs and one grader are a small sample.
 
 ## Requirements
 
