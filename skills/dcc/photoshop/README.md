@@ -24,18 +24,18 @@ lead skill, `scenario-photoshop-expert`.
   each with cited references and a Python toolkit.
 - Every toolkit has a live suite run against Photoshop 27.11 on macOS: 98 tests across 12 suites,
   several on real Scenario outputs (inpaint, upscale, restore, seamless texture repair), one that
-  fills History to its limit. All passed on 2026-10-19. Last run of each suite, Paris time:
-  composite, mockup, History and generative-edit at 12:17 to 12:21, after the last toolkit change;
-  io 10:49, audit 10:42, upscale 10:50, restore 10:51, retouch and game-art tiling 09:25, gates
+  fills History to its limit. All passed on 2026-10-19. Last run of each suite, Paris time: mockup
+  13:41, History 13:42, upscale 13:44 and restore 13:45, after the last toolkit change; composite
+  12:17, generative-edit 12:21, io 10:49, audit 10:42, retouch and game-art tiling 09:25, gates
   06:39, key-art 06:36 and game-art export 06:35, each after the last change to the code it runs
-  (since then, the io and gates toolkits changed in docstrings only, and the composite and mockup
-  changes add no DOM constant to the io suite's enum sweep). Steps no script reaches are listed as
-  GUI paths and marked not tested.
-- Blind grading on seven briefs, one per skill: the same model answered with the skills and from
-  memory alone, and a separate grader scored the shuffled pairs without knowing which was which.
-  With the skills: 102 of 105, six briefs won and one tie. Without: 91. The gain is mostly expert
-  technique and fewer wrong claims (one against three). Seven briefs and one grader are a small
-  sample.
+  (since then, the io and gates toolkits changed in docstrings only, and the composite, mockup and
+  upscale changes add no DOM constant to the io suite's enum sweep). Steps no script reaches are
+  listed as GUI paths and marked not tested.
+- Blind grading of the first draft, before the review fixes, on seven briefs, one per skill: the
+  same model answered with the skills and from memory alone, and a separate grader scored the
+  shuffled pairs without knowing which was which. With the skills: 102 of 105, six briefs won and
+  one tie. Without: 91. The gain is mostly expert technique and fewer wrong claims (one against
+  three). Seven briefs and one grader are a small sample.
 
 ## Requirements
 

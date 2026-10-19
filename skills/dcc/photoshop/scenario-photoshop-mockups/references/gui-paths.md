@@ -29,9 +29,10 @@ tapered bottle, a pouch), and for the hand finish.
 
 ## Colorway by hand
 
-Start from a white or light-gray blank. A dark garment keeps its shallow fold contrast under a
-lighter color and reads flat; with only a dark plate, ask the user for a light blank or make one by
-instruction edit ([procedures.md](procedures.md) P9).
+Start from a white or light-gray blank, chosen before the fit: a much lighter color (sand, white) on
+a dark garment loses its folds. With only a dark plate, ask the user for a light blank or make one
+by instruction edit ([procedures.md](procedures.md) P9). A white colorway on a white blank needs no
+Curves: the blank is that colorway.
 
 1. Select the garment or product (Select > Subject, minus the print), then Layer > New Fill Layer >
    Solid Color: the selection becomes its mask.

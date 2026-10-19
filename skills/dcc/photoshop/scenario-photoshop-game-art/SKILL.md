@@ -201,7 +201,7 @@ Toolkit thresholds are authoring-time: check them on your own images.
   sprites and 9-slice insets to scenario-unity-ui or scenario-godot-ui. Local fixes go to
   scenario-photoshop-generative-edit, soft takes to scenario-photoshop-upscale-restore, type to
   scenario-photoshop-key-art.
-- **Scenario siblings:** `scenario` (connection, `recommend`, quote, job waiting),
+- **Scenario siblings:** `scenario` (connection, `recommend`, quote, Scenario job waiting),
   `scenario-textures` (tiling textures, maps, tiling-safe upscale), `scenario-game-assets` (sprites,
   icons, UI parts, transparent backgrounds), `scenario-image` (inpaint and edits with references,
   style passes).

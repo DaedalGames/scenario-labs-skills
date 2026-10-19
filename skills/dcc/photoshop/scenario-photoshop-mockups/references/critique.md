@@ -42,7 +42,8 @@ looks pasted on, a printable area that spills onto a lid, or a logo with a wrong
 | `batch` History            | `A.history_gate(h0) == []`               | a batch that left the last design in               |
 | `colorways` History        | `A.history_gate(h0) == []`               | a colorway left on the document                    |
 | `colorways` `check`        | `delta_e` 5 or less, `folds` 0.9 or more | Color mode alone, a wrong mask, gamut clipping     |
-| `colorways` `flat`         | false, or a 100% fold crop shown         | a light colorway from a dark garment: flat folds   |
+| `colorways` `flat`         | false                                    | a light colorway from a dark garment: folds gone   |
+| `colorways` `blank`        | a 100% fold crop shown                   | white on a white blank: the blank stands as is     |
 | `A.deliverable(profile)`   | returns `[]`                             | size, mode, profile, hidden layers outside "Takes" |
 
 Thresholds are authoring-time, from striped and checkered fixtures. A fit that passes them can still
@@ -94,8 +95,9 @@ folds and the stretching will be more accurate" (Dinda [Z168F2BlAdA 15:36]), and
 - **Colorway:** each colorway reads as its swatch at the garment's mid-tones (a navy shirt is navy,
   not pale blue); the folds and highlights sit where the original plate has them, as deep as on a
   real garment of that color; the print and the background did not change. `delta_e` and `folds`
-  pass a light colorway made from a dark garment, whose folds read flat: colorways start from a
-  white or light-gray blank, and a `flat` colorway is judged on a 100% crop of a fold.
+  pass a light colorway made from a dark garment even when its folds are gone: `flat` catches it,
+  and a white or light-gray blank chosen at intake avoids it. White on a white blank is the blank
+  (`blank`): its folds are judged on a 100% crop.
 
 ## 6. Edges and frame
 

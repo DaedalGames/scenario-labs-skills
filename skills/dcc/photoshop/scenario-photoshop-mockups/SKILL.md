@@ -16,12 +16,12 @@ tool schemas and flag the gap.
 **REQUIRED BACKGROUND:** scenario-photoshop-expert (execution channel, round trip, gates).
 
 **Status (2026-10-19):** every call in [`scripts/ps_mockup.py`](scripts/ps_mockup.py) is verified
-live on Photoshop 27.11 (macOS): `test_mockup_live.py` runs 15 tests on synthetic fixtures (striped,
-checkered, a white and a black shirt drawn with folds). On the black shirt, a light colorway matches
-the swatch but keeps the black shirt's fold contrast in levels (flagged `flat`). Not tested:
-`fit="contain"`, `color=`, `prefix=`, the default map folder, the shell commands, lighting from a
-Background layer, SVG placement, corners read from a path, Windows, the Scenario jobs and the GUI
-paths.
+live on Photoshop 27.11 (macOS) except `lab_to_rgb` and a Lab swatch (`{"lab": ...}`), tested
+offline only. `test_mockup_live.py` runs 15 tests on synthetic fixtures (stripes, checks, a white
+and a black shirt with folds). On the black shirt, white loses its folds and sand keeps faint ones
+(both `flat`). Not tested: `fit="contain"`, `color=`, `prefix=`, the default map folder, the shell
+commands, lighting from a Background layer, SVG placement, corners read from a path, Windows, the
+Scenario jobs and the GUI paths.
 
 ## Stance (the expert delta)
 
@@ -54,9 +54,9 @@ paths.
 - **A colorway shows the swatch and keeps the folds, from a light blank.** WeJustClickme clips a
   Solid Color layer in Color mode to a t-shirt (WeJustClickme [i-hYHLXDheU 02:10]). [added] Color
   mode keeps the garment's luminance: navy on a white shirt came out pale blue (measured).
-  `colorways` moves the mid-tones to the swatch's luminance with Curves first, then measures the
-  color. A lighter color on a dark garment keeps its shallow folds and reads flat (measured), so
-  colorways start from a white or light-gray blank.
+  `colorways` brings the mid-tones to the swatch's luminance with Curves first, then measures. Sand
+  on a black shirt came out flat (measured), so light colorways start from a white or light-gray
+  blank; white on a white blank is the blank.
 - **Printed ink is never pin sharp.** Print on fabric "is not that sharp" (Dinda [_VNqOhHJIm8
   07:17]). On a dark shirt, Anders lowers the design to 90% (Anders [rrxTM5AZALU 06:38]).
 
@@ -84,8 +84,9 @@ times out, recover as the lead's Quality gates say. Code: [procedures](reference
 
 1. **Intake.** `A.doc_state()`: name, size, mode, profile, layers. Name the product layer, each
    printable face, the designs and the colorways. A soft or small plate goes to
-   scenario-photoshop-upscale-restore first. GATE: document named; product layer, surfaces, designs
-   and colorways written.
+   scenario-photoshop-upscale-restore first. Light colorways from a dark plate: get a light blank
+   now (the user's, or a quoted `scenario-product-shots` edit): fit, light and Displace are built
+   from the plate. GATE: document named; product layer, surfaces, designs and colorways written.
 2. **Scenario inputs.** Each Scenario job is quoted first, with the user's yes (`scenario`).
    - No product photo: a plate or scene from `scenario-image`; a product to restage or relight:
      `scenario-product-shots`; a fix on the photo: scenario-photoshop-generative-edit.
@@ -102,28 +103,26 @@ times out, recover as the lead's Quality gates say. Code: [procedures](reference
    look. GATE: the mask covers the face and stops at its edges.
 4. **Placeholder and fit.** `P = M.placeholder(quad, size=[w, h])` makes a solid smart object in
    group "Mockup: Place Design Here", warped to the quad at Fill 60, with the selection as the group
-   mask. `size` is the printed area's real size (GraphiqVibe [WeDJv63Wgjk 01:37]); it rides in the
-   layer's XMP and sets the crop of every design. Re-fit with `M.fit_quad(layer, quad)`. A can,
-   bottle or mug: `M.fit_cylinder(layer, quad, bulge, top_bulge=, angle=)`: the label's corners,
-   each edge's sag at its middle in px, the visible arc in degrees. Read with `M.corners(layer)`.
-   GATE: `corner_error` under 1, `fit_check` under 0.5, `group_mask` true when a selection was
-   active, each corner (and a cylinder's bottom middle) seen on a 100% `R.preview(crop=)`.
+   mask. `size` is the printed area's real size (GraphiqVibe [WeDJv63Wgjk 01:37]); it sets the crop
+   of every design. Re-fit with `M.fit_quad(layer, quad)`. A can, bottle or mug:
+   `M.fit_cylinder(layer, quad, bulge, top_bulge=, angle=)`: the label's corners, each edge's sag at
+   its middle in px, the visible arc in degrees. Read with `M.corners(layer)`. GATE: `corner_error`
+   under 1, `fit_check` under 0.5, `group_mask` true when a selection was active, each corner (and a
+   cylinder's bottom middle) seen on a 100% `R.preview(crop=)`.
 5. **Light and creases.** Swap in a ramp or check design with
    `M.replace_design(layer, ramp, fit="exact")`. Then `M.lighting(layer, product)` and
    `M.displace(layer, product, scale=s)`. GATE: folds and highlights show across both the ramp's
-   dark and bright ends; `map` exists on disk and goes in the report.
+   dark and bright ends; `map` on disk, named in the report.
 6. **Designs.** `M.replace_design(layer, path)` per design, or
    `M.batch(layer, designs, OUT + "/mockups")`. GATE: `drift` under 0.5 and `content_size` unchanged
    per design; one PNG per design; after a batch, `A.history_gate(h0) == []` with `h0 = A.history()`
    taken before it.
-7. **Colorways** (Pillow needed). Start from a white or light-gray blank; with only a dark plate,
-   ask the user for one or make one by instruction edit (`scenario-product-shots`, quoted). Select
-   the garment, `h0 = A.history()`, then `M.colorways(product, {"navy": "#1e3278"}, OUT + "/cw")`:
-   per color, Curves and a Color-mode fill above the product, masked by the selection (else
-   clipped), one PNG, one step back. A raise midway, with "Scenario: Colorway" active:
-   `A.step_back(h0, "Scenario: Colorway")`. GATE: per colorway `check["delta_e"]` 5 or less and
-   `check["folds"]` 0.9 or more; `check["flat"]` true: a 100% crop of a fold shown to the user;
-   print and background unchanged; `A.history_gate(h0) == []`.
+7. **Colorways** (Pillow needed). On the light blank, select the garment, `h0 = A.history()`, then
+   `M.colorways(product, {"navy": "#1e3278"}, OUT + "/cw")`: per color, Curves and a Color-mode fill
+   above the product, masked by the selection (else clipped), one PNG, one step back. A raise
+   midway: the lead's recovery, `undo` "Scenario: Colorway". GATE: per colorway `check["delta_e"]` 5
+   or less and `check["folds"]` 0.9 or more, except `check["blank"]` (judge the blank at 100%);
+   `check["flat"]` false; print and background unchanged; `A.history_gate(h0) == []`.
 8. **Hand finish (not tested).** Ink blur 0.6 to 1 px as a Smart Filter on the design, shadows
    desaturated where color seeps, 90% on a dark garment, a contrast Curves on top
    ([gui-paths](references/gui-paths.md)). GATE: at 100%, folds cross the design, highlights sit on
@@ -140,21 +139,21 @@ refuses Smart Filters and layer masks, and replaces any warp. One placeholder pe
 
 ## Numbers
 
-| Value                                                        | Relative to                     | Source                                                                                     |
-| ------------------------------------------------------------ | ------------------------------- | ------------------------------------------------------------------------------------------ |
-| `corner_error` under 1 px, `fit_check` under 0.5 px          | the requested corners           | toolkit, verified live                                                                     |
-| `drift` under 0.5 px                                         | corners before Replace Contents | toolkit, verified live                                                                     |
-| Cylinder `angle` 120 degrees; `top_bulge` = `bulge`          | the label's visible arc         | toolkit default                                                                            |
-| Fill 60 while fitting, 100 after a replace                   | the placeholder                 | toolkit default                                                                            |
-| Shading 85%, Highlights 50%                                  | the two product copies          | toolkit default                                                                            |
-| Displace scale 8; map blur max(1, doc width / 1500)          | the toolkit's defaults          | toolkit default                                                                            |
-| Displace 4, map blur 1 px                                    | a fabric tote                   | Dinda [_VNqOhHJIm8 06:11]; [_VNqOhHJIm8 05:39]                                             |
-| Displace 15, map blur 3 px                                   | a crushed can                   | Geller [0l2Ma_2B-A8 05:24]; [0l2Ma_2B-A8 01:04]                                            |
-| Displace 10, then 20; map blur 18 px for big folds only      | a t-shirt                       | Dinda [sy1w5mTif-E 06:27]; [sy1w5mTif-E 05:54]                                             |
-| Ink blur 1 px; 0.6 px with a stroke                          | the design                      | Dinda [_VNqOhHJIm8 07:17]; [_VNqOhHJIm8 08:55]                                             |
-| Design opacity 90%                                           | a dark garment                  | Anders [rrxTM5AZALU 06:38]                                                                 |
-| Colorway Delta E 5 or less (CIE76); fold pattern 0.9 or more | mid-tones vs swatch or Lab      | authoring-time: proves the math, catches clipping; brand specs hold about 2 (Delta E 2000) |
-| Colorway `flat`: swatch over 1.25 times the mid-tones        | the garment's mid-tones         | authoring-time                                                                             |
+| Value                                                        | Relative to                      | Source                                                |
+| ------------------------------------------------------------ | -------------------------------- | ----------------------------------------------------- |
+| `corner_error` under 1 px, `fit_check` under 0.5 px          | the requested corners            | toolkit, verified live                                |
+| `drift` under 0.5 px                                         | corners before Replace Contents  | toolkit, verified live                                |
+| Cylinder `angle` 120 degrees; `top_bulge` = `bulge`          | the label's visible arc          | toolkit default                                       |
+| Fill 60 while fitting, 100 after a replace                   | the placeholder                  | toolkit default                                       |
+| Shading 85%, Highlights 50%                                  | the two product copies           | toolkit default                                       |
+| Displace scale 8; map blur max(1, doc width / 1500)          | the toolkit's defaults           | toolkit default                                       |
+| Displace 4, map blur 1 px                                    | a fabric tote                    | Dinda [_VNqOhHJIm8 06:11]; [_VNqOhHJIm8 05:39]        |
+| Displace 15, map blur 3 px                                   | a crushed can                    | Geller [0l2Ma_2B-A8 05:24]; [0l2Ma_2B-A8 01:04]       |
+| Displace 10, then 20; map blur 18 px for big folds only      | a t-shirt                        | Dinda [sy1w5mTif-E 06:27]; [sy1w5mTif-E 05:54]        |
+| Ink blur 1 px; 0.6 px with a stroke                          | the design                       | Dinda [_VNqOhHJIm8 07:17]; [_VNqOhHJIm8 08:55]        |
+| Design opacity 90%                                           | a dark garment                   | Anders [rrxTM5AZALU 06:38]                            |
+| Colorway Delta E 5 or less (CIE76); fold pattern 0.9 or more | mid-tones vs swatch or Lab       | authoring-time: proves the math, catches clipping     |
+| `flat`: fold contrast after under 0.15 and half of before    | (p90 - p10) / p50 of the garment | authoring-time: kept 0.21 to 0.57; lost 0.008 to 0.14 |
 
 Toolkit thresholds are authoring-time: check them on your own images.
 
@@ -163,8 +162,7 @@ Toolkit thresholds are authoring-time: check them on your own images.
 - **Code:** after every fit, `corner_error` under 1, `fit_check` under 0.5, `corners` consistent;
   after every replace, `drift` under 0.5 and `content_size` unchanged;
   `A.history_gate(h0, undo) == []` per call, `A.history_gate(h0) == []` after `batch` and
-  `colorways`; the `displace` map on disk; each colorway's `check` within Numbers, a `flat` one seen
-  at 100%.
+  `colorways`; the `displace` map on disk; each colorway's `check` within Numbers, none `flat`.
 - **Visual:** each corner at 100%; a cylinder's columns narrowing toward the sides; the ramp under
   light and creases; the printable edge (no design on a lid, seam or hand); each export on the
   sheet. Rubric: [critique](references/critique.md).
@@ -181,17 +179,17 @@ Toolkit thresholds are authoring-time: check them on your own images.
 | A fit judged by eye                 | corners a few px off, or a warp that did nothing | `corner_error`, `fit_check`, corner crops         |
 | A can label fitted with `fit_quad`  | a flat sticker on a round can                    | `fit_cylinder`                                    |
 | A colorway in Color mode alone      | navy on a white shirt comes out pale blue        | `colorways`: Curves under the Color fill          |
-| A light colorway from a dark blank  | shallow folds; every number passes               | a white or light-gray blank; read `flat`          |
+| A light colorway from a dark blank  | no folds; Delta E and `folds` pass, `flat` true  | a light blank, chosen at intake                   |
 
 ## Handoffs
 
 - **Receives** from scenario-photoshop-expert: routing and document state; from
-  scenario-photoshop-compositing: a product placed in a scene that now needs its design; from
-  scenario-photoshop-key-art: art to show on a product, a poster or a screen.
+  scenario-photoshop-compositing: a product placed in a scene; from scenario-photoshop-key-art: art
+  to show on a product, a poster or a screen.
 - **Delivers** a "Mockup: <name>" group, one PNG per design and per colorway, the gate numbers and
   the map path. Poster sizes and type go to scenario-photoshop-key-art; a product into a new scene
   to scenario-photoshop-compositing; the final audit to scenario-photoshop-expert.
-- **Scenario siblings:** `scenario` (connection, `recommend`, price quote, Scenario job waiting),
+- **Scenario siblings:** `scenario` (connection, `recommend`, quote, Scenario job waiting),
   `scenario-image` (plates and scenes with no photo, new designs), `scenario-product-shots`
   (restaging, relighting, colorway sets), `scenario-image-editing` (background removal, vectorize,
   upscale), `scenario-brand-kit` (vector marks, logo variants), `scenario-textures` (seamless

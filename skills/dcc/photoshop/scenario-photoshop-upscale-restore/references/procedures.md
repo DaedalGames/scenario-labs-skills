@@ -131,7 +131,8 @@ IO.export_region(OUT + "/risk.png", bounds=box)  # on the source, before the sta
 st = U.build_stack([], 2)                        # the scripted baseline alone; now the active document
 base = U.crops(OUT + "/base", boxes=[[2 * v for v in box]])   # stack pixels: the box at 2x
 # Look at the baseline crop at 100%. If it holds, deliver it: no paid run.
-# Scenario MCP: two candidates on risk.png, one quote, the user's yes; download both.
+# Scenario MCP: dry-run each candidate on risk.png and on prep["path"]. Same price: run both on the
+# full frame, stack them (P2), crop the same box. Cheaper crop: both on risk.png, one quote, a yes.
 R.sheet(base["files"] + [OUT + "/risk_a.png", OUT + "/risk_b.png"], OUT + "/risk sheet.jpg",
         labels=["baseline", "<member A>", "<member B>"])
 # The winner only, on the full frame (quoted): prep["path"] as in P1.
@@ -139,9 +140,12 @@ L = U.place_result(OUT + "/up_win.png", "<member A>, 2x scale", prep=prep, base=
 print(L["match"])                                # mean under 6 at 256 px
 ```
 
-- The crop costs a fraction of the full frame and shows the failure that matters: a face, lettering
-  or a gradient. Pay for the full frame only when the baseline fails at 100% and one candidate beats
-  it there.
+- Dry-run each candidate on the crop and on the full frame before the quote. Some upscalers price by
+  output size; others charge one flat price for any input up to a size. When the crop quotes the
+  same as the full frame, run both candidates on the full frame (`prep["path"]`) and compare them on
+  the same crops: two paid jobs, not three.
+- The crop shows the failure that matters: a face, lettering or a gradient. When it is cheaper, pay
+  for the full frame only when the baseline fails at 100% and one candidate beats it there.
 - Each candidate is judged against the baseline's crop of the same area, at the same scale.
 
 ## P3. The crop grid
@@ -256,9 +260,9 @@ for t in takes:
 ## P8. Auto-Align, kept only on a gain
 
 Status: verified live (restore tests 2 and 3): the drifted copy improved and was kept as "Drifted,
-aligned" (structure 22.7 down to 11.9, 12.8 and 19.2 over three runs) with Background still a
-Background and no temporary layers left; on the aligned restore the align was not kept and the
-layers were unchanged.
+aligned" (structure 22.7 down to 12.8, 19.2 and 20.0 over the three stored runs) with Background
+still a Background and no temporary layers left; on the aligned restore the align was not kept and
+the layers were unchanged.
 
 ```python
 r = U.align("Restore, take 1", "Background")      # gain=0.9: keep on a 10% drop or more

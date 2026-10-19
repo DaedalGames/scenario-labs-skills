@@ -55,7 +55,10 @@ Route by the brief:
   P10, P11.
 - **Can, mug or straight bottle:** P1, P2, P3, then P4b instead of a flat fit, then P5 and P6. A
   tapered bottle or a pouch: the hand warp in [gui-paths.md](gui-paths.md), after the last fit.
-- **Colorways of the product:** P7b after the designs are in.
+- **Colorways of the product:** decide the blank here, before P1: light colorways (sand, pastels,
+  white) from a dark garment come out flat, so they need a white or light-gray blank first (the
+  user's, or P9's instruction edit). The fit, lighting and Displace map are built from that plate.
+  P7b runs after the designs are in.
 - **A Scenario result onto a screen or frame:** P8, then P5 if the surface has texture.
 - **A logo that exists only as a small raster:** P9 before P6.
 
@@ -331,42 +334,55 @@ colorway.png", each within Delta E 5 of its swatch with folds 0.9 or more, hue w
 strips' order of lightness kept, the background and a print above unchanged, the document rendering
 identically afterwards, `A.history_gate(h0) == []`. Color mode alone (`match=False`) keeps each
 strip's luminance within 2 and fails the check. With a selection active, a red colorway masked to
-it: only the selected strips change, and the selection is still active afterwards. F7: navy, red and
-sand on a white and a black shirt drawn with folds, measured independently on the delivered PNGs:
-mid-tones within Delta E 0.12 to 0.48 of the swatch, folds 0.998 to 1.0 (the toolkit's own check:
-0.11 to 0.46). On the white shirt the folds keep their depth (relative fold contrast 0.23 before,
-0.21 to 0.23 after). On the black shirt, a lighter colorway matches the swatch but keeps the black
-shirt's fold contrast in levels, so it reads flat: relative contrast 0.58 before, 0.41 after navy,
-0.28 after red, 0.11 after sand, all three flagged `flat` (the flag on sand is asserted). Color mode
-alone turns navy on the white shirt into (221, 228, 255), Delta E 75. The same math ran offline on
-two frames from Anders [rrxTM5AZALU]: a white tee kept its relative fold contrast (0.21) for navy,
-red and sand; a black sweatshirt fell from 1.13 to 0.57, 0.39 and 0.14, all flagged `flat`
-([sources.md](sources.md)).
+it: only the selected strips change, and the selection is still active afterwards. F7: navy, red,
+sand and white on a white and a black shirt drawn with folds, measured independently on the
+delivered PNGs. Navy, red and sand: mid-tones within Delta E 0.12 to 0.48 of the swatch, folds 0.998
+to 1.0 (the toolkit's own check: 0.11 to 0.46). On the white shirt the folds keep their depth
+(relative fold contrast 0.23 before, 0.21 to 0.23 after), and white is the blank: no curve,
+mid-tones 228.2 before and 228.3 after, contrast unchanged, `blank` true. On the black shirt (0.58
+before), navy keeps 0.41 and red 0.28, folds still visible, not `flat`; sand falls to 0.11 (faint
+folds) and white to 0.004 (none), both `flat` (asserted). Color mode alone turns navy on the white
+shirt into (221, 228, 255), Delta E 75. `M.lab_to_rgb` and a Lab swatch (`{"lab": ...}`) are tested
+offline only. The same math ran offline on two frames from Anders [rrxTM5AZALU]: a white tee kept
+its relative fold contrast (0.21) for navy, red and sand, and kept the blank for white; a black
+sweatshirt fell from 1.13 to 0.57 (navy) and 0.39 (red), both kept, and to 0.14 (sand) and 0.004
+(white), both `flat` ([sources.md](sources.md)).
 
 ```python
 check_doc()
+import time
 from PIL import Image
-# A swatch lighter than the garment needs a light blank: with only a dark plate, ask the user for a
-# white or light-gray blank, or make one (P9, an instruction edit, quoted). Run this block on it.
-# Select the garment or product without its background (P1's Select Subject, minus the print).
+# On the blank chosen at P0. Select the garment or product without its background (P1's Select
+# Subject, minus the print).
 h0 = A.history()                      # after the selection, so the mark holds it
-colors = {"navy": "#1e3278", "red": (176, 32, 32), "sand": "#e6d2a0",
-          "brand blue": {"lab": [38, 12, -48]}}     # a Lab spec is checked against its own value
+UNDO = "Scenario: Colorway"
+colors = {"navy": "#1e3278", "red": (176, 32, 32), "sand": "#e6d2a0", "white": "#ffffff",
+          "brand blue": {"lab": [38, 12, -48]}}     # Lab: tested offline only
 FOLD = [420, 610, 620, 760]           # a deep fold, document px
 try:
     res = M.colorways("Product", colors, OUT + "/colorways")
-except RuntimeError:
-    # The lead's recovery (Quality gates): after a timeout, wait before reading History.
-    if A.history()["name"] == "Scenario: Colorway":   # one colorway left half done
-        A.step_back(h0, "Scenario: Colorway")         # back to the mark, selection included
-    raise                                             # rerun only from the mark
+except Exception:                     # RuntimeError from a job; ValueError or a Pillow OSError too
+    # The lead's recovery (Quality gates). A timed-out job may still finish: wait until History
+    # stops moving, then let the gate decide, never the state's name alone.
+    a, b = None, A.history()
+    while a != b:
+        time.sleep(3)
+        a, b = b, A.history()
+    p = A.history_gate(h0, UNDO)
+    if p == []:                       # one colorway left on top of the mark
+        A.step_back(h0, UNDO)         # back to the mark, selection included
+    elif not any("no new History state" in x for x in p):
+        print("History moved since the mark: stop and tell the user", p)
+    raise                             # fix what the error names, then run again from the mark
 for r in res:
     c = r["check"]                    # mid-tones of the product against the swatch
     print(r["colorway"], os.path.basename(r["out"]), r["curve"], c["delta_e"], c["folds"],
-          c["spread"], c["contrast"], c["flat"])
-    assert c["delta_e"] <= 5 and c["folds"] >= 0.9, (r["colorway"], c)
-    if c["flat"]:                     # show this crop to the user before delivering the colorway
+          c["contrast"], c["flat"], c["blank"])
+    assert not c["flat"], (r["colorway"], c)        # folds gone: a lighter blank (P0, P9)
+    if c["blank"]:                    # no Curves: the blank is this colorway; show a fold at 100%
         Image.open(r["out"]).crop(FOLD).save(OUT + "/fold %s.png" % r["colorway"])
+    else:
+        assert c["delta_e"] <= 5 and c["folds"] >= 0.9, (r["colorway"], c)
 assert A.history_gate(h0) == []
 R.sheet([r["out"] for r in res], OUT + "/colorways sheet.jpg", labels=list(colors))
 ```
@@ -376,28 +392,34 @@ R.sheet([r["out"] for r in res], OUT + "/colorways sheet.jpg", labels=list(color
   so on its own a white shirt stays near white and a black one near black. So, when the product's
   mid-tones sit more than 3 levels from the swatch's luminance, a Curves layer "Colorway tone:
   <name>" goes under the fill first, with the same mask. The mockup group above is not recolored.
-- The curve: a darker swatch scales the luminance (gain = swatch over mid-tones), so the folds
-  darken in proportion; a lighter swatch lifts it (an offset), its slope lowered so the brightest 1%
-  stays at 250 or under. Mid-tones: the mean of the 25th to 75th percentile of the product's
-  luminance under the mask. `M.tone_curve(tones, rgb)` returns the points, `None` within 3 levels.
-- Why a light blank: the offset keeps a dark garment's folds at their depth in levels, so against a
-  light swatch they read shallow (relative contrast falls to about mid-tones over swatch). A gain
-  instead clips the highlights and lifts noise out of the black. No curve turns a black blank into a
-  credible light colorway.
+- The curve: a darker swatch scales the luminance (gain = swatch over mid-tones, at least 0.05), so
+  the folds darken in proportion; a lighter swatch lifts it (an offset), its slope lowered so the
+  brightest 1% stays at 250 or under. Mid-tones: the mean of the 25th to 75th percentile of the
+  product's luminance under the mask. `M.tone_curve(tones, rgb)` returns the points, `None` within 3
+  levels.
+- No curve when the blank stands (`M.is_blank`): the swatch is so light that the slope would fall
+  under 0.5, and the blank is already within 25% of it. White on a white blank is the blank: a curve
+  there would clip every fold to white (relative contrast 0.23 to 0.008, measured offline before
+  this rule). On a dark blank the rule never applies, so white is curved and comes out `flat`.
+- Why a light blank: the offset keeps a dark garment's folds at their depth in levels, so relative
+  to a light swatch they shrink to about mid-tones over swatch. A gain instead clips the highlights
+  and lifts noise out of the black. No curve turns a black blank into a credible light colorway.
 - The check exports the product with only its colorway layers, reads the pixels under the mask at a
   400 px long side, and returns:
   - `mean`, the mid-tones' color, and `delta_e`: CIE76 against the swatch, or against its Lab value
     when one is given; 5 or less passes (authoring-time). It reads the same mid-tones the curve
-    targets, so it mainly proves the math and catches gamut clipping. A brand spec usually holds
-    about 2 in Delta E 2000, checked on a print or a calibrated photo, not here.
+    targets, so it mainly proves the math and catches gamut clipping. A brand spec is checked on a
+    print or a calibrated photo, not here.
   - `folds`: the correlation of the luminance pattern before and after (0.9 or more). 1 means the
     folds sit in the same places; it is blind to their depth.
   - `spread`: fold depth in levels, after over before. Below 1 on a darker swatch, about 1 on a
     lighter one.
   - `contrast`: fold depth relative to the mid-tones, (p90 - p10) / p50, before and after.
-  - `flat`: true when the swatch's luminance is more than 1.25 times the garment's mid-tones
-    (authoring-time). Then crop a deep fold of the PNG at 100% and show it to the user; on a dark
-    garment, go back to a light blank.
+  - `flat`: true when the contrast after is under 0.15 and under half the contrast before
+    (authoring-time: colorways that kept visible folds measured 0.21 to 0.57, those that lost them
+    0.008 to 0.14). The folds are gone: go back to a lighter blank.
+  - `blank`: true when no curve ran because the blank stands. `delta_e` then measures the blank's
+    own shading, not an error, so show a deep fold at 100% instead.
 - `match=False` keeps Color mode alone, for a hue-only change on a mid-tone product; `check=False`
   skips the measurement. Matching and the check need Pillow.
 - With a selection active, the selection is its mask. Without one it is clipped to the product
@@ -440,7 +462,8 @@ Status: not tested (no Scenario job runs in the suite).
 #     scene, straight-on to the printable face (a flat face is easier to fit)
 #   a real product to restage or relight: scenario-product-shots
 #   light colorways wanted and only a dark garment: scenario-product-shots, an instruction edit to
-#     a white or light-gray blank, same folds, light and framing; it becomes the product layer (P7b)
+#     a white or light-gray blank, same folds, light and framing; it becomes the product layer
+#     before P1, since the fit, lighting and Displace map are built from it
 #   a new design: scenario-image at the print size's ratio; a seamless repeat: scenario-textures
 #   a raster logo: scenario-image-editing (vectorize, recommend with the user's words)
 #     or scenario-brand-kit: trace an existing mark to editable SVG, do not regenerate it

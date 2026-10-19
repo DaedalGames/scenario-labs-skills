@@ -35,8 +35,8 @@ Library:
       # Auto-Align (content, auto projection) of a result onto the base layer, kept only when
       # ps_gates.structure drops by 10% or more; otherwise History steps back and the result
       # stays as it was ("kept": false). Auto-Align misreads a damaged base: it pushed an
-      # aligned restore 7 px off (structure 11.3 to 19.8) and fixed a drifted one (22.7 to
-      # 11.9). Runs in a temporary document, so the user's Background stays a Background.
+      # aligned restore 7 px off (structure 11.3 to 19.7) and fixed a drifted one (22.7 to
+      # 12.8). Runs in a temporary document, so the user's Background stays a Background.
       # The aligned copy lands as "<layer>, aligned" above the result, which is hidden.
       # Returns structure_before/after, kept, moved [dx, dy] (center, px), scale [sx, sy],
       # uncovered [l, t, r, b] (canvas px the aligned layer leaves bare).
@@ -401,7 +401,10 @@ def place_result(path, name, prep=None, base=None, box=None, undo="Scenario: Pla
 
 def build_stack(candidates, factor, name=None, base_name=None):
     label = ("%g" % factor)
-    doc = ps_run.run("return app.activeDocument.name;")["result"]
+    res = ps_run.run("return app.activeDocument.name;")
+    if not res.get("ok"):
+        raise RuntimeError(res.get("error"))
+    doc = res["result"]
     args = {"candidates": [{"path": os.path.abspath(c["path"]), "label": c["label"]} for c in candidates],
             "factor": float(factor), "factor_label": label,
             "name": name or "%s, %sx candidates" % (os.path.splitext(doc)[0], label),

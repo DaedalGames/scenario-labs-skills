@@ -3,10 +3,13 @@
 Each procedure names the calls it runs and its status. "Verified live" means a live suite on
 Photoshop 27.11 (macOS) runs those calls; "not tested" means the block was written from the
 toolkit's code and Adobe's documentation but never run as shown. Every call below is one `ps_run`
-job, so each is its own unit of failure. A toolkit call raises `RuntimeError` with the error and the
-line; a raw `ps_run.run` returns `ok`, `error`, `exit` and `body_line` instead. After either,
-recover as the SKILL.md's Quality gates say: read `A.history()`, step back a partial named state,
-and never retry on top of it.
+job, so each is its own unit of failure. A toolkit call raises `RuntimeError` with the error, and
+the line where the toolkit adds one (`ValueError` for a bad argument, before any job); a raw
+`ps_run.run` returns `ok`, `error`, `exit` and `body_line` instead. After either, recover as the
+SKILL.md's Quality gates say: `A.history_gate(h0, undo)` decides. `[]`: the call left its state, so
+`A.step_back(h0, undo)`; "no new History state": nothing changed, so fix the cause and run it again;
+anything else: stop. A name check alone can undo the previous call's finished edit when both share
+one `undo`.
 
 Setup for every block:
 

@@ -31,6 +31,8 @@ Concept art, sprites, and effects in one consistent style. 27 skills.
 npx skills add scenario-labs/skills --skill scenario scenario-moderation scenario-report scenario-inspiration scenario-image scenario-sprite-animation scenario-side-view-game-kit scenario-blender-2d-animation scenario-game-assets scenario-image-editing scenario-text-overlay scenario-3d scenario-video scenario-consistency scenario-model-training scenario-refine-loop scenario-gpt-image scenario-mai-image scenario-seedream scenario-gemini-image scenario-reve scenario-ideogram scenario-grok-imagine-image scenario-luma-image scenario-multi-reference scenario-chatgpt-pet-create scenario-chatgpt-pet-update
 ```
 
+Working in Photoshop? Add the expert tools for it: [Photoshop](skills/dcc/photoshop/README.md).
+
 ### 3D Artist
 
 Meshes from a picture, rigged and ready to animate. 13 skills.
@@ -135,6 +137,8 @@ Store art and ads that stay on brand at every size. 25 skills.
 ```bash
 npx skills add scenario-labs/skills --skill scenario scenario-moderation scenario-report scenario-formats scenario-brand-kit scenario-text-overlay scenario-product-shots scenario-video-ads scenario-ugc scenario-inspiration scenario-image scenario-image-editing scenario-video scenario-video-editing scenario-audio scenario-video-assembly scenario-consistency scenario-asset-analysis scenario-veo scenario-seedance scenario-kling scenario-elevenlabs scenario-ad-variants scenario-thumbnails scenario-fan-cam
 ```
+
+Working in Photoshop? Add the expert tools for it: [Photoshop](skills/dcc/photoshop/README.md).
 
 ### Technical Director
 

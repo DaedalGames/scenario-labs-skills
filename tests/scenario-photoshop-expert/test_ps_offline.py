@@ -203,6 +203,84 @@ class HistoryGateTest(unittest.TestCase):
         self.assertEqual(ps_audit.history_problems(hist(5, "A", "B", 9, id_=3), hist(2, "A", "B", 9, id_=3)), [])
 
 
+class FakeHistory:
+    """A History panel behind ps_run.run, for ps_audit's own history and step_back jobs."""
+
+    def __init__(self, states):
+        self.states = [dict(s) for s in states]        # [{"name", "id"}], oldest first
+        self.active = len(self.states) - 1
+
+    def push(self, name, id_):
+        del self.states[self.active + 1:]
+        self.states.append({"name": name, "id": id_})
+        self.active = len(self.states) - 1
+
+    def _state(self):
+        i = self.active
+        prev = self.states[i - 1] if i > 0 else None
+        return {"index": i, "name": self.states[i]["name"], "prev": prev and prev["name"],
+                "id": self.states[i]["id"], "prev_id": prev and prev["id"], "count": len(self.states),
+                "limit": 50, "full": False}
+
+    def run(self, js, timeout=120, **kw):
+        if "step_back:" in js:                           # STEP_BACK_JS: name check, one step down
+            if self.states[self.active]["name"] not in js:
+                return {"ok": False, "error": "step_back: the active History state is another"}
+            self.active -= 1
+        return {"ok": True, "result": self._state()}
+
+
+def recover(h0, undo):
+    """The lead's recovery rule (scenario-photoshop-expert SKILL.md, Quality gates)."""
+    probs = ps_audit.history_gate(h0, undo)
+    if probs == []:
+        ps_audit.step_back(h0, undo)
+        return "stepped back"
+    if any("no new History state" in p for p in probs):
+        return "run again"
+    return "stop"
+
+
+class RecoveryTest(unittest.TestCase):
+    """Two calls with the same undo name, the second failing: History decides, never the name."""
+
+    UNDO = "Scenario: Match grain"
+
+    def setUp(self):
+        self.saved = ps_audit.ps_run.run
+        self.h = FakeHistory([{"name": "Lasso", "id": 209}, {"name": self.UNDO, "id": 330}])
+        ps_audit.ps_run.run = self.h.run
+
+    def tearDown(self):
+        ps_audit.ps_run.run = self.saved
+
+    def test_a_failure_before_any_change_keeps_the_finished_edit(self):
+        h0 = ps_audit.history()                          # the first element's grain, finished
+        # The second match_grain raises before any state (a refused name, a timeout in a read).
+        self.assertEqual(ps_audit.history()["name"], self.UNDO, "a name check alone would step back")
+        self.assertIn("no new History state: the marked state is still active",
+                      ps_audit.history_gate(h0, self.UNDO))
+        self.assertEqual(recover(h0, self.UNDO), "run again")
+        self.assertEqual(ps_audit.history()["id"], 330, "the first edit is still active")
+        # Stepping back here undoes the finished edit, and only then raises.
+        with self.assertRaises(RuntimeError):
+            ps_audit.step_back(h0, self.UNDO)
+        self.assertEqual(ps_audit.history()["name"], "Lasso")
+
+    def test_a_failure_that_left_its_state_steps_back_to_the_mark(self):
+        h0 = ps_audit.history()
+        self.h.push(self.UNDO, 331)                      # the second call left a partial state
+        self.assertEqual(recover(h0, self.UNDO), "stepped back")
+        self.assertEqual(ps_audit.history()["id"], h0["id"])
+
+    def test_anything_else_stops(self):
+        h0 = ps_audit.history()
+        self.h.push(self.UNDO, 331)
+        self.h.push("Brush Tool", 332)                   # the user painted meanwhile
+        self.assertEqual(recover(h0, self.UNDO), "stop")
+        self.assertEqual(ps_audit.history()["id"], 332, "nothing undone")
+
+
 class ProvenanceTest(unittest.TestCase):
     def test_round_trip_escapes_markup(self):
         fields = {"assetId": "asset_x", "prompt": 'a "red" ball & <box>', "seed": "1"}
@@ -335,6 +413,37 @@ class MockupHelpersTest(unittest.TestCase):
         light = [(v, v, v) for v in range(200, 232)]
         navy = [(round(v * 0.23), round(v * 0.23), round(v * 0.23)) for v in range(200, 232)]
         self.assertFalse(ps_mockup.swatch_check(light, navy, (52, 52, 52))["flat"])
+
+    def test_flat_rule_on_the_stored_contrasts(self):
+        """Relative fold contrast before and after, from the live F7 log and the corpus frames."""
+        stored = [(0.227, 0.213, False), (0.227, 0.228, False),          # white tee colorways
+                  (0.583, 0.406, False), (0.583, 0.279, False),          # black tee navy, red
+                  (0.583, 0.105, True), (0.227, 0.008, True),            # black tee sand; white on white, old curve
+                  (1.127, 0.569, False), (1.127, 0.394, False), (1.127, 0.142, True),   # corpus sweatshirt
+                  (0.211, 0.213, False)]                                 # corpus white tee
+        for before, after, flat in stored:
+            got = after < min(ps_mockup.FLAT_FLOOR, ps_mockup.FLAT_SHARE * before)
+            self.assertEqual(got, flat, (before, after))
+
+    def test_white_on_a_white_blank_keeps_the_blank(self):
+        white_tee = {"mid": 228.26, "p99": 241}                          # the live fixture's tones
+        for rgb in ((255, 255, 255), (250, 250, 250)):
+            self.assertTrue(ps_mockup.is_blank(white_tee, rgb))
+            self.assertIsNone(ps_mockup.tone_curve(white_tee, rgb))
+        self.assertFalse(ps_mockup.is_blank(white_tee, (230, 210, 160)))  # sand: a gain, as before
+        black_tee = {"mid": 36.0, "p99": 47}
+        self.assertFalse(ps_mockup.is_blank(black_tee, (255, 255, 255)))  # white from black: curved, then flat
+        self.assertIsNotNone(ps_mockup.tone_curve(black_tee, (255, 255, 255)))
+        base = [(v, v, v) for v in range(200, 250)]
+        out = ps_mockup.swatch_check(base, base, (255, 255, 255))
+        self.assertTrue(out["blank"])
+        self.assertFalse(out["flat"])
+        self.assertGreater(out["delta_e"], 5, "delta_e measures the blank's own shading")
+
+    def test_black_swatch_curve_has_a_floor(self):
+        pts = ps_mockup.tone_curve({"mid": 227.0, "p99": 242}, (0, 0, 0))
+        self.assertEqual(pts[0], [0, 0.0])
+        self.assertGreater(pts[1][1], 0)
 
     def test_lab_swatch(self):
         self.assertEqual(ps_mockup._rgb({"lab": [100, 0, 0]}), [255, 255, 255])

@@ -44,13 +44,15 @@ photo.
   degrees, the strips' order of lightness kept, the background and the print above unchanged, the
   document rendering identically afterwards. With a selection, only the selected strips change. On a
   white and a black shirt with folds (F7), navy, red and sand measured on the delivered PNGs: Delta
-  E 0.12 to 0.48, folds 0.998 to 1.0; navy in Color mode alone on the white shirt: Delta E 75. On
-  the black shirt a light colorway matches the swatch but keeps the black shirt's fold contrast in
-  levels, so it reads flat: relative fold contrast 0.58 before, 0.41 to 0.11 after (sand the
-  lowest), all three flagged `flat`; on the white shirt it stays at 0.21 to 0.23. `folds` is a
-  correlation and reads 1.0 whatever the depth. The fixtures are synthetic; the same math on two
-  frames from Anders [rrxTM5AZALU] (offline): a white tee kept 0.21, a black sweatshirt fell from
-  1.13 to 0.14 under sand.
+  E 0.12 to 0.48, folds 0.998 to 1.0; navy in Color mode alone on the white shirt: Delta E 75.
+  Relative fold contrast on the white shirt: 0.23 before, 0.21 to 0.23 after; white there keeps the
+  blank (no curve, mid-tones 228.2 to 228.3). On the black shirt, 0.58 before: navy 0.41 and red
+  0.28 keep visible folds; sand 0.11 (faint folds) and white 0.004 (none) are flagged `flat`. The
+  offset keeps the black shirt's fold depth in levels, which shrinks relative to a light swatch.
+  `folds` is a correlation and reads 1.0 whatever the depth. The fixtures are synthetic; the same
+  math on two frames from Anders [rrxTM5AZALU] (offline): a white tee kept 0.21 and the blank for
+  white, a black sweatshirt fell from 1.13 to 0.57 (navy) and 0.39 (red), kept, and to 0.14 (sand)
+  and 0.004 (white), flagged.
 - **Replace.** A design swapped in moves no corner by more than 0.5 px; the content size does not
   change; Fill returns to 100; a left/right two-color design keeps its sides (no transposition).
 - **Lighting.** Under a flat gray design, the composite got darker by more than 15 over a dark strip

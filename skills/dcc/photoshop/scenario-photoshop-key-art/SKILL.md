@@ -186,11 +186,12 @@ Visual gates:
   face retouch to scenario-photoshop-compositing; key art onto a product or screen photo to
   scenario-photoshop-mockups; print (canvases here are 72 ppi screen files) to the print path of
   scenario-photoshop-upscale-restore (its procedures P10).
-- **Scenario siblings:** `scenario` (connection, quote, jobs), `scenario-image` (plates, instruction
-  edits), `scenario-thumbnails` (a video cover's concept), `scenario-consistency` (one character
-  across plates), `scenario-formats` (a size set made on the platform when nobody needs a PSD). When
-  nobody needs a layered file, scenario-text-overlay sets the text on the platform instead. A brand
-  kit (scenario-brand-kit) supplies the copy sheet's fonts and colors.
+- **Scenario siblings:** `scenario` (connection, `recommend`, quote, Scenario job waiting),
+  `scenario-image` (plates, instruction edits), `scenario-thumbnails` (a video cover's concept),
+  `scenario-consistency` (one character across plates), `scenario-formats` (a size set made on the
+  platform when nobody needs a PSD). When nobody needs a layered file, scenario-text-overlay sets
+  the text on the platform instead. A brand kit (scenario-brand-kit) supplies the copy sheet's fonts
+  and colors.
 
 ## Photoshop 2026 notes
 

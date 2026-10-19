@@ -37,18 +37,20 @@ Library:
       # one merged PNG per product color: a Solid Color fill in Color mode above `product`,
       # masked by the active selection, else clipped to the product layer; colors =
       # {"name": (r, g, b), "#rrggbb" or {"lab": [L, a, b]}}; pixels, layers and the active
-      # History state end as they started. match: a Curves under the fill brings the product's
-      # mid-tones to the swatch's luminance first (Color mode alone keeps the product's, so navy
-      # on white came out pale blue). check: per colorway, the product's mid-tones against the
-      # swatch ("delta_e", CIE76, against the Lab value when one is given), "folds" (correlation
-      # of the luminance pattern: 1 = folds in the same places, blind to their depth),
-      # "spread" (fold depth in levels, after over before), "contrast" (fold depth relative to
-      # the mid-tones, (p90 - p10) / p50, before and after) and "flat" (the swatch is more than
-      # 25% lighter than the garment's mid-tones: the folds keep their depth in levels and read
-      # shallower; show a 100% crop of a fold, or start from a light blank). match and check
-      # need Pillow.
-  M.tone_curve(tones, rgb), M.swatch_check(base, result, rgb, lab=None), M.delta_e(a, b),
-  M.lab_to_rgb(lab)
+      # History state end as they started (at the History limit the temporary states drop the
+      # oldest undo steps). match: a Curves under the fill brings the product's mid-tones to
+      # the swatch's luminance first (Color mode alone keeps the product's, so navy on white
+      # came out pale blue); a swatch at or past a light blank's lit fabric (white on a white
+      # blank) gets no Curves: the blank stands. check: per colorway, the product's mid-tones
+      # against the swatch ("delta_e", CIE76, against the Lab value when one is given),
+      # "folds" (correlation of the luminance pattern: 1 = folds in the same places, blind to
+      # their depth), "spread" (fold depth in levels, after over before), "contrast" (fold
+      # depth relative to the mid-tones, (p90 - p10) / p50, before and after), "flat" (the
+      # contrast after under 0.15 and under half the contrast before: the folds are gone, start
+      # from a lighter blank) and "blank" (no Curves ran because the blank stands; delta_e then
+      # measures the blank's own shading). match and check need Pillow.
+  M.tone_curve(tones, rgb), M.is_blank(tones, rgb), M.swatch_check(base, result, rgb, lab=None),
+  M.delta_e(a, b), M.lab_to_rgb(lab)
       # the pure math behind match and check
 Every fit wraps the object once more (Convert to Smart Object) at the target's size: fit before
 displace (Smart Filters refuse a fit), and keep layer masks on the group.
@@ -745,16 +747,32 @@ def garment_tones(lums):
             "pixels": len(v)}
 
 
+# A swatch so light that a curve keeping the 99th percentile at 250 would keep under half the
+# folds' depth, on a blank already within 25% of it (white on a white blank): no curve, the blank
+# stands as that colorway. Authoring-time.
+BLANK_SLOPE = 0.5
+BLANK_RATIO = 1.25
+
+
+def is_blank(tones, rgb, margin=3):
+    """True when the swatch is at or past the blank's lit fabric and the blank is already within
+    25% of it: no Curves runs, and the blank's own shading is the colorway."""
+    target, mid, p99 = _lum(rgb), tones["mid"], tones["p99"]
+    if target <= mid + margin or p99 <= mid:
+        return False
+    return (250.0 - target) / (p99 - mid) < BLANK_SLOPE and target <= BLANK_RATIO * mid
+
+
 def tone_curve(tones, rgb, margin=3):
     """Curves points (composite channel) that bring the mid-tones to the swatch's luminance, or
-    None when they are within `margin`. Darker swatch: a gain (L * target / mid), so folds scale
-    with the color. Lighter swatch: an offset, its slope lowered so the 99th percentile stays at
-    250 or under."""
+    None when they are within `margin` or the blank stands (is_blank). Darker swatch: a gain
+    (L * target / mid, at least 0.05), so folds scale with the color. Lighter swatch: an offset,
+    its slope lowered so the 99th percentile stays at 250 or under."""
     target, mid = _lum(rgb), tones["mid"]
-    if abs(target - mid) <= margin or mid <= 0:
+    if abs(target - mid) <= margin or mid <= 0 or is_blank(tones, rgb, margin):
         return None
     if target < mid:
-        k = target / mid
+        k = max(target / mid, 0.05)
     else:
         k = 1.0
         if tones["p99"] > mid:
@@ -806,10 +824,11 @@ def delta_e(a, b):
     return round(math.dist(_lab(a), _lab(b)), 2)
 
 
-# A swatch this much lighter than the garment's mid-tones (luminance ratio) is flagged "flat": the
-# lightening offset keeps the folds' depth in levels, so relative to the lighter color they keep
-# about mid / swatch of their contrast, under 80% past this ratio. Authoring-time.
-FLAT_RATIO = 1.25
+# "flat": the result's relative fold contrast under FLAT_FLOOR and under FLAT_SHARE of the
+# original's. Authoring-time, from synthetic shirts and two corpus frames: colorways that kept their
+# folds measured 0.21 to 0.57, flat ones 0.008 to 0.14.
+FLAT_FLOOR = 0.15
+FLAT_SHARE = 0.5
 
 
 def _rel_contrast(v):
@@ -822,8 +841,9 @@ def swatch_check(base, result, rgb, lab=None):
     [(r, g, b)] before and after. Returns the mid-tones' mean color; delta_e (CIE76) to the
     swatch, or to `lab` when given; folds (correlation of the luminance pattern: 1 = folds in the
     same places, blind to their depth); spread (p90 - p10 of the luminance, after over before);
-    contrast ((p90 - p10) / p50, before and after); flat (the swatch's luminance is more than
-    FLAT_RATIO times the garment's mid-tones)."""
+    contrast ((p90 - p10) / p50, before and after); flat (the contrast after is under FLAT_FLOOR
+    and under FLAT_SHARE of the contrast before); blank (is_blank: the blank stands as the
+    colorway, so delta_e measures its own shading)."""
     if len(base) != len(result) or not base:
         raise ValueError("base and result need the same, non-empty pixel list")
     lb, lr = [_lum(p) for p in base], [_lum(p) for p in result]
@@ -839,11 +859,12 @@ def swatch_check(base, result, rgb, lab=None):
     before = _pct(vb, 90) - _pct(vb, 10)
     after = _pct(v, 90) - _pct(v, 10)
     target = _lab(rgb) if lab is None else [float(x) for x in lab]
-    mid = garment_tones(lb)["mid"]
+    c0, c1 = _rel_contrast(vb), _rel_contrast(v)
+    flat = c0 is not None and c1 is not None and c1 < min(FLAT_FLOOR, FLAT_SHARE * c0)
     return {"mean": mean, "swatch": list(rgb), "delta_e": round(math.dist(_lab(mean), target), 2),
             "folds": round(folds, 3), "spread": round(after / before, 2) if before else None,
-            "contrast": [_rel_contrast(vb), _rel_contrast(v)],
-            "flat": _lum(rgb) > FLAT_RATIO * mid, "pixels": len(lr)}
+            "contrast": [c0, c1], "flat": flat, "blank": is_blank(garment_tones(lb), rgb),
+            "pixels": len(lr)}
 
 
 def _area_pixels(path, mask, size=400):

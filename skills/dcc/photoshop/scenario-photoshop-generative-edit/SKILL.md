@@ -182,10 +182,10 @@ Toolkit thresholds are authoring-time: check them on your own images.
   untouched original, plus the check and verify numbers. Soft takes go to
   scenario-photoshop-upscale-restore; tone and grain on a large edit to
   scenario-photoshop-compositing, which also takes faces and skin.
-- **Scenario siblings:** `scenario` (connection, `recommend`, quote, job waiting), `scenario-image`
-  (inpaint, instruction edit, mask field), `scenario-image-editing` (expand and reframe only),
-  `scenario-consistency` (references and identities), `scenario-orbit-views` (new angles of a whole
-  subject), `scenario-refine-loop` (re-prompt, swap references or change member).
+- **Scenario siblings:** `scenario` (connection, `recommend`, quote, Scenario job waiting),
+  `scenario-image` (inpaint, instruction edit, mask field), `scenario-image-editing` (expand and
+  reframe only), `scenario-consistency` (references and identities), `scenario-orbit-views` (new
+  angles of a whole subject), `scenario-refine-loop` (re-prompt, swap references or change member).
 
 ## Photoshop 2026 notes
 

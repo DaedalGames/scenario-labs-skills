@@ -1,6 +1,6 @@
 ---
 name: scenario-photoshop-compositing
-description: "Use when placing a person, product or generated element into a new scene in Photoshop, or when a composite looks pasted on: hard, white or dark fringed cutout edges, hair, trees or sky to separate, Blend If or a channel mask, missing contact or cast shadows, light from the wrong side, a color cast or brightness that does not match, a generated patch smoother than the photo, Harmonize or a relight that changed the subject, or a flat image to split into editable layers. Also when skin on a generated, edited or upscaled face looks plastic, waxy or smoothed, a face or eyes changed after an edit, or generated skin turned orange, magenta or green and needs frequency separation, dodge and burn or a High Pass smoother."
+description: "Use when placing a person, product or generated element into a new scene in Photoshop, or when a composite looks pasted on: hard, white or dark fringed cutout edges, hair, trees or sky to separate, Blend If or a channel mask, missing contact or cast shadows, light from the wrong side, a color cast that does not match the scene or brightness to grade by eye, a generated patch smoother than the photo, Harmonize or a relight that changed the subject, or a flat image to split into editable layers. Also when skin on a generated, edited or upscaled face looks plastic, waxy or smoothed, a face or eyes changed after an edit, or generated skin turned orange, magenta or green and needs frequency separation, dodge and burn or a High Pass smoother."
 license: MIT
 ---
 
@@ -188,11 +188,11 @@ Toolkit thresholds are authoring-time: check them on your own images.
   grouped, retouch scaffolds with black masks, gate numbers. Local fixes inside a plate go to
   scenario-photoshop-generative-edit; soft or small elements to scenario-photoshop-upscale-restore;
   sizes and type to scenario-photoshop-key-art; a design on a product to scenario-photoshop-mockups.
-- **Scenario siblings:** `scenario` (connection, `recommend`, quote, job waiting), `scenario-image`
-  (plates, subjects, instruction edits), `scenario-image-editing` (background removal, relight,
-  split into layers), `scenario-product-shots`, `scenario-consistency`, `scenario-quality-gate`
-  (scoring takes, an Enterprise add-on; otherwise scenario-asset-analysis), `scenario-refine-loop`
-  (re-prompting after a failed gate).
+- **Scenario siblings:** `scenario` (connection, `recommend`, quote, Scenario job waiting),
+  `scenario-image` (plates, subjects, instruction edits), `scenario-image-editing` (background
+  removal, relight, split into layers), `scenario-product-shots`, `scenario-consistency`,
+  `scenario-quality-gate` (scoring takes, an Enterprise add-on; otherwise scenario-asset-analysis),
+  `scenario-refine-loop` (re-prompting after a failed gate).
 
 ## Photoshop 2026 notes
 

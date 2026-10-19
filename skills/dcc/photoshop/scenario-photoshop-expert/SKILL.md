@@ -16,8 +16,8 @@ proceed from tool schemas and flag the gap.
 **Status (2026-10-19):** every toolkit call in Workflow is verified live on Photoshop 27.11 (macOS)
 by the io, gates, audit, history and restore suites and the specialists' suites. `test_io_live.py`
 runs stage 5 as written (a masked placement with provenance, then the outside gate);
-`test_history_live.py` runs the History gate and `step_back` at a lowered History limit. Not tested:
-the `social` profile, `app.doAction`, the batch loop, and Windows.
+`test_history_live.py` runs the History gate and `step_back` at the History limit. Not tested: the
+`social` profile, `app.doAction`, the batch loop, and Windows.
 
 ## Stance (the expert delta)
 
@@ -65,15 +65,16 @@ the `social` profile, `app.doAction`, the batch loop, and Windows.
 Import once: `sys.path.insert(0, "<this skill>/scripts")`, then
 `import ps_run, ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A`. Each call is one
 ExtendScript job ("job" below; a paid run is a Scenario job). A library call raises `RuntimeError`
-on failure; a raw `ps_run.run` returns `ok`, `error` and `exit`. The user keeps working meanwhile:
-never bring Photoshop to the front, click the screen, or open a modal dialog.
+on failure (`ValueError` for a bad argument, before any job); a raw `ps_run.run` returns `ok`,
+`error` and `exit`. The user keeps working meanwhile: never bring Photoshop to the front, click the
+screen, or open a modal dialog.
 
 1. **Connect and read.** `ps_run.find_photoshop()`, `ps_run.run("return app.version;")` (exit 3:
    `ps_run.py --launch`; exit 6: the user allows automation), then `A.doc_state()`. GATE: exit 0;
    the document name matches the brief; `saved`, bits and profile recorded.
 2. **Route.** Pick the owner in Handoffs and write down any chain. GATE: one owner per brief before
    the first edit.
-3. **Capture.** `IO.selection()`, `cap = IO.export_region(out, pad=32)`,
+3. **Capture.** `sel = IO.selection()["bounds"]`, `cap = IO.export_region(out, pad=32)`,
    `IO.export_mask(out_mask, bounds=cap["bounds"])`. Whole-image edits capture the canvas with no
    mask. GATE: both files share `cap["bounds"]`; the selection covers only what should change.
 4. **Quote and generate** through the Scenario MCP with the `scenario` skill: `recommend` for the
@@ -113,7 +114,7 @@ files the user has open; stop at the first failure ([procedures](references/proc
 | drop >= 10%             | structure score, to keep an Auto-Align        | measured, restore                                              |
 | mean < 6 at 256 px      | upscale against its baseline (identity)       | measured, upscale-restore                                      |
 | 1600 px, sRGB 8-bit     | preview long edge                             | toolkit default                                                |
-| 120 s                   | `ps_run.run` timeout per job                  | its default; the toolkits pass 180 to 300 s                    |
+| 120 to 300 s            | `ps_run.run` timeout per job                  | toolkit defaults                                               |
 
 Authoring-time thresholds: check them on your own images.
 
@@ -125,17 +126,18 @@ Code gates, in order:
 - Capture and mask bounds equal; placed bounds equal the capture.
 - One History state per named edit: `A.history_gate(h0, undo) == []`, with `h0 = A.history()` taken
   right before the call. The gate reads the active state: its name, and that it is a new state on
-  top of `h0`. Never the list length (captures step back and leave redo states); the index only
-  below the History limit, where the oldest state drops and the index stops moving. To undo one
-  edit, `A.step_back(h0, undo)`. No job without `undo=` edits pixels.
+  top of `h0`. Never the list length (captures leave redo states); the index only below the History
+  limit, where it stops moving. To undo one edit, `A.step_back(h0, undo)`. No job without `undo=`
+  edits pixels.
 - A take equal to its input (`edited` false) is still billed. Check the mask field and its polarity
   first; if both are right, change the member, not the prompt, and quote again.
-- **After a call raises or times out**, a partial named state may remain. After exit 4 (a modal
-  dialog: ask the user to close it) or a timeout, the job may still finish, so wait before reading
-  History. Then read `A.history()`: if the active state carries the call's `undo`, run
-  `A.step_back(h0, undo)`; the mark brings back the selection it held, so compare `IO.selection()`
-  with the capture's. Never retry on top of a partial state; if History shows anything else, stop
-  and tell the user.
+- **After a call raises or times out**, decide from History. A timed-out job ("timed out" in the
+  error, exit 4 from a raw run) may still finish: read `A.history()` a few seconds apart until it
+  stops moving, and ask the user to close any modal dialog. Then `p = A.history_gate(h0, undo)`:
+  - `[]`: the call left its state. `A.step_back(h0, undo)`, then compare `IO.selection()["bounds"]`
+    with `sel`.
+  - "no new History state" in `p`: nothing changed. Fix what the error names; run it again.
+  - Anything else: stop and tell the user. Never retry on top of a partial state.
 - Outside the mask: `G.diff(...)["worst"]["max"]` <= 2. On a stack with adjustments above the base,
   compare captured files instead.
 - Texture ratio, halo rims and skin line within Numbers; structure compared between candidates,

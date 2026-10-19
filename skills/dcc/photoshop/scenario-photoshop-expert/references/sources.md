@@ -72,12 +72,13 @@ Live suites on Photoshop 27.11 (macOS), 2026-10-19:
   toolkits name, read and, for blend modes, assigned.
 - **`test_gates_live.py`** (9 tests) and **`test_audit_live.py`** (5 tests): the gates, the delivery
   profiles (hidden takes kept in a group named "Takes" pass), and `A.history`.
-- **`test_history_live.py`** (7 tests, 2026-10-19): History lowered to 5 states and filled on a
-  document the test makes, the preference restored in a `finally`. At the limit, the gate passes a
-  correct edit and fails a missing, unnamed, doubled or misnamed one; `IO.place` with a mask (and a
-  selection gate after it), `A.step_back`, `match_grain` (trials 2.3 to 16.6 against a scene grain
-  of 21.4, one named state left) and `colorways` on a selection (the marked state active again, the
-  layers unchanged, the list down from 6 states to 3 as the oldest dropped) keep their gates.
-  `match_grain` also keeps its gate with redo states above the mark (left by a selection gate).
-  Generative-edit's `place_edit` is gated in its own suite, below the limit.
+- **`test_history_live.py`** (7 tests, 2026-10-19): History filled to its limit on a document the
+  test makes. The test lowers the preference to 5 states and restores it in a `finally`, unless
+  other documents are open, then it keeps the user's limit (one run at 5, one at 50). At the limit,
+  the gate passes a correct edit and fails a missing, unnamed, doubled or misnamed one; `IO.place`
+  with a mask (and a selection gate after it), `A.step_back`, `match_grain` (trials 2.3 to 16.8
+  against a scene grain of 21.4, one named state left) and `colorways` on a selection (the marked
+  state active again, the layers unchanged, the oldest states dropped: 6 to 3 at limit 5, 51 to 48
+  at 50) keep their gates. `match_grain` also keeps its gate with redo states above the mark (left
+  by a selection gate). Generative-edit's `place_edit` is gated in its own suite, below the limit.
 - The specialists' suites run `ps_run`, `ps_io` and `ps_review` inside their own procedures.

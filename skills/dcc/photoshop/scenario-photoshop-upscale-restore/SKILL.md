@@ -100,8 +100,9 @@ Code: [procedures](references/procedures.md).
    deliver it and quote nothing.
 4. **Candidates on the riskiest crop (paid).** `scenario` for the connection, `recommend`, the quote
    and the user's yes; `scenario-image-editing` for upscale tool models, run on `risk.png`. Two
-   candidates, one quote: an upscale is judged by comparison. GATE: one beats the baseline's crop at
-   100% (`R.sheet` of both), else stop at the baseline.
+   candidates, one quote: an upscale is judged by comparison. Price the crop and the full frame
+   first; when they quote the same, run the candidates on the full frame (P2b). GATE: one beats the
+   baseline's crop at 100% (`R.sheet` of both), else stop at the baseline.
 5. **Winner on the full frame (paid).** Quote the winner on `prep["path"]`. In the stack,
    `L = U.place_result(p, "<label>, 2x scale", prep=prep, base=st["base"])`, then `U.crops` again.
    GATE: `L["match"]["matches"]` (mean under 6 at 256 px); its `G.texture` near the baseline's or
@@ -184,7 +185,7 @@ Toolkit thresholds are authoring-time, from one 512 px photo: check them on your
   Skin texture, grain and tone matching after an upscale go to scenario-photoshop-compositing;
   enlarged art for posters and thumbnails to scenario-photoshop-key-art; the final audit to
   scenario-photoshop-expert.
-- **Scenario siblings:** `scenario` (connection, `recommend`, price quote, job waiting),
+- **Scenario siblings:** `scenario` (connection, `recommend`, quote, Scenario job waiting),
   `scenario-image-editing` (upscale and enhance tool models), `scenario-image` (instruction restore
   and colorize), `scenario-asset-analysis` (a written verdict against the brief),
   `scenario-model-comparison` (a bake-off for a default upscaler), `scenario-refine-loop`
