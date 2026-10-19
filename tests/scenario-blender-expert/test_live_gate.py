@@ -129,6 +129,18 @@ class DeliveryGate(unittest.TestCase):
         r = self.verdict("dense_roblox")
         self.assertEqual(r["errors"], ["Dense: 20480 triangles, over the 20000 per-mesh limit"])
 
+    def test_parent_scale_names_the_parent(self):
+        r = self.cases["parent_scale"]
+        self.assertFalse(r["pass"])
+        self.assertEqual(len(r["errors"]), 1)
+        self.assertIn("unapplied scale [2.0, 2.0, 2.0] from its parent Root", r["errors"][0])
+        self.assertTrue(self.cases["parent_scale_applied"]["pass"])
+
+    def test_uvs_read_from_the_evaluated_mesh(self):
+        self.assertTrue(self.cases["nodes_uv"]["pass"])
+        self.assertEqual(self.cases["nodes_uv"]["errors"], [])
+        self.assertTrue(any("no UV map" in e for e in self.cases["nodes_uv_base"]["errors"]))
+
     def test_missing_uv_fails_only_under_a_texture(self):
         r = self.verdict("bare")
         self.assertTrue(r["pass"], r["errors"])

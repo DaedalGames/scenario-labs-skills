@@ -398,6 +398,17 @@ def _inside(a, b):
     return True
 
 
+def _scale_owner(o):
+    """The engine receives the world scale. When the object's own scale is 1, it is the
+    nearest parent that carries one, and applying scale on the object cannot clear it."""
+    def unit(ob):
+        return ob.matrix_basis.determinant() > 0 and all(abs(s - 1.0) <= 1e-3 for s in ob.matrix_basis.to_scale())
+    src = o
+    while unit(src) and src.parent:
+        src = src.parent
+    return o if unit(src) else src
+
+
 def deliverable(objs, profile="game", eps=None, tol=None, gap=None, evaluated=True):
     """Gate the parts of ONE asset before export or handoff.
 
@@ -445,10 +456,13 @@ def deliverable(objs, profile="game", eps=None, tol=None, gap=None, evaluated=Tr
         out["per_object"][n] = {"tris": 0, "parts": 0, "errors": [], "warnings": []}
         det = o.matrix_world.determinant()
         scale = o.matrix_world.to_scale()
+        src = _scale_owner(o)
+        where = "" if src is o else f" from its parent {src.name}; apply it on {src.name} and its children"
         if det < 0:
-            flag("negative_scale", [n], f"{n}: negative scale (mirrored); apply it, then recalculate normals")
+            flag("negative_scale", [n], f"{n}: negative scale (mirrored){where or '; apply it'}, "
+                                        "then recalculate normals")
         elif any(abs(s - 1.0) > 1e-3 for s in scale):
-            flag("unapplied_scale", [n], f"{n}: unapplied scale {[round(s, 3) for s in scale]}")
+            flag("unapplied_scale", [n], f"{n}: unapplied scale {[round(s, 3) for s in scale]}{where}")
         bm, double, b2b, zero = _welded(o, evaluated, weld)
         isl = _islands(bm, 1.0 if det >= 0 else -1.0)
         tris = sum(len(f.verts) - 2 for f in bm.faces)
@@ -491,14 +505,17 @@ def deliverable(objs, profile="game", eps=None, tol=None, gap=None, evaluated=Tr
             flag("ngons", [n], f"{n}: {_n(ngons, 'n-gon')}")
         if profile == "roblox" and tris > ROBLOX_MAX_TRIS:
             flag("tri_budget", [n], f"{n}: {tris} triangles, over the {ROBLOX_MAX_TRIS} per-mesh limit")
-        if not o.data.uv_layers:
-            textured = any(s.material and s.material.node_tree and any(
-                nd.type == "TEX_IMAGE" for nd in s.material.node_tree.nodes) for s in o.material_slots)
+        # UVs and materials as exported: modifiers (Geometry Nodes, UV Project) can add them.
+        mats = ([s.material for s in o.evaluated_get(bpy.context.evaluated_depsgraph_get()).material_slots]
+                if evaluated else [s.material for s in o.material_slots])
+        if not bm.loops.layers.uv:
+            textured = any(m and m.node_tree and any(nd.type == "TEX_IMAGE" for nd in m.node_tree.nodes)
+                           for m in mats)
             if textured:
                 flag("no_uv", [n], f"{n}: no UV map, and a material samples an image texture")
             else:
                 flag("no_uv_flat", [n], f"{n}: no UV map (fine for flat colors; textures and lightmaps need one)")
-        if not o.material_slots or any(s.material is None for s in o.material_slots):
+        if not mats or None in mats:
             flag("material_slots", [n], f"{n}: no material or an empty material slot")
         lo = Vector([min(c[k] for c in box[n]) for k in range(3)])
         hi = Vector([max(c[k] for c in box[n]) for k in range(3)])
@@ -640,7 +657,8 @@ def _cli():
         r["problems"] = verdict(r)
     text = json.dumps(r, indent=1)
     if a.json:
-        open(a.json, "w").write(text)
+        with open(a.json, "w") as f:
+            f.write(text)
     print(text)
     if a.deliverable:
         print("DELIVERABLE", "PASS" if r["pass"] else "FAIL")
