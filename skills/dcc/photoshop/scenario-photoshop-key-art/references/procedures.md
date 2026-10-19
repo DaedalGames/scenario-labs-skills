@@ -147,6 +147,8 @@ for x in t:
 - A line that shrinks below what reads at display size (P6) needs a line break, shorter copy agreed
   with the user, or a larger box. Never a smaller minimum.
 - A missing font keeps Myriad Pro and raises nothing: the `font_used` comparison is the only signal.
+- A text layer scaled with Free Transform may report its size before the scale (not tested): change
+  sizes through `type_layers`.
 - To change copy, remove the layers (P10) and run `type_layers` again. Editing contents in place
   skips the fit.
 
@@ -298,7 +300,8 @@ ps_run.run('return psr_export(app.activeDocument, %s, "psd");' % json.dumps(OUT 
 
 - Expected findings: "layers extend past the canvas" for a cover plate; "long edge 462 px below 600"
   for `steam-small` under `web`. Name them in the report; any other finding is a failure.
-- `psd-handoff` also flags default layer names, hidden layers and empty layers. Name every layer.
+- `psd-handoff` also flags default layer names, hidden layers outside a group named "Takes", and
+  empty layers. Name every layer.
 - The report lists per channel: size, export path, bytes, JPEG quality, `check` result, fonts used,
   and what was not verified.
 

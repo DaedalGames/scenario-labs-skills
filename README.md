@@ -436,7 +436,7 @@ export, pipeline automation. Every procedure was run live in Godot 4.7.2.
 
 ### Expert tools: Photoshop
 
-Image editor. A lead and six specialists that drive Adobe Photoshop 2026 on macOS through
+DCC software. A lead and six specialists that drive Adobe Photoshop 2026 on macOS through
 ExtendScript and Action Manager jobs, with Scenario models for the generative steps: selection edits
 and expand, upscale and restore, compositing and skin, key art and store capsules, product mockups,
 game textures and UI. Each toolkit has a live test suite run in Photoshop 27.11.

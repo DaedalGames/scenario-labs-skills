@@ -60,10 +60,9 @@ selections, Windows.
 - **Photoshop's own tool first when it wins.** The Remove tool spends no generative credits (Nace
   [nmvewzc6MG4 00:13]); Photoshop's own fill model reads context outside the selection (Ramirez
   [fR0CI04XBpM 08:12]), masks to it and returns three variations (White [MsX4_p_BbSQ 01:40]).
-  Partner models in Generative Fill see only a crop around the selection and return one. Scenario
-  earns the job with more references, a trained style inside a selection, the measured outside
-  check, and agent access [added: the toolkit has no Generative Fill call; a recorded Action may
-  replay one, not tested].
+  Partner models there return one. Scenario earns the job with more references, a trained style
+  inside a selection, the measured outside check, and agent access [added: the toolkit has no
+  Generative Fill call; a recorded Action may replay one, not tested].
 
 ## Establish first
 
@@ -106,10 +105,12 @@ then `import ps_io as IO`, `ps_audit as A`, `ps_review as R`. Code:
    `polarity_suspect`, `seam_ok` (bias under 12, residual under 6), and result width at least the
    box width. Then open each passing take and judge it inside the mask at 100% with
    [critique](references/critique.md). A take that fails a code gate is never placed.
-6. **Place.** `GE.place_edit(cap, path, "Iris ice blue, take 2", feather=2, xmp={...})`: embedded
-   smart object on the capture box, a layer mask rebuilt from `mask_edit.png`, model, asset id and
-   prompt in the layer's XMP, one History state. A target inside a hidden group (a markup group) is
-   moved out of it first (`moved_out_of`). GATE: returned bounds equal `cap["bounds"]`.
+6. **Place.** `h0 = A.history()`, then
+   `GE.place_edit(cap, path, "Iris ice blue, take 2", feather=2, xmp={...})`: embedded smart object
+   on the capture box, a layer mask rebuilt from `mask_edit.png`, model, asset id and prompt in the
+   layer's XMP. A target inside a hidden group (a markup group) is moved out of it first
+   (`moved_out_of`). GATE: returned bounds equal `cap["bounds"]`;
+   `A.history_gate(h0, "Scenario: Generative edit") == []` (one new named state).
 7. **Verify and look.** `v = GE.verify(cap)`; `R.preview(path)` of the canvas and
    `R.preview(path, crop=box_plus_32, max_px=0)` of the seam. On a borderline residual,
    `R.overlay(out, layer, base, crop=box)`. GATE: `v["untouched"]` (outside max 2 or less) and
@@ -149,8 +150,8 @@ Toolkit thresholds are authoring-time: check them on your own images.
 ## Quality gates
 
 - **Code:** `check` flags (`aspect_ok`, `edited`, not `polarity_suspect`, `seam_ok`); result width
-  at least the capture box width; `place_edit` bounds equal the capture bounds and History grew by
-  one state; `verify()["untouched"]`; `A.deliverable(profile)` returns `[]`.
+  at least the capture box width; stage 6's bounds and History gates; `verify()["untouched"]`;
+  `A.deliverable(profile)` returns `[]`.
 - **Visual:** each take inside the mask at 100% (anatomy, hands, text, reference fidelity, nothing
   grown past the intended object); the seam at 100% and 200%; the canvas preview for light direction
   and grain; for people, likeness against the original. Rubric: [critique](references/critique.md).
@@ -182,8 +183,7 @@ Toolkit thresholds are authoring-time: check them on your own images.
 - **Scenario siblings:** `scenario` (connection, `recommend`, quote, job waiting), `scenario-image`
   (inpaint, instruction edit, mask field), `scenario-image-editing` (expand and reframe only),
   `scenario-consistency` (references and identities), `scenario-orbit-views` (new angles of a whole
-  subject), `scenario-refine-loop` (re-prompt, swap references or change member). Model training is
-  a separate Scenario step; this skill only uses a trained model inside a selection.
+  subject), `scenario-refine-loop` (re-prompt, swap references or change member).
 
 ## Photoshop 2026 notes
 
@@ -195,12 +195,11 @@ Toolkit thresholds are authoring-time: check them on your own images.
 - Photoshop's newest fill model uses the selection as a native mask (Adobe help, 2026-08), so
   protection outside the selection is parity, not a Scenario edge. The partner-model lineup in the
   picker changes between releases (27.11 dropped one); never route by a Photoshop model name.
-- `capture` and `verify` leave History unchanged; `place_edit` and `expand` each add one named
-  state. `place_edit` refuses when the canvas size changed since the capture.
+- `place_edit` refuses when the canvas size changed since the capture.
 - A gray selection shows no marching ants, and Photoshop warns that no pixels are more than 50%
   selected (Williams [0h8lwK-shOY 01:34]); `capture` still exports its density.
 - Experts move to 8-bit before partner edits because 16-bit shifted colors (Smith [qeeAa8pnICc
-  04:47]); `capture` already sends sRGB 8-bit and leaves the master's depth alone.
+  04:47]); `capture` sends sRGB 8-bit.
 
 ## References
 

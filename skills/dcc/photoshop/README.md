@@ -22,11 +22,11 @@ lead skill, `scenario-photoshop-expert`.
 
 - 7 skills written from 208 transcribed videos (80.8% from 2025 to 2026) and Adobe documentation,
   each with cited references and a Python toolkit.
-- Every toolkit has a live suite run against Photoshop 27.11 on macOS: 86 tests across 11 suites,
-  several on real Scenario outputs (inpaint, upscale, restore, seamless texture repair). The last
-  run, on 2026-10-19, covered 56 of them after the latest toolkit changes; the other 30 (the audit,
-  retouch, compositing and restore suites, and 10 game-art tests) passed before those changes and
-  were not re-run. Steps no script reaches are listed as GUI paths and marked not tested.
+- Every toolkit has a live suite run against Photoshop 27.11 on macOS: 97 tests across 12 suites,
+  several on real Scenario outputs (inpaint, upscale, restore, seamless texture repair), one that
+  fills History to its limit. All passed on 2026-10-19: the 55 tests in the seven suites that
+  exercise the latest toolkit changes ran after them; the other 42 exercise toolkits those changes
+  did not touch. Steps no script reaches are listed as GUI paths and marked not tested.
 - Blind grading on seven briefs, one per skill: the same model answered with the skills and from
   memory alone, and a separate grader scored the shuffled pairs without knowing which was which.
   With the skills: 102 of 105, six briefs won and one tie. Without: 91. The gain is mostly expert
@@ -50,7 +50,7 @@ The installer puts the skills side by side, which the specialists need: they imp
 `scripts/`. In the installer picker (`npx skills add scenario-labs/skills`), the family is the
 "Expert tools: Photoshop" group. Update with `npx skills update`.
 
-## How it was built
+## Provenance
 
 - **Research:** 208 videos with transcripts and frame sheets, analyzed into cited notes by theme,
   plus Adobe's Photoshop and UXP documentation. Use cases were ranked by how often experts do them,

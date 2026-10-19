@@ -24,11 +24,8 @@ import ps_run, ps_gates as G, ps_review as R, ps_audit as A, ps_io as IO
 OUT = "/path/to/a/work/folder"    # never the folder of the user's PSD
 DOC = "tote_shoot.psd"            # the document the brief names
 
-def history():
-    # The active state, never the list length: a step back leaves redo states in the list.
-    # At the History limit the oldest state drops and the index holds still: the name decides.
-    h = A.doc_state()["history"]
-    return h["index"], h["name"]
+# History: h0 = A.history() right before a call; A.history_gate(h0, undo) == [] after it, or
+# A.history_gate(h0) == [] after a call that must leave History as it found it. Never the list length.
 
 def check_doc():
     assert A.doc_state()["name"] == DOC, "another document is active"
@@ -153,11 +150,11 @@ and red only inside the selection. `color=` is not tested.
 ```python
 check_doc()
 quad = [[300, 200], [700, 240], [690, 600], [310, 560]]
-h0 = history()                       # right before the call: a selection is a state of its own
+h0 = A.history()                     # right before the call: a selection is a state of its own
 P = M.placeholder(quad, name="Place Design Here", size=[800, 500])   # size: the real print size
 print(P["group"], P["size"], P["print_size"], P["corner_error"], P["fit_check"], P["group_mask"])
 assert P["corner_error"] < 1.0 and P["fit_check"] < 0.5
-assert history() == (h0[0] + 1, "Scenario: Mockup placeholder")
+assert A.history_gate(h0, "Scenario: Mockup placeholder") == []
 for x, y in quad:
     R.preview(OUT + "/fit_%d_%d.png" % (x, y), crop=[x - 40, y - 40, x + 40, y + 40], max_px=0)
 ```
@@ -204,9 +201,9 @@ print(C["corners"], C["consistent"], C["size"], C["print_size"], C["fill"])
 
 Status: verified live (F3) on an 800x400 checkerboard with
 `fit_cylinder(quad, 24, top_bulge=12, angle=120)`: corners within 2 px rendered, the bottom edge's
-middle 24 px below its corners and the top's 12 px (both within 2), column widths 46, 60, 70, 74 px
-from the side to the middle (the edge column 0.61 of the middle, as on a cylinder), one History
-state "Scenario: Fit to cylinder".
+middle 24 px below its corners and the top's 12 px (both within 2), column widths 44, 60, 70, 74,
+74, 70, 60, 45 px across (the edge columns 0.595 and 0.608 of the middle, where a cylinder predicts
+0.61; the test accepts 0.55 to 0.67), one History state "Scenario: Fit to cylinder".
 
 ```python
 label = [[250, 200], [750, 200], [750, 520], [250, 520]]   # the label's corners, TL TR BR BL
@@ -226,7 +223,8 @@ R.preview(OUT + "/bottom_middle.png", crop=[mid[0] - 40, mid[1] - 40, mid[0] + 4
 - `angle`: the label's visible arc in degrees, at most 180. A label wrapping past the silhouette
   shows close to 180, and its sides compress hard; one ending in front shows less. Start at 120 and
   compare the check design's side columns with the product's curve.
-- A run of P6 designs keeps the cylinder: Replace Contents keeps the warp.
+- A run of P6 designs keeps the cylinder: Replace Contents keeps the warp (not tested on a cylinder;
+  tested on four-corner fits).
 - Read the result on a check design (P5's ramp has a grid): the columns narrow toward both sides,
   and the grid's horizontals bow with the rim and the base.
 
@@ -309,11 +307,11 @@ renders identically before and after (difference 0), and the active History stat
 
 ```python
 designs = ["/designs/sunrise.png", "/designs/wave.png", "/designs/logo_on_white.png"]
-h1 = history()
+h0 = A.history()
 res = M.batch("Place Design Here", designs, OUT + "/mockups", fit="cover")
 for r in res:
     print(os.path.basename(r["out"]), r["drift"])
-assert history() == h1               # index and name; the list itself grows by the stepped-back state
+assert A.history_gate(h0) == []      # h0's state is active again; redo states may follow it
 R.sheet([r["out"] for r in res], OUT + "/mockups sheet.jpg",
         labels=[os.path.basename(r["design"]) for r in res])
 ```
@@ -326,40 +324,56 @@ R.sheet([r["out"] for r in res], OUT + "/mockups sheet.jpg",
 
 ## P7b. Colorways
 
-Status: verified live (F6). Navy and forest over eight gray strips, clipped to the product layer:
-two PNGs named "<name> colorway.png", luminance within 2 of each strip, hue within 5 degrees of the
-swatch, the background and a print above unchanged, the document rendering identically afterwards
-with the same layers and active History state. With a selection active, a red colorway masked to it:
-only the selected strips change, and the selection is still active afterwards.
+Status: verified live (F6, F7). F6: navy and forest over eight gray strips, clipped to the product
+layer: two PNGs named "<name> colorway.png", each within Delta E 5 of its swatch with folds 0.9 or
+more, hue within 5 degrees, the strips' order of lightness kept, the background and a print above
+unchanged, the document rendering identically afterwards, `A.history_gate(h0) == []`. Color mode
+alone (`match=False`) keeps each strip's luminance within 2 and fails the check. With a selection
+active, a red colorway masked to it: only the selected strips change, and the selection is still
+active afterwards. F7: navy, red and sand on a white and a black shirt with folds, measured
+independently on the delivered PNGs: mid-tone means within Delta E 0.12 to 0.48 of the swatch, folds
+0.998 to 1.0 (the toolkit's own check: 0.11 to 0.46). Color mode alone turns navy on the white shirt
+into (221, 228, 255), Delta E 75.
 
 ```python
 check_doc()
 # Select the garment or product without its background (P1's Select Subject, minus the print).
-h1 = history()
-colors = {"navy": "#1e3278", "forest": (40, 120, 60), "sand": "#c8b48c"}
+h0 = A.history()
+colors = {"navy": "#1e3278", "red": (176, 32, 32), "sand": "#e6d2a0"}
 res = M.colorways("Product", colors, OUT + "/colorways")
 for r in res:
-    print(r["colorway"], os.path.basename(r["out"]), r["masked"], r["clipped"])
-assert history() == h1
+    c = r["check"]                    # mid-tones of the product against the swatch
+    print(r["colorway"], os.path.basename(r["out"]), r["curve"], c["mean"], c["delta_e"], c["folds"])
+    assert c["delta_e"] <= 5 and c["folds"] >= 0.9, (r["colorway"], c)
+assert A.history_gate(h0) == []
 R.sheet([r["out"] for r in res], OUT + "/colorways sheet.jpg", labels=list(colors))
 ```
 
-- Each colorway is a Solid Color fill layer named "Colorway: <name>", in Color mode, made just above
-  the product layer: it takes the swatch's hue and saturation and keeps the product's luminance, so
-  folds, highlights and texture stay. The mockup group above it is not recolored.
+- Each colorway is a Solid Color fill layer named "Colorway: <name>", in Color mode, just above the
+  product layer. Color mode takes the swatch's hue and saturation and keeps the luminance below it,
+  so on its own a white shirt stays near white and a black one near black. So, when the product's
+  mid-tones sit more than 3 levels from the swatch's luminance, a Curves layer "Colorway tone:
+  <name>" goes under the fill first, with the same mask. The mockup group above is not recolored.
+- The curve: a darker swatch scales the luminance (gain = swatch over mid-tones), so the folds
+  darken in proportion; a lighter swatch lifts it (an offset), its slope lowered so the brightest 1%
+  stays at 250 or under. Mid-tones: the mean of the 25th to 75th percentile of the product's
+  luminance under the mask. `M.tone_curve(tones, rgb)` returns the points, `None` within 3 levels.
+- The check exports the product with only its colorway layers, reads the pixels under the mask at a
+  400 px long side, and returns `mean` (the mid-tones' color), `delta_e` (CIE76 against the swatch;
+  5 or less passes, authoring-time), `folds` (correlation of the luminance before and after; 0.9 or
+  more) and `spread` (fold contrast after over before: below 1 on a darker swatch). Look at the
+  folds on the sheet too.
+- `match=False` keeps Color mode alone, for a hue-only change on a mid-tone product; `check=False`
+  skips the measurement. Matching and the check need Pillow.
 - With a selection active, the selection is its mask. Without one it is clipped to the product
   layer, which recolors everything on that layer, background included: select the garment first when
   the product layer is the whole photo.
-- Color mode keeps luminance, so a white garment stays near white and a black one near black. A
-  white shirt in navy needs a darker base: a Levels or Curves under the colorway, or a Scenario
-  colorway (below).
 - Each colorway is one History state, exported from a merged copy, then stepped back, like P7.
   Designs times colorways is not one call: add the fill layer by hand
   ([gui-paths.md](gui-paths.md)), run P7, then pick the next color (not tested).
-- A colorway that changes the material (heather, wash, another weave), or a dark-to-light change
-  Color mode cannot reach: an instruction edit per color on the plate (`scenario-product-shots`,
-  quoted first), each result placed with `IO.place` under the mockup group and shown one at a time
-  (not tested).
+- A colorway that changes the material (heather, wash, another weave): an instruction edit per color
+  on the plate (`scenario-product-shots`, quoted first), each result placed with `IO.place` under
+  the mockup group and shown one at a time (not tested).
 
 ## P8. A placed Scenario result on four corners
 

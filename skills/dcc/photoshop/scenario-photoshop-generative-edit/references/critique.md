@@ -23,17 +23,17 @@ anatomy, likeness, text or a wrong object: the measured job's enlarged pupil pas
 
 ## 2. Code gates
 
-| Gate                    | Pass                                  | Fails on                                        |
-| ----------------------- | ------------------------------------- | ----------------------------------------------- |
-| `aspect_ok`             | take ratio within 1% of the capture's | a fixed-ratio member, a cropped or padded take  |
-| `edited`                | inside mean 3 or more                 | prompt or mask ignored                          |
-| `polarity_suspect`      | false                                 | mask read inverted: outside changed, not inside |
-| `seam_ok`               | bias under 12 and residual under 6    | tone shift (bias), shift or rescale (residual)  |
-| Resolution              | take width at least the box width     | a soft patch beside sharp pixels                |
-| `place_edit` bounds     | equal `cap["bounds"]`                 | a placement or transform error                  |
-| History                 | one new state per placed take         | a stray edit on the user's document             |
-| `verify()["untouched"]` | outside max 2 or less                 | a missing or wrong layer mask                   |
-| `A.deliverable(...)`    | returns `[]`                          | profile problems, hidden takes in a handoff     |
+| Gate                       | Pass                                  | Fails on                                        |
+| -------------------------- | ------------------------------------- | ----------------------------------------------- |
+| `aspect_ok`                | take ratio within 1% of the capture's | a fixed-ratio member, a cropped or padded take  |
+| `edited`                   | inside mean 3 or more                 | prompt or mask ignored                          |
+| `polarity_suspect`         | false                                 | mask read inverted: outside changed, not inside |
+| `seam_ok`                  | bias under 12 and residual under 6    | tone shift (bias), shift or rescale (residual)  |
+| Resolution                 | take width at least the box width     | a soft patch beside sharp pixels                |
+| `place_edit` bounds        | equal `cap["bounds"]`                 | a placement or transform error                  |
+| `A.history_gate(h0, undo)` | `[]`: one new named state per take    | a stray edit on the user's document             |
+| `verify()["untouched"]`    | outside max 2 or less                 | a missing or wrong layer mask                   |
+| `A.deliverable(...)`       | returns `[]`                          | profile problems, hidden takes outside "Takes"  |
 
 Thresholds are authoring-time, from two real takes of one image. A take that fails a code gate is
 never placed. An outside mean of 10 or more on a passing take is expected: the member re-rendered
@@ -92,7 +92,8 @@ the frame, and the mask hides it.
 1. Drop every take that fails a code gate.
 2. Rank the rest on the brief first, then light, then texture.
 3. Between close takes, prefer the lower seam residual, then the lower bias.
-4. Place the best take; place the runners-up as hidden layers only when the user wants to compare.
+4. Place the best take; place the runners-up as hidden layers, in a group named "Takes", only when
+   the user wants to compare.
 
 ## 7. Report
 

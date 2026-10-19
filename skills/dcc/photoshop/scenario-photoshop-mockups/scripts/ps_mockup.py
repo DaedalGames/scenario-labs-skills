@@ -32,10 +32,16 @@ Library:
       # displace maps/. Returns its path; never delete it while the filter exists.
   M.batch(layer, designs, out_dir, fit="cover")
       # one merged PNG per design file; the document ends as it started
-  M.colorways(product, colors, out_dir)
-      # one merged PNG per product color: a Solid Color fill in Color mode above `product`
-      # (luminance kept), masked by the active selection, else clipped to the product layer;
-      # colors = {"name": (r, g, b) or "#rrggbb"}; the document ends as it started
+  M.colorways(product, colors, out_dir, match=True, check=True)
+      # one merged PNG per product color: a Solid Color fill in Color mode above `product`,
+      # masked by the active selection, else clipped to the product layer; colors =
+      # {"name": (r, g, b) or "#rrggbb"}; the document ends as it started. match: a Curves
+      # under the fill brings the product's mid-tones to the swatch's luminance first (Color
+      # mode alone keeps the product's, so navy on white came out pale blue). check: per
+      # colorway, the product's mid-tones against the swatch ("delta_e", CIE76), "folds" (1 =
+      # the same fold pattern) and "spread". match and check need Pillow.
+  M.tone_curve(tones, rgb), M.swatch_check(base, result, rgb), M.delta_e(a, b)
+      # the pure math behind match and check
 Every fit wraps the object once more (Convert to Smart Object) at the target's size: fit before
 displace (Smart Filters refuse a fit), and keep layer masks on the group.
 Shell:
@@ -60,6 +66,7 @@ import zlib
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "scenario-photoshop-expert", "scripts"))
 import ps_gates as G  # noqa: E402
+import ps_io as IO  # noqa: E402
 import ps_run  # noqa: E402
 
 HELPERS_JS = r"""
@@ -153,7 +160,8 @@ function pm_wrap(l, box) {
   d.activeLayer = g;
   executeAction(pm_s("newPlacedLayer"), undefined, DialogModes.NO);
   var w = d.activeLayer; w.name = name;
-  for (var k = 0; k < chain.length; k++) chain[k].grouped = true;
+  // grouped toggles the clip (measured): set it only where it is off.
+  for (var k = 0; k < chain.length; k++) if (!chain[k].grouped) chain[k].grouped = true;
   d.activeLayer = w;
   return w;
 }
@@ -423,7 +431,7 @@ function copy(name, mode, lo, hi, opacity) {
   c.adjustLevels(lo, hi, 1.0, 0, 255);
   c.blendMode = mode;
   c.opacity = opacity;
-  c.grouped = true;
+  if (!c.grouped) c.grouped = true;     // a copy placed inside the chain is clipped already
   top = c;
   made.push({id: c.id, name: c.name});
 }
@@ -482,8 +490,41 @@ return {id: L.id, map: map.fsName, map_box: b, blur: r, scale: ARGS.scale};
 """
 
 COLORWAY_JS = r"""
-var P = pm_layer(ARGS.product), sel = pm_has_selection(d);
+var P = pm_layer(ARGS.product), sel = pm_has_selection(d), tmp = null, T = null;
+if (sel) {
+  tmp = d.channels.add(); tmp.name = "pm_colorway_sel"; d.selection.store(tmp);
+  d.activeChannels = d.componentChannels;
+}
 d.activeLayer = P;
+if (ARGS.curve) {
+  // Curves under the color: Color mode keeps the base's luminance, so the base is first mapped
+  // to the swatch's (a gain when darkening, an offset when lightening); the folds keep their pattern.
+  var desc = new ActionDescriptor(), ref = new ActionReference(), lay = new ActionDescriptor(),
+      crv = new ActionDescriptor();
+  ref.putClass(pm_c("AdjL")); desc.putReference(pm_c("null"), ref);
+  crv.putEnumerated(pm_s("presetKind"), pm_s("presetKindType"), pm_s("presetKindDefault"));
+  lay.putObject(pm_c("Type"), pm_c("Crvs"), crv);
+  lay.putBoolean(pm_c("Grup"), !sel);
+  desc.putObject(pm_c("Usng"), pm_c("AdjL"), lay);
+  executeAction(pm_c("Mk  "), desc, DialogModes.NO);
+  T = d.activeLayer; T.name = "Colorway tone: " + ARGS.name;
+  var sd = new ActionDescriptor(), sref = new ActionReference();
+  sref.putEnumerated(pm_c("AdjL"), pm_c("Ordn"), pm_c("Trgt")); sd.putReference(pm_c("null"), sref);
+  var c2 = new ActionDescriptor(), adjs = new ActionList(), ca = new ActionDescriptor(),
+      cref = new ActionReference(), pts = new ActionList();
+  c2.putEnumerated(pm_s("presetKind"), pm_s("presetKindType"), pm_s("presetKindCustom"));
+  cref.putEnumerated(pm_c("Chnl"), pm_c("Chnl"), pm_c("Cmps")); ca.putReference(pm_c("Chnl"), cref);
+  for (var i = 0; i < ARGS.curve.length; i++) {
+    var pt = new ActionDescriptor();
+    pt.putDouble(pm_c("Hrzn"), ARGS.curve[i][0]); pt.putDouble(pm_c("Vrtc"), ARGS.curve[i][1]);
+    pts.putObject(pm_c("Pnt "), pt);
+  }
+  ca.putList(pm_c("Crv "), pts); adjs.putObject(pm_c("CrvA"), ca);
+  c2.putList(pm_c("Adjs"), adjs); sd.putObject(pm_c("T   "), pm_c("Crvs"), c2);
+  executeAction(pm_c("setd"), sd, DialogModes.NO);
+  if (sel) d.selection.load(tmp, SelectionType.REPLACE);
+  d.activeLayer = T;
+}
 // A fill layer made while a selection is active takes the selection as its mask.
 var desc = new ActionDescriptor(), ref = new ActionReference(), lay = new ActionDescriptor(),
     fill = new ActionDescriptor(), col = new ActionDescriptor();
@@ -496,20 +537,52 @@ executeAction(pm_c("Mk  "), desc, DialogModes.NO);
 var F = d.activeLayer;
 F.name = "Colorway: " + ARGS.name;
 F.blendMode = BlendMode.COLORBLEND;
-if (!sel) F.grouped = true;
-return {id: F.id, masked: sel, clipped: !sel};
+// Above a clipped Curves the fill is clipped already, and grouped toggles: set it only when off.
+if (!sel && !F.grouped) F.grouped = true;
+if (!sel && !F.grouped) throw new Error("could not clip the colorway to " + P.name);
+if (tmp) tmp.remove();
+return {id: F.id, tone_id: T ? T.id : null, masked: sel, clipped: F.grouped};
+"""
+
+# The product (and its colorway layers) alone, in the document's own color space: what the swatch
+# check reads, without the print above it.
+SOLO_EXPORT_JS = r"""
+function pm_keep(c, keep) {
+  var any = false;
+  for (var i = 0; i < c.layers.length; i++) {
+    var l = c.layers[i], k = false;
+    for (var j = 0; j < keep.length; j++) if (l.name === keep[j]) k = true;
+    if (!k && l.typename === "LayerSet") k = pm_keep(l, keep);
+    l.visible = k;
+    if (k) any = true;
+  }
+  return any;
+}
+var pl = pm_find(d, ARGS.product);
+if (!pl) throw new Error("layer not found: " + ARGS.product);
+var keep = [pl.name].concat(ARGS.keep), s = psr_dup(d, d.name + " check", false);
+try {
+  app.activeDocument = s;
+  if (!pm_keep(s, keep)) throw new Error("layer not found: " + pl.name);
+  try { s.mergeVisibleLayers(); } catch (e) {}
+  psr_export(s, ARGS.path, "png");
+} finally { psr_close(s); app.activeDocument = d; }
+return ARGS.path;
 """
 
 # One design = one replace state; the export works on a temporary copy and adds none. Stepping
-# back one state therefore returns to the document as it was, even at the History limit. (Deleting
+# back from the active state (checked by name, never by list length) therefore returns to the
+# document as it was, even at the History limit. (Deleting
 # an active snapshot instead sends History to the opening state: measured.)
 EXPORT_JS = r"""
 var c = psr_dup(d, d.name + " export", true);
 var p = psr_export(c, ARGS.out, "png");
 psr_close(c);
 app.activeDocument = d;
-if (d.historyStates[d.historyStates.length - 1].name !== ARGS.state) throw new Error("unexpected History state");
-d.activeHistoryState = d.historyStates[d.historyStates.length - 2];
+var hs = d.historyStates, a = d.activeHistoryState, i = -1;
+for (var q = hs.length - 1; q >= 0; q--) if (hs[q] == a) { i = q; break; }
+if (a.name !== ARGS.state || i < 1) throw new Error("unexpected History state: " + a.name);
+d.activeHistoryState = hs[i - 1];
 return p;
 """
 
@@ -640,15 +713,134 @@ def _rgb(c):
     return [int(v) for v in c]
 
 
-def colorways(product, colors, out_dir):
+def _lum(rgb):
+    # Photoshop's luminosity weights, the ones its Color blend mode keeps.
+    return 0.3 * rgb[0] + 0.59 * rgb[1] + 0.11 * rgb[2]
+
+
+def _pct(sorted_vals, p):
+    return sorted_vals[min(len(sorted_vals) - 1, int(p / 100.0 * len(sorted_vals)))]
+
+
+def garment_tones(lums):
+    """The product's luminance under the colorway: mid (mean of the 25th to 75th percentile), p99."""
+    v = sorted(lums)
+    if not v:
+        raise ValueError("no product pixels in the colorway area")
+    lo, hi = _pct(v, 25), _pct(v, 75)
+    mid = [x for x in v if lo <= x <= hi]
+    return {"mid": round(sum(mid) / len(mid), 2), "p25": lo, "p75": hi, "p99": _pct(v, 99),
+            "pixels": len(v)}
+
+
+def tone_curve(tones, rgb, margin=3):
+    """Curves points (composite channel) that bring the mid-tones to the swatch's luminance, or
+    None when they are within `margin`. Darker swatch: a gain (L * target / mid), so folds scale
+    with the color. Lighter swatch: an offset, its slope lowered so the 99th percentile stays at
+    250 or under."""
+    target, mid = _lum(rgb), tones["mid"]
+    if abs(target - mid) <= margin or mid <= 0:
+        return None
+    if target < mid:
+        k = target / mid
+    else:
+        k = 1.0
+        if tones["p99"] > mid:
+            k = min(1.0, (250.0 - target) / (tones["p99"] - mid))
+        k = max(k, 0.05)
+    y0 = max(0.0, target - k * mid)
+    x1 = (255.0 - y0) / k
+    if x1 >= 255:
+        return [[0, round(y0, 2)], [255, round(y0 + 255 * k, 2)]]
+    return [[0, round(y0, 2)], [round(x1, 2), 255]]
+
+
+def delta_e(a, b):
+    """CIE76 color difference of two sRGB colors (0 to 255)."""
+    def lab(c):
+        def lin(v):
+            v /= 255.0
+            return v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4
+        r, g, bl = (lin(float(x)) for x in c)
+        x = (0.4124 * r + 0.3576 * g + 0.1805 * bl) / 0.95047
+        y = 0.2126 * r + 0.7152 * g + 0.0722 * bl
+        z = (0.0193 * r + 0.1192 * g + 0.9505 * bl) / 1.08883
+
+        def f(t):
+            return t ** (1.0 / 3) if t > 0.008856 else 7.787 * t + 16.0 / 116
+        fx, fy, fz = f(x), f(y), f(z)
+        return 116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)
+    return round(math.dist(lab(a), lab(b)), 2)
+
+
+def swatch_check(base, result, rgb):
+    """The colorway's mid-tones against the swatch. base and result: the same product pixels
+    [(r, g, b)] before and after. Returns the mid-tones' mean color, delta_e (CIE76) to the
+    swatch, folds (correlation of the luminance pattern, 1 = the same folds) and spread (fold
+    contrast after over before)."""
+    if len(base) != len(result) or not base:
+        raise ValueError("base and result need the same, non-empty pixel list")
+    lb, lr = [_lum(p) for p in base], [_lum(p) for p in result]
+    v = sorted(lr)
+    lo, hi = _pct(v, 25), _pct(v, 75)
+    mids = [p for p, x in zip(result, lr) if lo <= x <= hi]
+    mean = [round(sum(p[i] for p in mids) / len(mids), 1) for i in range(3)]
+    mb, mr = sum(lb) / len(lb), sum(lr) / len(lr)
+    sb = math.sqrt(sum((x - mb) ** 2 for x in lb))
+    sr = math.sqrt(sum((x - mr) ** 2 for x in lr))
+    folds = sum((x - mb) * (y - mr) for x, y in zip(lb, lr)) / (sb * sr) if sb and sr else 0.0
+    vb = sorted(lb)
+    before = _pct(vb, 90) - _pct(vb, 10)
+    after = _pct(v, 90) - _pct(v, 10)
+    return {"mean": mean, "swatch": list(rgb), "delta_e": delta_e(mean, rgb),
+            "folds": round(folds, 3), "spread": round(after / before, 2) if before else None,
+            "pixels": len(lr)}
+
+
+def _area_pixels(path, mask, size=400):
+    """[(r, g, b)] under the mask (white = in), both scaled to a `size` px long side. The same
+    mask gives the same pixels in the same order for every image of one canvas."""
+    from PIL import Image  # optional dependency, only for colorway matching and checks
+    with Image.open(path) as im, Image.open(mask) as m:
+        k = min(1.0, float(size) / max(im.size))
+        dims = (max(1, round(im.width * k)), max(1, round(im.height * k)))
+        px = im.convert("RGB").resize(dims, Image.BOX).tobytes()
+        mk = m.convert("L").resize(dims, Image.BOX).tobytes()
+    return [tuple(px[i * 3:i * 3 + 3]) for i in range(len(mk)) if mk[i] >= 128]
+
+
+def colorways(product, colors, out_dir, match=True, check=True):
     os.makedirs(out_dir, exist_ok=True)
     state = "Scenario: Colorway"
+    work = tempfile.mkdtemp(prefix="scenario_colorways_")
+    mask, tones, base = os.path.join(work, "area.png"), None, None
+    if match or check:
+        from PIL import Image  # optional dependency, only for colorway matching and checks
+        sel = IO.selection()
+        bp = _run(SOLO_EXPORT_JS, {"product": _key(product), "keep": [],
+                                   "path": os.path.join(work, "base.png")})
+        if sel["bounds"]:
+            IO.export_mask(mask, bounds=[0, 0] + sel["canvas"])
+        else:
+            # Clipped to the product: the colorway covers the product's opaque pixels.
+            with Image.open(bp) as im:
+                im.convert("RGBA").getchannel("A").point(lambda a: 255 if a >= 128 else 0).save(mask)
+        base = _area_pixels(bp, mask)
+        tones = garment_tones([_lum(p) for p in base])
     results = []
     for name, color in colors.items():
-        r = _run(COLORWAY_JS, {"product": _key(product), "name": name, "rgb": _rgb(color)}, undo=state)
+        rgb = _rgb(color)
+        curve = tone_curve(tones, rgb) if match else None
+        r = _run(COLORWAY_JS, {"product": _key(product), "name": name, "rgb": rgb, "curve": curve},
+                 undo=state)
         out = os.path.abspath(os.path.join(out_dir, "%s colorway.png" % name))
+        if check:
+            keep = ["Colorway: " + name, "Colorway tone: " + name]
+            cp = _run(SOLO_EXPORT_JS, {"product": _key(product), "keep": keep,
+                                       "path": os.path.join(work, name + ".png")})
+            r["check"] = swatch_check(base, _area_pixels(cp, mask), rgb)
         r["out"] = _run(EXPORT_JS, {"out": out, "state": state})
-        r["colorway"] = name
+        r.update({"colorway": name, "curve": curve, "tones": tones})
         results.append(r)
     return results
 

@@ -186,10 +186,9 @@ Visual gates:
   scenario-photoshop-mockups.
 - **Scenario siblings:** `scenario` (connection, quote, jobs), `scenario-image` (plates, instruction
   edits), `scenario-thumbnails` (a video cover's concept), `scenario-consistency` (one character
-  across plates), `scenario-formats` (a size set made on the platform when nobody needs a PSD). They
-  end at an approved plate on disk; this skill starts there. When nobody needs a layered file,
-  scenario-text-overlay sets the text on the platform instead. A brand kit (scenario-brand-kit)
-  supplies the copy sheet's fonts and colors.
+  across plates), `scenario-formats` (a size set made on the platform when nobody needs a PSD). When
+  nobody needs a layered file, scenario-text-overlay sets the text on the platform instead. A brand
+  kit (scenario-brand-kit) supplies the copy sheet's fonts and colors.
 
 ## Photoshop 2026 notes
 
@@ -202,10 +201,7 @@ Visual gates:
   in your own jobs.
 - The DOM has no artboard API; artboards by Action Manager are not tested here. One document per
   channel replaces them.
-- Photoshop's Generate Image has no toolkit call (a recorded Action may replay it, not tested);
-  scripted plates come from Scenario.
-- A text layer scaled with Free Transform may report its size before the scale (not tested here):
-  change sizes through `type_layers`.
+- Photoshop's Generate Image has no toolkit call; scripted plates come from Scenario.
 - `export_under` saves a flattened duplicate through `psr_export`: JPEG quality 0 to 12; PNG skips
   the cap search.
 - A Clarity layer makes the DOM's `layer.kind` throw "Internal error": `check` reads the layer kind

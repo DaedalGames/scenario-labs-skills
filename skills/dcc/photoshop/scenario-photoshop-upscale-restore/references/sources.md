@@ -52,9 +52,9 @@ Documentation pages were read on 2026-10-18.
 ## Measured
 
 - **Two Scenario 2x upscales** of a 512 px owl photo, 2026-10-19: the calibration table in
-  [expert-notes.md](expert-notes.md). They are the fixtures of `test_upscale_live.py` (6 tests,
+  [expert-notes.md](expert-notes.md). They are the fixtures of `test_upscale_live.py` (7 tests,
   Photoshop 27.11, macOS): `prepare_input`, `build_stack`, `crops`, `lock` in Luminosity and Color
-  modes, `place_result` with and without `prep`.
+  modes, `place_result` with and without `prep`, and the 300 ppi print step without resampling.
 - **One Scenario restore and colorize** of the same photo, damaged on purpose, 2026-10-19: the
   structure scores and Auto-Align runs in [expert-notes.md](expert-notes.md). It is the fixture of
   `test_restore_live.py` (5 tests): `G.structure`, `U.align` kept and not kept, `region_blend`,

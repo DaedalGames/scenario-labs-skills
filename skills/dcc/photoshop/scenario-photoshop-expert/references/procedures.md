@@ -30,11 +30,17 @@ s = A.doc_state()                       # name, path, saved, width, height, ppi,
   to bring it to the front; never switch documents under them.
 - Record `s["saved"]`, `s["bits"]` and `s["profile"]`. At the end, `saved` must be unchanged by the
   agent.
-- `s["history"]` is the active History state: `{index, name, count}`. Gate an edit on it, taken
-  right before the call: afterwards the index is one higher and the name is the job's `undo` name.
-  Never gate on `count`: captures, previews and exports step History back and leave redo states in
-  the list, and a selection is a state of its own. At the History limit the oldest state drops and
-  the index holds still: the name decides (verified live, `test_io_live.py`).
+- `s["history"]`, or `A.history()` alone, is the active History state:
+  `{index, name, prev, id, prev_id, count, limit, full}`. Gate an edit on it: `h0 = A.history()`
+  right before the call, then `A.history_gate(h0, undo) == []` after it. The gate passes when the
+  active state is named as the job's `undo` and sits directly on top of `h0`: its `prev_id` is
+  `h0["id"]` when Photoshop reports state ids, else its `prev` is `h0["name"]` and, below the limit,
+  its index is one higher. Never gate on `count`: captures, previews and exports step History back
+  and leave redo states in the list, and a selection is a state of its own. At the History limit
+  (`full`) the oldest state drops and the index holds still, so the gate skips the index there
+  (verified live at a lowered limit, `test_history_live.py`).
+- `A.step_back(h0, undo)` undoes one named edit and checks that `h0`'s state is active again; it
+  raises if the active state has another name. Use it for trials, never an index or the list length.
 - `A.layer_find("Sky")` returns every layer with that exact name, with its path and kind. Two hits
   mean the name is ambiguous: rename or use the id.
 
@@ -69,12 +75,13 @@ if not r["ok"]:
 
 ## P3. The local edit round trip
 
-Status: verified live. `test_io_live.py` runs this block as written on a fixture photo: a selection,
-`export_region`, a brightened result placed with `mask_selection=True`, `xmp=` and `undo=`, then
-`masked` and `selection_kept` true, the capture's bounds, one History state with that name, the
-outside unchanged (`G.diff` max 2 or less), the inside changed, and `layer_xmp` reading the
-provenance back. For a selection-scoped edit with seam and outside checks, the generative-edit
-specialist's `capture`, `check`, `place_edit` and `verify` wrap these calls.
+Status: verified live. `test_io_live.py` runs this block on a fixture photo, from `export_region` on
+(the test makes the selection; `export_mask` runs in the generative-edit suite): a brightened result
+placed with `mask_selection=True`, `xmp=` and `undo=`, then `masked` and `selection_kept` true, the
+capture's bounds, `A.history_gate` passing for that name, the outside unchanged (`G.diff` max 2 or
+less), the inside changed, and `layer_xmp` reading the provenance back. For a selection-scoped edit
+with seam and outside checks, the generative-edit specialist's `capture`, `check`, `place_edit` and
+`verify` wrap these calls.
 
 ```python
 sel = IO.selection()["bounds"]          # None: no selection; ask, or use a layer or the canvas
@@ -82,13 +89,12 @@ cap = IO.export_region(OUT + "/input.png", pad=32)        # merged pixels, selec
 msk = IO.export_mask(OUT + "/mask.png", bounds=cap["bounds"])   # same box: the files line up
 # Scenario MCP (the scenario skill): recommend for the capability, upload input.png and mask.png,
 # price the exact payload, get the user's yes, run, wait, download OUT + "/result.png".
-h0 = A.doc_state()["history"]           # right before the call
+h0 = A.history()                        # right before the call
 L = IO.place(OUT + "/result.png", "Window, tiki hut, take 1", bounds=cap["bounds"],
              mask_selection=True, undo="Scenario: Edit window",
              xmp={"assetId": "...", "jobId": "...", "prompt": "...", "createdAt": "2026-10-19"})
 assert L["bounds"] == cap["bounds"] and L["masked"] and L["selection_kept"]
-h1 = A.doc_state()["history"]
-assert (h1["index"], h1["name"]) == (h0["index"] + 1, "Scenario: Edit window")
+assert A.history_gate(h0, "Scenario: Edit window") == []   # one new state, with that name
 print(IO.layer_xmp(L["name"]))          # the provenance, read back from the layer
 ```
 
@@ -167,8 +173,9 @@ R.before_after(paths[0], paths[1], OUT + "/a_b.jpg")
 ```
 
 - `layers_only` hides every other layer in the preview copy only; the document is untouched.
-- Open the sheet, then each finalist at 100%. Keep the losing takes hidden, named, until the user
-  decides; deleting them is the user's call.
+- Open the sheet, then each finalist at 100%. Keep the losing takes hidden, named, in a group named
+  "Takes" until the user decides (`psd-handoff` accepts hidden layers there); deleting them is the
+  user's call.
 
 ## P7. Alignment after a tone change
 
@@ -220,7 +227,8 @@ ps_run.run('return psr_export(app.activeDocument, %s, "psd");' % json.dumps(OUT 
   live in the game-art packing test). PNG keeps layer transparency, not alpha channels.
 - Profiles: `web` RGB 8-bit sRGB, long edge 600 to 4096 px; `social` the same, from 1080; `print`
   300 ppi or more, long edge 2400 or more; `game-texture` RGB 8-bit, power-of-two sides, 256 to 8192
-  px; `psd-handoff` no default layer names, hidden or empty layers, or layers past the canvas.
+  px; `psd-handoff` no default layer names, no hidden layers outside a group named "Takes", no empty
+  layers, no layers past the canvas.
 
 ## P10. The same edit over many files
 

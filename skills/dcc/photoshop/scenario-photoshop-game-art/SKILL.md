@@ -122,7 +122,7 @@ one `ps_run` job. Code: [procedures](references/procedures.md).
    place and verify. GATE: `bounds` not None; `partial` only the edge; `untouched`.
 4. **Judge.** `R.sheet` of the takes beside the render (Frederick compares side by side [pAIYEsECSRw
    26:55]); a grayscale copy for values; no area left "very, very 3D" (Tuffan [j_czTAnOSCM 17:06]).
-   GATE: a verdict per take; losing takes hidden and named.
+   GATE: a verdict per take; losing takes hidden and named, in a group named "Takes".
 
 **C. Sprites, icons and UI kits.** Generation (sprites, icon sets, buttons, transparent backgrounds,
 style batches) goes to `scenario-game-assets`. Photoshop finishes:

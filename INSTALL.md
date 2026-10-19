@@ -46,9 +46,9 @@ Meshes from a picture, rigged and ready to animate. 13 skills.
 npx skills add scenario-labs/skills --skill scenario scenario-moderation scenario-report scenario-3d scenario-orbit-views scenario-meshy scenario-blender scenario-skyboxes scenario-patina-retexture scenario-video scenario-rodin scenario-sparc3d scenario-3d-worlds
 ```
 
-Working in ZBrush, Blender or Maya? Add the expert tools for it:
+Working in ZBrush, Blender, Maya or Photoshop? Add the expert tools for it:
 [ZBrush](skills/dcc/zbrush/README.md), [Blender](skills/dcc/blender/README.md),
-[Maya](skills/dcc/maya/README.md).
+[Maya](skills/dcc/maya/README.md), [Photoshop](skills/dcc/photoshop/README.md).
 
 ### Environment Artist
 
@@ -231,7 +231,8 @@ npx skills add scenario-labs/skills --skill scenario scenario-chatgpt-pet-create
 ## Expert tools
 
 Teams of skills that drive DCC software and game engines installed on your machine. They need the
-application, not the Scenario MCP server. Each family installs as one set:
-[ZBrush](skills/dcc/zbrush/README.md), [Blender](skills/dcc/blender/README.md),
-[Maya](skills/dcc/maya/README.md), [Unreal Engine](skills/game-engines/unreal/README.md),
+application; only the Photoshop family also uses the Scenario MCP server, for its generative steps.
+Each family installs as one set: [ZBrush](skills/dcc/zbrush/README.md),
+[Blender](skills/dcc/blender/README.md), [Maya](skills/dcc/maya/README.md),
+[Photoshop](skills/dcc/photoshop/README.md), [Unreal Engine](skills/game-engines/unreal/README.md),
 [Unity](skills/game-engines/unity/README.md), [Godot](skills/game-engines/godot/README.md).

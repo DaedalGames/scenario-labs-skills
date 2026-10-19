@@ -21,15 +21,8 @@ import ps_retouch as RT
 import ps_run, ps_io as IO, ps_gates as G, ps_review as R, ps_audit as A
 OUT = "/path/to/a/work/folder"    # never the folder of the user's PSD
 
-def history():                    # the active state, never the list length (redo states stay in it)
-    h = A.doc_state()["history"]
-    return h["index"], h["name"]
-
-def back_to(mark):                # step back to a state from history(); later states go on the next edit
-    js = ("var d = app.activeDocument, s = d.historyStates[%d];"
-          " if (s.name !== %s) throw new Error('History moved: ' + s.name);"
-          " d.activeHistoryState = s; return true;" % (mark[0], json.dumps(mark[1])))
-    assert ps_run.run(js)["ok"]
+# History: h0 = A.history() right before a call; A.history_gate(h0, undo) == [] after it (one new
+# state, named); A.step_back(h0, undo) to undo a trial. Never the list length or a bare index.
 
 def dist(a, b):
     return math.sqrt(sum((x - y) ** 2 for x, y in zip(a, b)))
@@ -124,11 +117,12 @@ var c = new SolidColor(); c.rgb.red = %V%; c.rgb.green = %V%; c.rgb.blue = %V%;
 d.selection.selectAll(); d.selection.fill(c); d.selection.deselect(); return true;
 """
 box = [800, 540, 1200, 1320]                     # element bounds plus a margin
-mark = history()
 for tag, v in (("black", 0), ("white", 255), ("gray", 128)):
+    mark = A.history()
     ps_run.run(BACKDROP.replace("%NAME%", json.dumps(EL)).replace("%V%", str(v)), undo="Scenario: Edge check")
+    assert A.history_gate(mark, "Scenario: Edge check") == []
     R.preview(OUT + "/p4_%s.png" % tag, crop=box, max_px=0, layers_only=[EL, "Edge check"])
-    back_to(mark)
+    A.step_back(mark, "Scenario: Edge check")   # raises unless the marked state is active again
 R.sheet([OUT + "/p4_%s.png" % t for t in ("black", "white", "gray")], OUT + "/p4_edges.jpg",
         labels=["black", "white", "gray"])
 ```

@@ -18,12 +18,12 @@ flag the gap.
 **REQUIRED BACKGROUND:** scenario-photoshop-expert (execution channel, round trip, gates).
 
 **Status (2026-10-19):** every call in [`scripts/ps_upscale.py`](scripts/ps_upscale.py) is verified
-live on Photoshop 27.11 (macOS). `test_upscale_live.py` (6 tests, two real Scenario 2x upscales as
-fixtures) runs `prepare_input`, `build_stack`, `crops`, `lock` in Luminosity and Color modes and
-`place_result`. `test_restore_live.py` (5 tests, one real colorized Scenario restore) runs `align`,
-`region_blend`, `G.structure` and `R.overlay`. Not tested: `prepare_input(layer=)`, custom crop
-boxes, the shell commands, the changed-layer rejoin, Photoshop's Generative Upscale and Neural
-Filters, Windows.
+live on Photoshop 27.11 (macOS). `test_upscale_live.py` (7 tests, two real Scenario 2x upscales as
+fixtures) runs `prepare_input`, `build_stack`, `crops`, `lock` in Luminosity and Color modes,
+`place_result` and the print resolution step. `test_restore_live.py` (5 tests, one real colorized
+Scenario restore) runs `align`, `region_blend`, `G.structure` and `R.overlay`. Not tested:
+`prepare_input(layer=)`, custom crop boxes, the shell commands, the changed-layer rejoin,
+Photoshop's Generative Upscale and Neural Filters, Windows.
 
 ## Stance (the expert delta)
 
@@ -72,7 +72,7 @@ Filters, Windows.
 | Job                        | upscale, restore, colorize, or a mix            | read from the brief                               |
 | Fidelity                   | faithful or creative capability for `recommend` | faithful; creative only when asked                |
 | Risky content              | faces, product text, ornament, sky, gradients   | look for them; crop boxes go there                |
-| Factor or target size      | `build_stack(factor)`; the member's own factor  | 2x; 4x when a print size needs it                 |
+| Factor or target size      | `build_stack(factor)`; the member's own factor  | print inches x 300 over source pixels; else 2x    |
 | Scope                      | whole image, one layer, one region              | whole image                                       |
 | Candidates                 | layers to compare                               | two Scenario takes plus the baseline              |
 | Source mode and depth      | a Grayscale master shows no color               | ask before Image > Mode > RGB Color on the master |
@@ -121,8 +121,9 @@ Each call is one `ps_run` job. `import ps_upscale as U` puts the lead's `scripts
    layer below; the edge checked at 100%.
 8. **Finish and deliver.** Downloads can come over-sharpened: blur 0.8 to 1 px, sharpen once, add
    grain (Dinda [knYusnpB9zI 08:29]; [knYusnpB9zI 09:35]). Tone down hot color with Vibrance or
-   Saturation (Geller [jIvcJtPsJss 02:56]). `A.deliverable(profile)` returns `[]`. GATE: no halo or
-   crunch at 100%; the report names takes, gate numbers and what was not verified.
+   Saturation (Geller [jIvcJtPsJss 02:56]). For print: 300 ppi, no resampling (procedures P10).
+   `A.deliverable(profile)` returns `[]`. GATE: no halo or crunch at 100%; the report names takes,
+   gate numbers and what was not verified.
 
 **Changed layer (not tested).** A layer that Harmonize or a generation left soft rejoins at full
 resolution: Smith upscales it, scales it back into the document, nudges it in Difference until it
@@ -204,7 +205,7 @@ Toolkit thresholds are authoring-time, from one 512 px photo: check them on your
 - Auto-Align by Action Manager needs the projection charID `Auto` (the string ID `auto` aligns
   nothing), does nothing on a smart object, and turns a Background into "Layer 0". `U.align` works
   on rasterized copies in a temporary document.
-- Stepping History back does not restore layer visibility; `U.align` restores it itself.
+- `U.align` restores layer visibility itself after a step back.
 - Neural Filters (Colorize, Photo Restoration, Super Zoom) appear in recent videos (Dinda
   [G5yuLhm0SdM 01:04]; Alwash [WwRbCKao7S4 00:33]); not tested here.
 

@@ -26,19 +26,19 @@ other zoom level can be misleading" (Ramirez [a7E4HlrAc3w 01:05]).
 
 ## 2. Code gates
 
-| Gate                     | Pass                                    | Fails on                                         |
-| ------------------------ | --------------------------------------- | ------------------------------------------------ |
-| `aspect_ok`              | the output's ratio matches the source's | reframing, a crop, padding left on the result    |
-| `size_ok`                | output = source x factor, within 1 px   | another factor (review is still possible)        |
-| `match["matches"]`       | worst-channel mean under 6 at 256 px    | shift, color cast, reframing                     |
-| `detail_vs_base`         | near 1 or above                         | a smoothed or blurred output (blurred: 0.08)     |
-| `texture_change`         | no threshold                            | information: high means the texture was redrawn  |
-| `G.structure`, per take  | lowest of the takes; drops after a fix  | a shift or scale change (relative only)          |
-| `U.align` `kept`         | true only on a drop of 10% or more      | the toolkit steps back on its own                |
-| `U.align` `uncovered`    | all zero, or cropped back               | a bare strip along an edge                       |
-| `lock` `after`           | under `before`                          | the lock hit the wrong layer, or layers above it |
-| History                  | one new state per placement or lock     | a stray edit on the user's document              |
-| `A.deliverable(profile)` | returns `[]`                            | size, mode, profile, hidden layers in a handoff  |
+| Gate                     | Pass                                    | Fails on                                           |
+| ------------------------ | --------------------------------------- | -------------------------------------------------- |
+| `aspect_ok`              | the output's ratio matches the source's | reframing, a crop, padding left on the result      |
+| `size_ok`                | output = source x factor, within 1 px   | another factor (review is still possible)          |
+| `match["matches"]`       | worst-channel mean under 6 at 256 px    | shift, color cast, reframing                       |
+| `detail_vs_base`         | near 1 or above                         | a smoothed or blurred output (blurred: 0.08)       |
+| `texture_change`         | no threshold                            | information: high means the texture was redrawn    |
+| `G.structure`, per take  | lowest of the takes; drops after a fix  | a shift or scale change (relative only)            |
+| `U.align` `kept`         | true only on a drop of 10% or more      | the toolkit steps back on its own                  |
+| `U.align` `uncovered`    | all zero, or cropped back               | a bare strip along an edge                         |
+| `lock` `after`           | under `before`                          | the lock hit the wrong layer, or layers above it   |
+| History                  | one new state per placement or lock     | a stray edit on the user's document                |
+| `A.deliverable(profile)` | returns `[]`                            | size, mode, profile, hidden layers outside "Takes" |
 
 Thresholds are authoring-time, from one 512 px photo and two real upscales. A smoother subject
 scores lower everywhere. A candidate that fails `aspect_ok` or `match` is not judged further.

@@ -141,16 +141,77 @@ class DeliverableTest(unittest.TestCase):
     def test_unknown_profile(self):
         self.assertIn("unknown profile", ps_audit.deliverable("nope", state())[0])
 
+    def test_handoff_keeps_hidden_takes_in_a_takes_group(self):
+        takes = {"name": "Takes", "kind": "group", "visible": False, "bounds": [0, 0, 5, 5],
+                 "path": "/Takes", "children": [
+                     {"name": "Iris, take 2", "kind": "smart_object", "visible": False,
+                      "bounds": [0, 0, 5, 5], "path": "/Takes/Iris, take 2"}]}
+        self.assertEqual(ps_audit.deliverable("psd-handoff", state(layers=[takes])), [])
+        other = {"name": "Old", "kind": "pixel", "visible": False, "bounds": [0, 0, 5, 5], "path": "/Old"}
+        probs = ps_audit.deliverable("psd-handoff", state(layers=[takes, other]))
+        self.assertEqual(len(probs), 1)
+        self.assertIn("1 hidden layers", probs[0])
+
+
+def hist(index, name, prev, count, full=False, limit=50, id_=None, prev_id=None):
+    return {"index": index, "name": name, "prev": prev, "count": count, "limit": limit,
+            "full": full, "id": id_, "prev_id": prev_id}
+
+
+class HistoryGateTest(unittest.TestCase):
+    """The History gate reads the active state, never the list length (ps_audit.history_problems)."""
+
+    def test_new_state_below_the_limit(self):
+        h0 = hist(3, "Select", "Fill", 6)               # two redo states above the mark
+        self.assertEqual(ps_audit.history_problems(h0, hist(4, "Scenario: Edit", "Select", 5), "Scenario: Edit"), [])
+
+    def test_index_must_rise_below_the_limit(self):
+        h0 = hist(3, "Select", "Fill", 4)
+        self.assertTrue(ps_audit.history_problems(h0, hist(2, "Scenario: Edit", "Select", 3), "Scenario: Edit"))
+
+    def test_at_the_limit_the_index_holds_still(self):
+        h0 = hist(49, "Select", "Fill", 50, full=True)
+        h1 = hist(49, "Scenario: Edit", "Select", 50, full=True)
+        self.assertEqual(ps_audit.history_problems(h0, h1, "Scenario: Edit"), [])
+
+    def test_missing_edit_fails(self):
+        h0 = hist(49, "Select", "Fill", 50, full=True)
+        self.assertTrue(ps_audit.history_problems(h0, h0, "Scenario: Edit"))
+        with_ids = hist(49, "Scenario: Edit", "Scenario: Edit", 50, full=True, id_=7, prev_id=6)
+        self.assertTrue(ps_audit.history_problems(with_ids, with_ids, "Scenario: Edit"))
+
+    def test_twice_or_without_undo_fails(self):
+        h0 = hist(10, "Select", "Fill", 11)
+        twice = hist(12, "Scenario: Edit", "Scenario: Edit", 13)
+        self.assertTrue(ps_audit.history_problems(h0, twice, "Scenario: Edit"))
+        no_undo = hist(11, "New Layer", "Select", 12)
+        self.assertTrue(ps_audit.history_problems(h0, no_undo, "Scenario: Edit"))
+
+    def test_ids_decide_when_readable(self):
+        h0 = hist(49, "Scenario: Edit", "Scenario: Edit", 50, full=True, id_=7, prev_id=6)
+        ok = hist(49, "Scenario: Edit", "Scenario: Edit", 50, full=True, id_=8, prev_id=7)
+        self.assertEqual(ps_audit.history_problems(h0, ok, "Scenario: Edit"), [])
+        moved = hist(49, "Scenario: Edit", "Scenario: Edit", 50, full=True, id_=9, prev_id=8)
+        self.assertTrue(ps_audit.history_problems(h0, moved, "Scenario: Edit"))
+
+    def test_back_at_the_mark(self):
+        h0 = hist(49, "Select", "Fill", 50, full=True)
+        self.assertEqual(ps_audit.history_problems(h0, hist(47, "Select", "Fill", 50)), [])
+        self.assertTrue(ps_audit.history_problems(h0, hist(48, "Fill", "Fill 2", 50)))
+        below = hist(5, "Select", "Fill", 9)
+        self.assertTrue(ps_audit.history_problems(below, hist(4, "Select", "Fill", 9)))
+        self.assertEqual(ps_audit.history_problems(hist(5, "A", "B", 9, id_=3), hist(2, "A", "B", 9, id_=3)), [])
+
 
 class ProvenanceTest(unittest.TestCase):
     def test_round_trip_escapes_markup(self):
-        fields = {"assetId": "asset_x", "prompt": 'a "red" ball & <box>', "cuCharged": "31.5"}
+        fields = {"assetId": "asset_x", "prompt": 'a "red" ball & <box>', "seed": "1"}
         xmp = ps_io.provenance_xmp(fields)
         self.assertNotIn('"red"', xmp)
         self.assertNotIn("<box>", xmp)
         self.assertEqual(ps_io.parse_xmp(xmp), dict(fields, schema="1"))
 
-    def test_snake_case_keys_join_the_plugin_schema(self):
+    def test_snake_case_keys_are_renamed_to_camel_case(self):
         xmp = ps_io.provenance_xmp({"asset_id": "a", "job_id": "j", "model": "m", "date": "d",
                                     "negative_prompt": "n"})
         self.assertEqual(ps_io.parse_xmp(xmp), {"schema": "1", "assetId": "a", "jobId": "j",
@@ -221,6 +282,47 @@ class MockupHelpersTest(unittest.TestCase):
     def test_quad_needs_four_corners(self):
         with self.assertRaises(ValueError):
             ps_mockup.quad_size([[0, 0], [1, 0], [1, 1]])
+
+    def test_cylinder_angle_and_colors_are_checked_before_photoshop(self):
+        for angle in (0, 181, -10):
+            with self.assertRaises(ValueError):
+                ps_mockup.fit_cylinder("x", [[0, 0], [1, 0], [1, 1], [0, 1]], 5, angle=angle)
+        self.assertEqual(ps_mockup._rgb("#1e3278"), [30, 50, 120])
+        self.assertEqual(ps_mockup._rgb((1, 2, 3)), [1, 2, 3])
+        for bad in ("#12345", "navy", (1, 2)):
+            with self.assertRaises(ValueError):
+                ps_mockup._rgb(bad)
+
+    def test_tone_curve_gain_when_darkening_offset_when_lightening(self):
+        white = {"mid": 227.0, "p99": 242}
+        navy = ps_mockup.tone_curve(white, (30, 50, 120))
+        self.assertEqual(navy[0], [0, 0.0])                    # a gain: black stays black
+        self.assertAlmostEqual(navy[1][1] / 255, ps_mockup._lum((30, 50, 120)) / 227.0, places=3)
+        black = {"mid": 35.0, "p99": 48}
+        sand = ps_mockup.tone_curve(black, (230, 210, 160))
+        k = (sand[1][1] - sand[0][1]) / (sand[1][0] - sand[0][0])
+        self.assertAlmostEqual(k, 1.0)                          # an offset keeps fold contrast
+        self.assertAlmostEqual(sand[0][1] + 35 * k, ps_mockup._lum((230, 210, 160)), places=1)
+        capped = ps_mockup.tone_curve({"mid": 35.0, "p99": 120}, (245, 245, 245))
+        k = (capped[1][1] - capped[0][1]) / (capped[1][0] - capped[0][0])
+        self.assertLessEqual(capped[0][1] + 120 * k, 250.01)    # highlights stay under 250
+        self.assertIsNone(ps_mockup.tone_curve({"mid": 120.0, "p99": 200}, (120, 120, 120)))
+
+    def test_swatch_check_and_delta_e(self):
+        self.assertEqual(ps_mockup.delta_e((30, 50, 120), (30, 50, 120)), 0)
+        self.assertAlmostEqual(ps_mockup.delta_e((255, 255, 255), (0, 0, 0)), 100, places=0)
+        base = [(v, v, v) for v in range(150, 250)]
+        good = [(max(0, v - 200 + 30), max(0, v - 200 + 50), max(0, v - 200 + 120)) for v in range(150, 250)]
+        r = ps_mockup.swatch_check(base, good, (30, 50, 120))
+        self.assertLess(r["delta_e"], 2)
+        self.assertGreater(r["folds"], 0.99)
+        pale = [(min(255, v - 10), v, 255) for v in range(150, 250)]
+        self.assertGreater(ps_mockup.swatch_check(base, pale, (30, 50, 120))["delta_e"], 20)
+        flat = [(30, 50, 120)] * 100
+        self.assertEqual(ps_mockup.swatch_check(base, flat, (30, 50, 120))["folds"], 0.0)
+        tones = ps_mockup.garment_tones([ps_mockup._lum(p) for p in base])
+        self.assertEqual(tones["pixels"], 100)
+        self.assertTrue(tones["p25"] <= tones["mid"] <= tones["p75"])
 
     def test_solid_png_is_valid(self):
         with tempfile.TemporaryDirectory() as tmp:

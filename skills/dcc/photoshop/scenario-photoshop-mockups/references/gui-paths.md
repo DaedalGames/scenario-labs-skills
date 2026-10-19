@@ -31,9 +31,13 @@ tapered bottle, a pouch), and for the hand finish.
 
 1. Select the garment or product (Select > Subject, minus the print), then Layer > New Fill Layer >
    Solid Color: the selection becomes its mask.
-2. Set the fill layer's blend mode to Color, so folds and highlights stay.
-3. Double-click its thumbnail to pick the next color (Quick Fix Up [boONV-waIUk 02:47]), and export
-   each one (File > Export > Quick Export as PNG).
+2. Set the fill layer's blend mode to Color, so folds and highlights stay (WeJustClickme
+   [i-hYHLXDheU 02:10]). Color keeps the garment's lightness: on a white or black garment, add a
+   Curves adjustment layer under the fill, with the same mask, and move the mid-tones to the
+   swatch's lightness, or navy stays pale blue on a white shirt.
+3. Double-click its thumbnail to pick the next color (Quick Fix Up does it on a background
+   [boONV-waIUk 02:47]), set the Curves again, and export each one (File > Export > Quick Export as
+   PNG).
 
 ## The printable area as a group mask
 

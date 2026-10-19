@@ -59,9 +59,10 @@ changed.
 
 ## Measured
 
-- **`test_composite_live.py`** (8 tests, Photoshop 27.11, macOS): `fix_halo`, `shadows`,
+- **`test_composite_live.py`** (9 tests, Photoshop 27.11, macOS): `fix_halo`, `shadows`,
   `match_tone`, `match_grain`, `blend_if`, `channel_pick`, `subject_mask` on a sample photo and a
-  fringed disc.
+  fringed disc; `match_grain` also on an element with other layers above it, the grain layer landing
+  directly above the element and clipped to it.
 - **`test_retouch_live.py`** (3 tests): frequency separation at 8 and 16 bits with `verify_fs`;
   `suggest_radius`, `highpass_smoother` and `dodge_burn`, each invisible until revealed.
 - **`test_gates_live.py`**: the skin line on a flat skin patch, texture on noise against flat, halo

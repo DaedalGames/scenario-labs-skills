@@ -442,9 +442,10 @@ def lock(layer, mode="color", base=None, undo="Scenario: Fidelity lock"):
 # Stepping History back removes the aligned copy but not a visibility change (Photoshop does not
 # record those by default), so the result is shown again by hand.
 STEP_BACK_JS = r"""
-var h = d.historyStates;
-if (d.activeHistoryState.name !== ARGS.undo) throw new Error("last History state is not " + ARGS.undo);
-d.activeHistoryState = h[h.length - 2];
+var h = d.historyStates, a = d.activeHistoryState, i = -1;
+for (var q = h.length - 1; q >= 0; q--) if (h[q] == a) { i = q; break; }
+if (a.name !== ARGS.undo || i < 1) throw new Error("active History state is not " + ARGS.undo);
+d.activeHistoryState = h[i - 1];
 var L = pu_find(d, ARGS.layer);
 if (L) L.visible = ARGS.visible;
 return d.activeHistoryState.name;

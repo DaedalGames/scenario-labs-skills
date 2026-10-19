@@ -20,11 +20,12 @@ flag the gap.
 
 **Status (2026-10-19):** every call in [`scripts/ps_composite.py`](scripts/ps_composite.py)
 (`subject_mask`, `channel_pick`, `blend_if`, `fix_halo`, `shadows`, `match_tone`, `match_grain`) is
-verified live on Photoshop 27.11 (macOS) by `test_composite_live.py` (8 tests on a sample photo and
+verified live on Photoshop 27.11 (macOS) by `test_composite_live.py` (9 tests on a sample photo and
 a fringed disc). [`scripts/ps_retouch.py`](scripts/ps_retouch.py) is verified by
 `test_retouch_live.py` (frequency separation at 8 and 16 bits, radius pick, smoother, dodge and
-burn); `skin_tone` wraps the skin-line gate, verified on a flat patch. Not tested: a real portrait,
-hair through `subject_mask`, Harmonize, any Scenario step, layer-split placement, Windows.
+burn). `skin_tone` is not run live; the `G.stats` skin line it wraps is, on a flat patch. Not
+tested: a real portrait, hair through `subject_mask`, Harmonize, any Scenario step, layer-split
+placement, Windows.
 
 ## Stance (the expert delta)
 
@@ -109,9 +110,9 @@ lead's `scripts/` on the path; then
    Then a Luminosity copy, the color copy partway, and the original masked back. GATE: `G.texture`
    ratio at least 0.6 against the original; identity and edges at 100%.
 5. **Shadows.** `C.shadows(layer, angle=a)`: contact and cast Multiply layers under the element.
-   Sharp sun: lower `cast_blur`. The silhouette follows the layer mask too, so a mask-cut element
-   casts its own shape. GATE: ground under the contact darker than before; cast direction matches
-   the plate's shadows at fit-to-screen; contact densest where the element touches.
+   Sharp sun: lower `cast_blur`. The silhouette follows the layer mask. GATE: ground under the
+   contact darker than before; cast direction matches the plate's shadows at fit-to-screen; contact
+   densest where the element touches.
 6. **Tone.** `t = C.match_tone(layer, strength=0.5)`: clipped Curves toward the scene ring,
    luminance kept. Contrast or brightness off: a clipped Levels by hand. GATE: `cast_after` closer
    to `cast_scene` than `cast_before`; luminance within 12%; no new cast at fit-to-screen.
@@ -155,7 +156,7 @@ Toolkit thresholds are authoring-time: check them on your own images.
 ## Quality gates
 
 - **Code:** `G.halo` rims; `match_tone` cast distances and luminance; `match_grain` end against
-  target; texture ratio and `skin_line_delta` on skin; `verify_fs`; History grew by one named state
+  target; texture ratio and `skin_line_delta` on skin; `verify_fs`; `A.history_gate(h0, undo) == []`
   per call; `A.deliverable("psd-handoff")` returns `[]`.
 - **Visual:** edges at 100% on black, white and gray; contact and cast against the plate's own
   shadows; light direction and tone at fit-to-screen; grain at 100% and 200%; eyes, teeth, hair and
@@ -204,7 +205,8 @@ Toolkit thresholds are authoring-time: check them on your own images.
   `match_grain` uses Overlay noise. The Light adjustment layer (27.10) pauses while layers below it
   are edited (Rudis [m6nSl2-t-iQ 07:19]).
 - Relight Layer (September 2026 beta) spends credits only on Done (Smith [P0OsXyEeuvM 04:05]).
-- `match_grain` tries amounts on the live document, then steps History back; one state remains.
+- `match_grain` tries amounts on the live document, stepping each back by name; exactly one new
+  state remains (checked).
 
 ## References
 

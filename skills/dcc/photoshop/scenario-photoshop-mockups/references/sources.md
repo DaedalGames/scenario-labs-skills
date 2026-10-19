@@ -18,8 +18,9 @@ against a live Photoshop 27.11 on macOS, not from these sources.
 | 70L2ngS8raY | Creating Product Design Mockups With Generative Fill Partner Models   | 2025-12-04 | 05:17  | https://www.youtube.com/watch?v=70L2ngS8raY | Morgan Hastie, graphic designer, on Adobe's Photoshop channel       | plate cleanup by fill, SVG artwork in smart objects, Arc Lower    | 00:33, 01:04, 02:47, 03:21, 04:28                             |
 | rrxTM5AZALU | Easily Create Realistic T-Shirt Mockups in Photoshop                  | 2023-07-13 | 07:33  | https://www.youtube.com/watch?v=rrxTM5AZALU | Philip Anders, print-on-demand seller                               | upscaled plate, Hard Light copy, dark garments, 90% opacity       | 00:34, 04:25, 04:58, 06:38                                    |
 | C3ZkcqB36xw | Create a Realistic Soda Can Mock-Up with Photoshop!                   | 2025-04-23 | 03:30  | https://www.youtube.com/watch?v=C3ZkcqB36xw | Design Master, tutorial channel (creator not named)                 | Cylinder preset, Multiply copy                                    | 00:00, 00:38, 01:47                                           |
-| boONV-waIUk | Create Realistic Tin Can Mockup in Photoshop                          | 2025-07-12 | 04:02  | https://www.youtube.com/watch?v=boONV-waIUk | Quick Fix Up, tutorial channel (creator not named)                  | named placeholder, group mask without lid, Linear Burn and Screen | 00:33, 01:39, 02:15, 03:21                                    |
+| boONV-waIUk | Create Realistic Tin Can Mockup in Photoshop                          | 2025-07-12 | 04:02  | https://www.youtube.com/watch?v=boONV-waIUk | Quick Fix Up, tutorial channel (creator not named)                  | named placeholder, group mask without lid, Linear Burn and Screen | 00:33, 01:39, 02:15, 02:47, 03:21                             |
 | -VM3ee1O_8U | How to create a Mockup in Photoshop for Beginners!                    | 2025-11-11 | 04:28  | https://www.youtube.com/watch?v=-VM3ee1O_8U | WeJustClickme, tutorial channel (creator not named)                 | measuring the product, Pen mask on the group                      | 00:00, 01:06, 02:22, 03:29                                    |
+| i-hYHLXDheU | Football Poster Design in Photoshop (Step by Step)                    | 2026-04-02 | 07:28  | https://www.youtube.com/watch?v=i-hYHLXDheU | WeJustClickme, tutorial channel (creator not named)                 | a t-shirt recolored by a clipped Solid Color in Color mode        | 01:36, 02:10                                                  |
 | SKYL0FCOO04 | How To Design Coffee Bag Product Packaging Mockup in Photoshop        | 2025-11-11 | 16:47  | https://www.youtube.com/watch?v=SKYL0FCOO04 | Mockup Art, sells mockup PSDs (creator not named); captions garbled | Distort on four points, three light copies                        | 05:31, 06:16, 15:12, 15:47                                    |
 | WeDJv63Wgjk | Learn Packaging Design Part 3: Turn Dielines into 3D Mockups          | 2026-05-29 | 08:37  | https://www.youtube.com/watch?v=WeDJv63Wgjk | GraphiqVibe, packaging design channel                               | real size first, faces fitted by corners, placement check         | 01:37, 04:58, 06:13, 06:46                                    |
 | tNrV1XdZX0o | How To QUICKLY Outline Logos In Photoshop                             | 2025-10-22 | 04:52  | https://www.youtube.com/watch?v=tNrV1XdZX0o | Brendan Williams, Photoshop educator                                | channel cutout of a flat logo                                     | 00:31, 01:03, 01:37, 03:14                                    |
@@ -41,13 +42,15 @@ tested.
 
 ## Measured
 
-- **`test_mockup_live.py`** (14 tests, Photoshop 27.11, macOS, 2026-10-19): `placeholder` without
+- **`test_mockup_live.py`** (15 tests, Photoshop 27.11, macOS, 2026-10-19): `placeholder` without
   and with a group mask and with `size=`, `fit_quad` on four quads in a row, on a placed result, on
   a PNG with transparent margins, a clipped layer and an active selection, `fit_cylinder` on a
   checkerboard, `corners`, `quad_size`, `replace_design` in `exact` and `cover` (print proportions
-  kept), `lighting`, `displace`, `batch`, `colorways` (clipped and masked), and a fit refused on a
-  smart object with Smart Filters. Fixtures: a 1000x800 document with 40 px gray strips and a white
-  1000x800 document. Results in [expert-notes.md](expert-notes.md).
+  kept), `lighting`, `displace`, `batch`, `colorways` (clipped and masked, with and without the
+  Curves match, on gray strips and on a white and a black shirt), and a fit refused on a smart
+  object with Smart Filters. Fixtures: a 1000x800 document with 40 px gray strips, a white 1000x800
+  document, and two 360x480 shirts with folds made with Pillow. Results in
+  [expert-notes.md](expert-notes.md).
 - **One visual check** on a generated tote photo, 2026-10-19: a design flat, then lit, then
   displaced, judged on the whole frame and on a zoomed crop of the creases.
 - **Platform checks on 27.11:** the custom warp descriptor, the scale-up rule for custom warps,

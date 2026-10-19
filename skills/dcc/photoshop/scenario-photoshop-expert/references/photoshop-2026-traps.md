@@ -148,7 +148,11 @@ MCP and describe Adobe's features as manual alternatives in [gui-paths.md](gui-p
   may not be available in this version of Photoshop". `psr_export` creates the folder first
   (measured).
 - **Clipping chains.** A layer inserted between a base and its clipped layers unclips the whole
-  chain. Add above the chain top, then set `grouped = true` (measured).
+  chain. `artLayers.add()` puts the new layer at the top of the stack, not above the active layer:
+  move it above the chain top (measured).
+- **`grouped` is a toggle.** A layer added or moved inside a clipping chain is clipped already, and
+  setting `grouped = true` on it releases the clip; `grouped = false` on a layer that is not clipped
+  clips it (measured on 27.11). Read `grouped`, set it only when it differs, then check it.
 - **Select Subject** is `executeAction(stringIDToTypeID("autoCutout"))` with
   `sampleAllLayers: false` (measured).
 - **Selections.** ExtendScript has no `Selection.border`. Build a ring as expand, store, contract,
@@ -176,10 +180,11 @@ MCP and describe Adobe's features as manual alternatives in [gui-paths.md](gui-p
 - **Deleting the active History snapshot** sends the document back to its opening state. Step back
   one state instead (measured).
 - **Gate on the active state, never the list length.** Captures, previews and exports step History
-  back and leave redo states in the list; making a selection is a state of its own; at the History
-  limit the oldest state drops and the index holds still. `doc_state()["history"]` returns the
-  active state's index and name (measured). A job with `undo` that throws still leaves its named
-  state, possibly empty.
+  back and leave redo states in the list; making a selection is a state of its own (measured). At
+  the History limit the oldest state drops and the index holds still, so an index check fails a
+  correct edit there; `A.history_gate` checks the name and that the state is new, and skips the
+  index at the limit (verified live at a lowered limit, `test_history_live.py`). A job with `undo`
+  that throws still leaves its named state, possibly empty.
 - **History stepping does not restore layer visibility** under the default preference, which leaves
   visibility out of History (measured). Restore visibility explicitly.
 - **Layer XMP** written on a layer survives save, close and reopen (measured). `ps_io.place` writes

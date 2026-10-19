@@ -70,6 +70,10 @@ Live suites on Photoshop 27.11 (macOS), 2026-10-19:
   active state after a step back; zero UnitValues through the JSON encoder; `replace` at the same
   and at another pixel size; `preview`, `sheet` and `before_after`; every DOM enum constant the
   toolkits name, read and, for blend modes, assigned.
-- **`test_gates_live.py`** (9 tests) and **`test_audit_live.py`** (4 tests): the gates and the
-  delivery profiles.
+- **`test_gates_live.py`** (9 tests) and **`test_audit_live.py`** (5 tests): the gates, the delivery
+  profiles (hidden takes kept in a group named "Takes" pass), and `A.history`.
+- **`test_history_live.py`** (7 tests): History lowered to 5 states and filled on a document the
+  test makes, the preference restored in a `finally`. The gate passes a correct edit and fails a
+  missing, unnamed, doubled or misnamed one; `place_edit`, `A.step_back`, `match_grain` and
+  `colorways` keep their gates at the limit and with redo states above the mark.
 - The specialists' suites run `ps_run`, `ps_io` and `ps_review` inside their own procedures.

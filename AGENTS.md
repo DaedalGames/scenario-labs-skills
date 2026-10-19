@@ -279,9 +279,9 @@ steps, procedure, or pipeline.
 
 ## Expert tools
 
-`skills/dcc/` (ZBrush, Blender, Maya) and `skills/game-engines/` (Unreal Engine, Unity, Godot) hold
-teams of skills, ported from Emmanuel de Maistre's expert-skill repositories. They drive
-applications installed on the user's machine through their Python, bridges, and command lines.
+`skills/dcc/` (ZBrush, Blender, Maya, Photoshop) and `skills/game-engines/` (Unreal Engine, Unity,
+Godot) hold teams of skills, most ported from Emmanuel de Maistre's expert-skill repositories. They
+drive applications installed on the user's machine through their Python, bridges, and command lines.
 
 - Each family is a lead `scenario-<app>-expert` plus specialists named `scenario-<app>-<topic>`. The
   specialists import the lead's `scripts/`, so a family installs as one set.

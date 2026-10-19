@@ -27,21 +27,22 @@ looks pasted on, a printable area that spills onto a lid, or a logo with a wrong
 
 ## 2. Code gates
 
-| Gate                     | Pass                              | Fails on                                         |
-| ------------------------ | --------------------------------- | ------------------------------------------------ |
-| `corner_error`           | under 1 px                        | a warp that missed, or a quad given out of order |
-| `fit_check`              | under 0.5 px                      | a warp that did nothing or landed off its box    |
-| `corners` `consistent`   | true                              | stored corners that disagree with the box        |
-| `group_mask`             | true when a selection was active  | the selection was lost before `placeholder`      |
-| `drift`                  | under 0.5 px after each replace   | a replace that moved the warp                    |
-| `content_size`           | unchanged across replaces         | a placeholder replaced outside the toolkit       |
-| `fill`                   | 100 after a design goes in        | the fitting Fill left on a delivery              |
-| `lighting` `layers`      | two, named Shading and Highlights | a copy skipped, or the product layer wrong       |
-| `displace` `map`         | the file exists                   | a map folder that cannot be written              |
-| History                  | one new state per call            | a stray edit on the user's document              |
-| `batch` History          | active state index and name kept  | a batch that left the last design in             |
-| `colorways` History      | active state index and name kept  | a colorway left on the document                  |
-| `A.deliverable(profile)` | returns `[]`                      | size, mode, profile, hidden layers in a handoff  |
+| Gate                       | Pass                                     | Fails on                                                  |
+| -------------------------- | ---------------------------------------- | --------------------------------------------------------- |
+| `corner_error`             | under 1 px                               | a warp that missed, or a quad given out of order          |
+| `fit_check`                | under 0.5 px                             | a warp that did nothing or landed off its box             |
+| `corners` `consistent`     | true                                     | stored corners that disagree with the box                 |
+| `group_mask`               | true when a selection was active         | the selection was lost before `placeholder`               |
+| `drift`                    | under 0.5 px after each replace          | a replace that moved the warp                             |
+| `content_size`             | unchanged across replaces                | a placeholder replaced outside the toolkit                |
+| `fill`                     | 100 after a design goes in               | the fitting Fill left on a delivery                       |
+| `lighting` `layers`        | two, named Shading and Highlights        | a copy skipped, or the product layer wrong                |
+| `displace` `map`           | the file exists                          | a map folder that cannot be written                       |
+| `A.history_gate(h0, undo)` | `[]` after each call                     | a stray edit on the user's document                       |
+| `batch` History            | `A.history_gate(h0) == []`               | a batch that left the last design in                      |
+| `colorways` History        | `A.history_gate(h0) == []`               | a colorway left on the document                           |
+| `colorways` `check`        | `delta_e` 5 or less, `folds` 0.9 or more | Color mode alone on a light or dark garment, a wrong mask |
+| `A.deliverable(profile)`   | returns `[]`                             | size, mode, profile, hidden layers outside "Takes"        |
 
 Thresholds are authoring-time, from striped and checkered fixtures. A fit that passes them can still
 sit on the wrong corners when the quad itself is wrong: the corner crops decide.
@@ -89,8 +90,9 @@ folds and the stretching will be more accurate" (Dinda [Z168F2BlAdA 15:36]), and
   face.
 - **Cylinder:** columns of a check or grid design narrow toward both sides; the bottom edge bows
   with the product's base and the top edge with its rim.
-- **Colorway:** the folds and highlights of each colorway match the original plate; only the hue
-  changed, and the print and the background did not.
+- **Colorway:** each colorway reads as its swatch at the garment's mid-tones (a navy shirt is navy,
+  not pale blue); the folds and highlights sit where the original plate has them; the print and the
+  background did not change.
 
 ## 6. Edges and frame
 

@@ -16,9 +16,10 @@ No rule here depends on one model: Photoshop's picker and the Scenario catalog b
 
 Setup: a 1000x800 document with one "product" layer of 40 px vertical gray strips (luminance 60 to
 230), a quad `[[300,200],[700,240],[690,600],[310,560]]`, and flat or two-color designs made with
-Pillow; a second white 1000x800 document for the fits, the cylinder and the colorways. Fourteen
-tests, all passing on macOS, plus one visual check of a flat, lit and displaced design on a
-generated tote photo.
+Pillow; a second white 1000x800 document for the fits, the cylinder and the colorways, with a white
+and a black shirt (360x480, folds, made with Pillow) for the colorway colors. Fifteen tests, all
+passing on macOS, plus one visual check of a flat, lit and displaced design on a generated tote
+photo.
 
 - **Fit.** `placeholder` lands every corner within 1 px of the quad, and `fit_check` stays under 0.5
   px. The rendered red was checked 5 px inside and 5 px outside each corner. A re-fit onto a second
@@ -34,12 +35,16 @@ generated tote photo.
   selection is the same after the fit.
 - **Cylinder.** `fit_cylinder(quad, 24, top_bulge=12, angle=120)` on an 800x400 checkerboard:
   corners within 2 px rendered, the bottom edge's middle 24 px below its corners and the top's 12
-  px, column widths 46, 60, 70, 74 from the side to the middle (0.61 of the middle at the edge, as
-  sin over a 120 degree arc predicts).
+  px, column widths 44, 60, 70, 74, 74, 70, 60, 45 across (the edge columns 0.595 and 0.608 of the
+  middle; sin over a 120 degree arc predicts 0.61).
 - **Smart Filters.** A fit on a smart object with a Smart Filter is refused before any change.
-- **Colorways.** Navy and forest on eight gray strips: luminance within 2 of each strip, hue within
-  5 degrees of the swatch, the background and the print above unchanged, the document rendering
-  identically afterwards. With a selection, only the selected strips change.
+- **Colorways.** Color mode alone (`match=False`) on eight gray strips keeps each strip's luminance
+  within 2, so navy on a light strip reads pale blue and fails the swatch check. With the default
+  Curves match, navy and forest land within Delta E 5 of the swatch, folds 0.9 or more, hue within 5
+  degrees, the strips' order of lightness kept, the background and the print above unchanged, the
+  document rendering identically afterwards. With a selection, only the selected strips change. On a
+  white and a black shirt with folds (F7), navy, red and sand measured on the delivered PNGs: Delta
+  E 0.12 to 0.48, folds 0.998 to 1.0; navy in Color mode alone on the white shirt: Delta E 75.
 - **Replace.** A design swapped in moves no corner by more than 0.5 px; the content size does not
   change; Fill returns to 100; a left/right two-color design keeps its sides (no transposition).
 - **Lighting.** Under a flat gray design, the composite got darker by more than 15 over a dark strip
@@ -291,10 +296,14 @@ Tests an agent driving Adobe tools; no Photoshop document is built by hand.
   09:28]), a Camera Raw copy in Screen (Quick Fix Up [boONV-waIUk 03:21]), or several copies (Mockup
   Art [SKYL0FCOO04 15:12]). Decider: whatever reads the product, never the design (Dinda
   [sy1w5mTif-E 09:11]).
-- **Colorway: Photoshop or a model.** Builders recolor a background or a product with a Solid Color
-  layer they can re-pick later (Quick Fix Up [boONV-waIUk 02:47]). Decider: a dye or a flat color
-  stays a Solid Color layer in Color mode (`colorways`); a change of material (heather, wash, a
-  different weave) is an instruction edit per color on the plate.
+- **Colorway: Photoshop or a model.** WeJustClickme recolors a t-shirt with a Solid Color layer
+  clipped to it in Color mode (WeJustClickme [i-hYHLXDheU 02:10]); Quick Fix Up recolors the
+  background with a Solid Color layer in Linear Burn and re-picks its color later by double-click
+  (Quick Fix Up [boONV-waIUk 02:47]). Color mode alone keeps the garment's luminance, so a white
+  shirt cannot turn navy (measured below); `colorways` puts a Curves layer under the fill first.
+  Decider: a dye or a flat color stays a Solid Color layer (`colorways`, checked against the
+  swatch); a change of material (heather, wash, a different weave) is an instruction edit per color
+  on the plate.
 - **Logo cutout.** A channel for a large flat logo (Williams [tNrV1XdZX0o 00:31]); a vector for
   print (Hastie [70L2ngS8raY 02:47]). Decider: a small, blurry or photographed logo needs a vector
   trace.

@@ -31,7 +31,6 @@ Status: `doc_state` verified live (`test_audit_live.py`); `IO.selection` runs in
 s = A.doc_state()
 assert s["name"] == "street.psd", s["name"]      # the document the brief names
 canvas = [s["width"], s["height"]]
-h0 = s["history"]                                # the active state {index, name}; never the list length
 sel = IO.selection()["bounds"]                   # None: build one (P1)
 change = "the parked car and its shadow"
 keep = "the cyclist, the curb, the light"
@@ -127,7 +126,8 @@ Reading a failed take:
 
 - **`aspect_ok` false:** the member returned another ratio. Recapture with a margin that gives a
   supported ratio. Never crop or stretch the take to fit.
-- **`edited` false:** nothing changed inside the mask. Check the prompt and the mask field.
+- **`edited` false:** the take equals its input. Follow the lead's rule for a take equal to its
+  input (scenario-photoshop-expert, Quality gates).
 - **`polarity_suspect`:** the member read the mask inverted. Recapture with the other polarity.
 - **Seam bias 12 or more:** a tone shift at the edge. Re-run, or place it and match tone with the
   compositing skill when the take is otherwise the best.
@@ -142,10 +142,12 @@ Then open `takes.jpg`, and each passing take at 100% inside the mask, against
 ```python
 best = passed[0]                                  # the take chosen by eye
 prompt = "Remove the parked car and its shadow. Keep the cyclist, the curb and the light unchanged."
+h0 = A.history()                                  # right before the call
 L = GE.place_edit(cap, best, "Car removed, take 1", feather=2,
                   xmp={"assetId": "<asset id>", "modelId": "<member id>", "prompt": prompt,
                        "createdAt": "2026-10-19"})
 assert L["bounds"] == box
+assert A.history_gate(h0, "Scenario: Generative edit") == []   # one new state; never the list length
 v = GE.verify(cap)                                # composite at the box against context.png
 assert v["untouched"] and v["edited"], v          # outside max 2 or less past 2 x feather + 2 px; inside changed
 R.preview(OUT + "/car/canvas.png")
@@ -401,7 +403,21 @@ R.sheet(crops, OUT + "/car/takes_in_place.jpg", labels=names)
 ```
 
 - Each placed take is one History state. Visibility changes are not History states by default.
-- The user picks; the other takes stay hidden. `A.deliverable("psd-handoff")` flags hidden layers:
-  ask whether to keep them.
+- The user picks; the other takes stay hidden inside a group named "Takes", where
+  `A.deliverable("psd-handoff")` accepts them; it flags hidden layers anywhere else. The grouping
+  job below is not tested:
+
+```python
+GROUP = r"""
+var d = app.activeDocument, a = %ARGS%, g = d.layerSets.add();
+g.name = "Takes";
+for (var i = 0; i < a.names.length; i++)
+  if (a.names[i] !== a.keep) d.artLayers.getByName(a.names[i]).move(g, ElementPlacement.INSIDE);
+return g.name;
+"""
+ps_run.run(GROUP.replace("%ARGS%", json.dumps({"names": names, "keep": names[0]})),
+           undo="Scenario: Group takes")
+```
+
 - To swap a take's pixels and keep its box, `IO.replace(name, path)`. Otherwise place each new take
   as its own layer.

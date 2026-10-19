@@ -17,7 +17,8 @@ Library:
   C.match_tone(layer, strength=0.5)     # clipped Curves moving the element's color cast toward
                                         # the scene ring around it, luminance kept
   C.match_grain(layer)                  # clipped Overlay noise until texture energy matches the
-                                        # ring (only adds, never removes grain)
+                                        # ring (only adds, never removes grain); trials step
+                                        # back, so one named state remains (checked, else raises)
 Shell:
   python3 ps_composite.py mask LAYER | pick L,T,R,B L,T,R,B | blendif LAYER [--channel gray]
       [--this a,b,c,d] [--under a,b,c,d] | halo LAYER [--px 1] | shadows LAYER [--angle 135]
@@ -34,6 +35,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "..", "scenario-photoshop-expert", "scripts"))
+import ps_audit as A  # noqa: E402
 import ps_gates as G  # noqa: E402
 import ps_run  # noqa: E402
 
@@ -254,10 +256,16 @@ GRAIN_JS = r"""
 var l = pc_layer(ARGS.layer);
 var g = pc_find(d, ARGS.name);
 if (!g) {
-  // Create it directly above the chain top: adding above l first would split the chain.
-  d.activeLayer = pc_chain_top(l);
+  // Directly above the chain top, moved there: artLayers.add() lands at the top of the stack
+  // (measured on 27.11), where the clip would take whatever layer is on top.
+  var chainTop = pc_chain_top(l);
   g = d.artLayers.add(); g.name = ARGS.name;
-  g.grouped = true;
+  g.move(chainTop, ElementPlacement.PLACEBEFORE);
+  d.activeLayer = g;
+  // Moved inside a clipping chain, the layer is clipped already, and setting grouped toggles the
+  // clip (measured): set it only when false, then check.
+  if (!g.grouped) g.grouped = true;
+  if (!g.grouped) throw new Error("could not clip " + ARGS.name + " to " + l.name);
   g.blendMode = BlendMode.OVERLAY;
 }
 d.activeLayer = g;
@@ -369,20 +377,24 @@ def match_grain(layer, ring=40, gap=4, name="Grain match", amounts=(1.5, 3, 5, 8
     if start >= 0.9 * target:
         out["action"] = "none: the element already has at least the scene's grain"
         return out
-    # Trials run on the live document; History then steps back so only the final pick remains.
-    mark = ps_run.run("return app.activeDocument.historyStates.length;")["result"]
+    # Each trial is one state on top of the mark, measured, then stepped back by state (never by
+    # list length or index: gates leave redo states, and the index stops moving at the History
+    # limit). The final pick is the one state left.
+    h0 = A.history()
     best = None
     for a in amounts:
         _run(GRAIN_JS, {"layer": k, "name": name, "amount": a}, undo=undo)
         e = G.texture(None, inside, radius)["energy"]
+        A.step_back(h0, undo)
         out["tries"].append([a, e])
         if best is None or abs(e - target) < abs(best[1] - target):
             best = (a, e)
         if e >= target:
             break
-    ps_run.run("var d = app.activeDocument; d.activeHistoryState = d.historyStates[%d - 1];"
-               " return true;" % mark)
     _run(GRAIN_JS, {"layer": k, "name": name, "amount": best[0]}, undo=undo)
+    probs = A.history_gate(h0, undo)
+    if probs:
+        raise RuntimeError("match_grain left History wrong: " + "; ".join(probs))
     out.update({"amount": best[0], "end": best[1], "layer": name})
     return out
 

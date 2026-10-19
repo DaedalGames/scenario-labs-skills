@@ -22,22 +22,22 @@ good" with no crop listed is not a verdict.
 
 ## Code gates (pass/fail)
 
-| Check                     | Call                                                      | Pass                               | Fail means                                     |
-| ------------------------- | --------------------------------------------------------- | ---------------------------------- | ---------------------------------------------- |
-| Right document            | `A.doc_state()["name"]`                                   | equals the brief                   | the user switched documents: stop and ask      |
-| Capture and mask line up  | `export_region` and `export_mask` bounds                  | identical                          | the mask was cut from another box              |
-| Result fits the capture   | result size against the capture                           | same aspect (scale may differ)     | the model reframed: re-run or pad to its ratio |
-| Landing box               | `IO.place(...)["bounds"]`                                 | equals the capture bounds          | the layer is offset or scaled                  |
-| One state per edit        | History length before and after                           | +1 per named edit                  | a job ran without `undo=`, or ran twice        |
-| Outside untouched         | `G.diff(None, base, region="outside")`                    | `worst.max` <= 2                   | the mask leaks or the stack above changed      |
-| Texture kept              | `G.texture` after / before, same region                   | ratio >= 0.6                       | generated or smoothed skin, plastic surfaces   |
-| No halo                   | `G.halo(layer)`                                           | `light_rim` and `dark_rim` <= 8    | a fringe shows on dark or light backgrounds    |
-| Skin on the skin line     | `G.stats(layer, region)["skin_line_delta"]`               | within +-10 degrees                | a color cast on skin                           |
-| Alignment, tone-blind     | `G.structure(a, b)["score"]`                              | the lower of two candidates        | shift or scale change: compare, never absolute |
-| Identity after an upscale | `G.diff(a, b, size=[256, 256])` or the specialist's match | mean under 6 at a 256 px long side | the upscaler changed content, not only detail  |
-| Clipping                  | `A.histogram_clip()`                                      | no unintended 0 or 255 piles       | blown highlights or crushed shadows            |
-| Delivery                  | `A.deliverable(profile)`                                  | `[]`                               | size, mode, depth, profile or layer hygiene    |
-| User's file untouched     | `doc_state()["saved"]`, the file's mtime                  | unchanged by the agent             | a save slipped through: tell the user at once  |
+| Check                     | Call                                                      | Pass                               | Fail means                                             |
+| ------------------------- | --------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------ |
+| Right document            | `A.doc_state()["name"]`                                   | equals the brief                   | the user switched documents: stop and ask              |
+| Capture and mask line up  | `export_region` and `export_mask` bounds                  | identical                          | the mask was cut from another box                      |
+| Result fits the capture   | result size against the capture                           | same aspect (scale may differ)     | the model reframed: re-run or pad to its ratio         |
+| Landing box               | `IO.place(...)["bounds"]`                                 | equals the capture bounds          | the layer is offset or scaled                          |
+| One state per edit        | `A.history_gate(h0, undo)`, `h0 = A.history()` before     | `[]`: one new active state, named  | a job ran without `undo=`, ran twice, or History moved |
+| Outside untouched         | `G.diff(None, base, region="outside")`                    | `worst.max` <= 2                   | the mask leaks or the stack above changed              |
+| Texture kept              | `G.texture` after / before, same region                   | ratio >= 0.6                       | generated or smoothed skin, plastic surfaces           |
+| No halo                   | `G.halo(layer)`                                           | `light_rim` and `dark_rim` <= 8    | a fringe shows on dark or light backgrounds            |
+| Skin on the skin line     | `G.stats(layer, region)["skin_line_delta"]`               | within +-10 degrees                | a color cast on skin                                   |
+| Alignment, tone-blind     | `G.structure(a, b)["score"]`                              | the lower of two candidates        | shift or scale change: compare, never absolute         |
+| Identity after an upscale | `G.diff(a, b, size=[256, 256])` or the specialist's match | mean under 6 at a 256 px long side | the upscaler changed content, not only detail          |
+| Clipping                  | `A.histogram_clip()`                                      | no unintended 0 or 255 piles       | blown highlights or crushed shadows                    |
+| Delivery                  | `A.deliverable(profile)`                                  | `[]`                               | size, mode, depth, profile or layer hygiene            |
+| User's file untouched     | `doc_state()["saved"]`, the file's mtime                  | unchanged by the agent             | a save slipped through: tell the user at once          |
 
 ## Visual rubric
 

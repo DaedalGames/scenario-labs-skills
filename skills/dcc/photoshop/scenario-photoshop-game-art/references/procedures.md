@@ -124,7 +124,8 @@ for i in (1, 2):
 ```
 
 - `edited` false: the member returned its input. Measured once with a mask-edit model, both outputs,
-  still billed. Change the member, not the prompt.
+  still billed. Follow the lead's rule for a take equal to its input (scenario-photoshop-expert,
+  Quality gates).
 - A residual of 6 or more: the stones moved. Re-run; never nudge a take into place.
 - `b_size` smaller than the tile: the band comes back soft, the resolution step Dinda shows
   [9_36YihB8I4 03:17].
@@ -281,7 +282,7 @@ handoff.
 ## P8. Style pass on a render
 
 Status: not tested. `IO.place`, `IO.export_region`, `G.structure` and `R.overlay` are verified live
-in other suites; `R.sheet` has no kept live test.
+in other suites; `R.sheet` is verified live in `test_io_live.py`.
 
 ```python
 s = A.doc_state()                            # the render open as the document, layer "Render"

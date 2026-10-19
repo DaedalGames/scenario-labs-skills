@@ -35,8 +35,8 @@ direction, a floating object, a changed face or a cast shadow on the wrong side.
 | Texture ratio                  | at least 0.6, same region, after / before | regenerated or smoothed skin and surfaces    |
 | `skin_line_delta`              | within 10 degrees                         | orange, magenta or green skin                |
 | `RT.verify_fs`                 | max 2 or less (8-bit), 0 to 1 (16-bit)    | wrong Apply Image recipe, edited source      |
-| History                        | one named state per toolkit call          | a stray edit on the user's document          |
-| `A.deliverable("psd-handoff")` | returns `[]`                              | hidden or empty layers left in the handoff   |
+| `A.history_gate(h0, undo)`     | `[]` after each toolkit call              | a stray edit on the user's document          |
+| `A.deliverable("psd-handoff")` | returns `[]`                              | empty layers, or hidden ones outside "Takes" |
 
 Thresholds are authoring-time: the halo and texture numbers come from the lead's gates, the tone and
 grain bounds from the live suite on one sample photo. Check them on your own images.

@@ -2,19 +2,31 @@
 ps_audit: read the live Photoshop document as data, and grade it against a delivery profile.
 Every scenario-photoshop-* skill gates its stages on these numbers before looking at a preview.
 
-Library (each call is one ps_run job, read only, no history state):
+Library (each call is one ps_run job, read only, no history state; step_back moves the active
+History state and adds none):
   import ps_audit as A
   A.doc_state()                    # active document: size, ppi, mode, bits, profile, layer tree,
-                                   # selection bounds, active layer, saved state, path, and
-                                   # history {index, name, count}: the active History state
-                                   # (gate on index and name; a step back keeps the count)
+                                   # selection bounds, active layer, saved state, path, history
   A.doc_state(max_layers=400)      # cap on layers walked (big documents)
+  A.history()                      # the active History state: {index, name, prev, id, prev_id,
+                                   # count, limit, full}; prev is the name of the state below it
+  A.history_gate(h0, undo)         # [] when the active state is the ONE new state a job named
+                                   # `undo` added on top of h0 (taken right before the call);
+                                   # undo=None: [] when the active state is h0 again
+  A.step_back(h0, undo)            # the active state, named `undo`, steps back to the one below,
+                                   # which must be h0's; raises otherwise
   A.layer_find(name)               # [{id, name, path, kind, bounds, visible}] for an exact name
   A.histogram_clip()               # % of pixels at 0 and 255 per channel on the merged image
   A.deliverable(profile)           # [] = pass, else a list of problems for "web", "print",
-                                   # "social", "game-texture", "psd-handoff"
+                                   # "social", "game-texture", "psd-handoff"; hidden layers in a
+                                   # group named "Takes..." are kept takes, not a problem
 Shell:
-  python3 ps_audit.py state | find NAME | clip | deliverable PROFILE
+  python3 ps_audit.py state | history | find NAME | clip | deliverable PROFILE
+
+History gates read the active state, never the list length: captures and gates step back and leave
+redo states, and at the History limit the oldest state drops, so the index stops moving. The
+Action Manager id of each state (`id`, `prev_id`) decides when it is readable; the name and, below
+the limit, the index decide otherwise.
 
 Kinds reported for layers: pixel, adjustment, fill, smart_object, text, shape, group, video,
 other (from the Action Manager layerKind; the DOM kind misreads shapes and throws on some
@@ -44,7 +56,49 @@ function kindOf(l) {
 }
 """
 
-STATE_JS = KIND_JS + r"""
+HISTORY_JS = r"""
+// The active History state. Steps backward leave redo states in the list, so its length is no gate.
+// At the History limit the oldest state drops and the index stops moving; the Action Manager id of
+// each state does not change, so it decides when readable.
+function psa_history(d) {
+  var hs = d.historyStates, a = d.activeHistoryState, hi = -1, snaps = 0;
+  for (var q = hs.length - 1; q >= 0; q--) if (hs[q] == a) { hi = q; break; }
+  for (var s = 0; s < hs.length; s++) { try { if (hs[s].snapshot) snaps++; } catch (e) {} }
+  var lim = null; try { lim = app.preferences.numberOfHistoryStates; } catch (e) {}
+  var h = {index: hi, name: a.name, prev: hi > 0 ? hs[hi - 1].name : null, id: null, prev_id: null,
+           count: hs.length, limit: lim,
+           full: lim !== null && hi === hs.length - 1 && hs.length - snaps >= lim};
+  try {
+    var kid = stringIDToTypeID("ID"), kix = stringIDToTypeID("itemIndex");
+    var r = new ActionReference();
+    r.putProperty(charIDToTypeID("HstS"), charIDToTypeID("CrnH"));   // (Ordn, CrnH) throws on 27.11
+    var cur = executeActionGet(r);
+    if (cur.hasKey(kid)) h.id = cur.getInteger(kid);
+    if (cur.hasKey(kix) && cur.getInteger(kix) > 1) {
+      var r2 = new ActionReference(); r2.putIndex(charIDToTypeID("HstS"), cur.getInteger(kix) - 1);
+      var pd = executeActionGet(r2);
+      if (pd.hasKey(kid)) h.prev_id = pd.getInteger(kid);
+    }
+  } catch (e) {}
+  return h;
+}
+"""
+
+HIST_ONLY_JS = HISTORY_JS + r"""
+if (app.documents.length === 0) throw new Error("no document open");
+return psa_history(app.activeDocument);
+"""
+
+STEP_BACK_JS = HISTORY_JS + r"""
+if (app.documents.length === 0) throw new Error("no document open");
+var d = app.activeDocument, h = psa_history(d);
+if (h.name !== %UNDO%) throw new Error("step_back: the active History state is '" + h.name + "', not '" + %UNDO% + "'");
+if (h.index < 1) throw new Error("step_back: no state below the active one");
+d.activeHistoryState = d.historyStates[h.index - 1];
+return psa_history(d);
+"""
+
+STATE_JS = KIND_JS + HISTORY_JS + r"""
 var MAXL = %MAX%;
 var count = 0, truncated = false;
 function walk(container, path) {
@@ -74,10 +128,7 @@ try { var sb = d.selection.bounds; sel = [sb[0].as("px"), sb[1].as("px"), sb[2].
 var prof = null; try { prof = d.colorProfileName; } catch (e) { prof = "untagged"; }
 var path = null; try { path = d.fullName.fsName; } catch (e) {}
 var al = null; try { al = {id: d.activeLayer.id, name: d.activeLayer.name}; } catch (e) {}
-// Steps backward leave redo states in the list, so the length is no gate: the active state is.
-var hs = d.historyStates, hi = -1;
-for (var q = hs.length - 1; q >= 0; q--) if (hs[q] == d.activeHistoryState) { hi = q; break; }
-var hist = {index: hi, name: d.activeHistoryState.name, count: hs.length};
+var hist = psa_history(d);
 return {open: true, name: d.name, id: d.id, path: path, saved: d.saved, width: d.width.as("px"),
         height: d.height.as("px"), ppi: d.resolution, mode: String(d.mode).replace("DocumentMode.", "")
           .toLowerCase(), bits: ({"BitsPerChannelType.ONE": 1, "BitsPerChannelType.EIGHT": 8,
@@ -149,6 +200,58 @@ def doc_state(max_layers=400):
     return _run(STATE_JS.replace("%MAX%", str(int(max_layers))))
 
 
+def history():
+    return _run(HIST_ONLY_JS)
+
+
+def _full(h):
+    return bool(h.get("full")) or bool(h.get("limit") and h.get("count", 0) >= h["limit"])
+
+
+def history_problems(h0, h1, undo=None):
+    """[] when h1 is the one state a job named `undo` added on top of h0; with undo=None, [] when
+    h1 is h0's state again. Pure function over two history() results."""
+    probs = []
+    ids = h0.get("id") is not None and h1.get("id") is not None
+    if undo is None:
+        if ids:
+            if h1["id"] != h0["id"]:
+                probs.append("active state %r is not the marked state %r" % (h1["name"], h0["name"]))
+        elif (h1["name"], h1.get("prev")) != (h0["name"], h0.get("prev")):
+            probs.append("active state %r is not the marked state %r" % (h1["name"], h0["name"]))
+        elif not (_full(h0) or _full(h1)) and h1["index"] != h0["index"]:
+            probs.append("active index %s, the marked state was at %s" % (h1["index"], h0["index"]))
+        return probs
+    if h1["name"] != undo:
+        probs.append("active state is %r, expected %r" % (h1["name"], undo))
+    if ids and h1["id"] == h0["id"]:
+        probs.append("no new History state: the marked state is still active")
+    elif ids and h1.get("prev_id") is not None:
+        if h1["prev_id"] != h0["id"]:
+            probs.append("the state below the active one is not the marked state: more than one "
+                         "state was added, or History moved")
+    else:
+        if h1.get("prev") != h0["name"]:
+            probs.append("the state below the active one is %r, not the marked %r"
+                         % (h1.get("prev"), h0["name"]))
+        # At the History limit the oldest state drops and the index stops moving.
+        if not (_full(h0) or _full(h1)) and h1["index"] != h0["index"] + 1:
+            probs.append("active index %s, expected %s" % (h1["index"], h0["index"] + 1))
+    return probs
+
+
+def history_gate(h0, undo=None):
+    return history_problems(h0, history(), undo)
+
+
+def step_back(h0, undo):
+    h1 = _run(STEP_BACK_JS.replace("%UNDO%", json.dumps(undo)))
+    probs = history_problems(h0, h1)
+    if probs:
+        raise RuntimeError("step_back: " + "; ".join(probs))
+    return h1
+
+
 def layer_find(name):
     return _run(FIND_JS.replace("%NAME%", json.dumps(name)))
 
@@ -161,6 +264,13 @@ def _flat(layers):
     for layer in layers or []:
         yield layer
         yield from _flat(layer.get("children"))
+
+
+def _in_takes(layer):
+    """True for a group named "Takes..." and every layer inside one (paths are "/A/B/name")."""
+    parts = layer.get("path", "").split("/")[1:]
+    groups = parts if layer.get("kind") == "group" else parts[:-1]
+    return any(g.lower().startswith("takes") for g in groups)
 
 
 def deliverable(profile, state=None):
@@ -194,9 +304,11 @@ def deliverable(profile, state=None):
         unnamed = [ly["name"] for ly in layers if ly["name"].startswith(("Layer ", "Group "))]
         if unnamed:
             probs.append("%d default layer names (e.g. %r)" % (len(unnamed), unnamed[0]))
-        hidden = [ly["name"] for ly in layers if not ly.get("visible")]
+        # Losing takes are kept hidden on purpose, inside a group named "Takes" (or "Takes: ...").
+        hidden = [ly["name"] for ly in layers if not ly.get("visible") and not _in_takes(ly)]
         if hidden:
-            probs.append("%d hidden layers left in the file" % len(hidden))
+            probs.append("%d hidden layers left in the file (e.g. %r); keep losing takes in a "
+                         "\"Takes\" group" % (len(hidden), hidden[0]))
         empty = [ly["name"] for ly in layers
                  if ly.get("bounds") == [0, 0, 0, 0] and ly["kind"] != "group"]
         if empty:
@@ -216,6 +328,8 @@ def main(argv):
     cmd = argv[0]
     if cmd == "state":
         out = doc_state()
+    elif cmd == "history":
+        out = history()
     elif cmd == "find":
         out = layer_find(argv[1])
     elif cmd == "clip":

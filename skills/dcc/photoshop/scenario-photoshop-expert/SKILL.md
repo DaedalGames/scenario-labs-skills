@@ -79,12 +79,11 @@ bring Photoshop to the front, click the screen, or open a modal dialog.
    capability, upload, price the exact payload, get the user's yes, run, wait, download. A saved
    Scenario workflow runs through `scenario-workflows`. GATE: the user approved this payload's
    price; the result has the capture's aspect.
-5. **Land.** `h0 = A.doc_state()["history"]` right before, then
+5. **Land.** `h0 = A.history()` right before, then
    `IO.place(result, name, bounds=cap["bounds"], mask_selection=True, xmp={...}, undo="Scenario: <action>")`:
    an embedded smart object, fitted, masked, with provenance; the selection stays active for
-   stage 6. One layer per take. GATE: returned `bounds` equal the capture's; the active History
-   state is `h0["index"] + 1` and named as `undo` (never compare the list length: captures step back
-   and leave redo states); the original is visible underneath.
+   stage 6. One layer per take. GATE: returned `bounds` equal the capture's;
+   `A.history_gate(h0, "Scenario: <action>") == []`; the original is visible underneath.
 6. **Gate.** `G.diff(None, base, region="outside")`, `G.texture`, `G.halo`, `G.stats`, and
    `G.structure` after a tone change. GATE: the numbers in Quality gates.
 7. **Look.** `R.preview(path)` for the whole canvas, `R.preview(path, crop=box, max_px=0)` for each
@@ -125,8 +124,13 @@ Code gates, in order:
 
 - Document name equals the brief at every editing job.
 - Capture and mask bounds equal; placed bounds equal the capture.
-- One History state per named edit, read as the active state's index and name; no job without
-  `undo=` edits pixels.
+- One History state per named edit: `A.history_gate(h0, undo) == []`, with `h0 = A.history()` taken
+  right before the call. The gate reads the active state: its name, and that it is a new state on
+  top of `h0`. Never the list length (captures step back and leave redo states); the index only
+  below the History limit, where the oldest state drops and the index stops moving. To undo one
+  edit, `A.step_back(h0, undo)`. No job without `undo=` edits pixels.
+- A take equal to its input (`edited` false) is still billed. Check the mask field and its polarity
+  first; if both are right, change the member, not the prompt, and quote again.
 - Outside the mask: `G.diff(...)["worst"]["max"]` <= 2. On a stack with adjustments above the base,
   compare captured files instead.
 - Texture ratio, halo rims and skin line within Numbers; structure compared between candidates,
@@ -138,7 +142,8 @@ Visual gates:
 - Whole canvas at viewing size: composition, nothing new that jumps out.
 - 100% crops: no seam, tone step, halo, soft or smeared patch, grain mismatch.
 - Must-keep elements unchanged; hands, eyes, text and logos intact.
-- Losing takes hidden and named, never deleted; every agent layer named.
+- Losing takes hidden and named in a group named "Takes", never deleted (`A.deliverable` accepts
+  hidden layers there); every agent layer named.
 
 ## Common mistakes
 

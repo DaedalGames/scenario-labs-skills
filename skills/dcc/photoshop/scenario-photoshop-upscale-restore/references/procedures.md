@@ -19,10 +19,6 @@ import ps_upscale as U            # also puts scenario-photoshop-expert/scripts 
 import ps_run, ps_gates as G, ps_review as R, ps_audit as A, ps_io as IO
 OUT = "/path/to/a/work/folder"    # never the folder of the user's PSD
 
-def history():                    # the active state, never the list length
-    h = A.doc_state()["history"]
-    return h["index"], h["name"]
-
 def select_box(b):                # a rectangular selection [l, t, r, b] on the active document
     js = ("var b = %s; app.activeDocument.selection.select([[b[0], b[1]], [b[2], b[1]], "
           "[b[2], b[3]], [b[0], b[3]]]); return 1;" % json.dumps(b))
@@ -38,7 +34,7 @@ s = A.doc_state()
 assert s["name"] == "family_1952.psd", s["name"]   # the document the brief names
 canvas = [s["width"], s["height"]]
 print(s["mode"], s["bits"], s["profile"], canvas)
-h0 = history()
+h0 = A.history()                  # the active History state; gates read it, never the list length
 ```
 
 Route by the job:
@@ -66,7 +62,7 @@ prep = U.prepare_input(OUT + "/input.png", ratios=["1:1", "4:3", "3:4", "16:9", 
                        max_px=2048)
 json.dump(prep, open(OUT + "/prep.json", "w"))
 print(prep["ratio"], prep["padded"], prep["pad"], prep["scale"], prep["output"])
-assert history() == h0
+assert A.history_gate(h0) == []   # History unchanged: h0's state is still the active one
 ```
 
 - `ratios=None` exports at the source ratio, with no padding. Use it only when the member accepts
@@ -251,7 +247,8 @@ if r["kept"] and any(r["uncovered"]):
 - Run it on a take without padding. A take placed through the padding (P6) has bounds past the
   canvas, which Auto-Align reads as a shift and a scale, so it is not kept. Crop the padding off the
   downloaded result first (P2) and place it with the source's bounds.
-- When kept, "Restore, take 1, aligned" lands above the result and the result is hidden.
+- When kept, "Restore, take 1, aligned" lands above the result and the result is hidden; before a
+  layered handoff, move it into a group named "Takes" (`psd-handoff` flags hidden layers elsewhere).
 - `uncovered` is the bare margin, in canvas pixels, that the aligned layer leaves on each side. Crop
   back (Dinda [G5yuLhm0SdM 10:55]) or let the original show there.
 - When Auto-Align fails, nudge by hand in Difference on the eyes (Dinda [mSgSaisb6Kg 05:28]), or
@@ -294,10 +291,19 @@ ps_run.run("app.activeDocument.selection.deselect(); return 1;")
 
 ## P10. Finish and deliver
 
-Status: `A.deliverable` verified live (`test_audit_live.py`). The finishing filters are by hand
-([gui-paths.md](gui-paths.md)); not tested by script.
+Status: `A.deliverable` verified live (`test_audit_live.py`); the 300 ppi step verified live as
+written (`test_upscale_live.py`, a 2400 x 1600 px document at 72 ppi). The finishing filters are by
+hand ([gui-paths.md](gui-paths.md)); not tested by script.
 
 ```python
+# Print, on the delivered document (never the master): 300 ppi without resampling first. The pixels
+# stay; the print size becomes pixels / 300 (2400 px prints 8 in). A target print size in inches x
+# 300 gives the pixels the upscale must reach.
+h0 = A.history()
+r = ps_run.run("var d = app.activeDocument; d.resizeImage(undefined, undefined, 300, ResampleMethod.NONE);"
+               " return [d.width.as('px'), d.height.as('px'), d.resolution];",
+               undo="Scenario: Print resolution")
+assert r["ok"] and A.history_gate(h0, "Scenario: Print resolution") == []
 print(A.deliverable("print"))     # or "web" (sRGB 8-bit, long edge 4096 or less), "psd-handoff"
 R.preview(OUT + "/final.png")
 R.preview(OUT + "/final_face.png", crop=face, max_px=0)
@@ -312,8 +318,8 @@ R.preview(OUT + "/final_face.png", crop=face, max_px=0)
 - Smoothed skin after an upscale: Camera Raw Texture, Clarity and Sharpening on the upscaled layer
   (Marsh [ZCTPo7M8Eyg 04:57]), or hand it to scenario-photoshop-compositing.
 - The "web" profile caps the long edge at 4096: a 4x upscale for print fails it by design.
-- Losing takes stay hidden. `A.deliverable("psd-handoff")` flags hidden layers: ask before removing
-  any.
+- Losing takes stay hidden inside a group named "Takes", where `A.deliverable("psd-handoff")`
+  accepts them; it flags hidden layers anywhere else. Ask before removing any.
 
 ## P11. Rejoin one changed layer at full resolution
 
