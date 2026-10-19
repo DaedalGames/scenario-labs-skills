@@ -184,9 +184,11 @@ Abud
 Accu
 Adreno
 Aguiar
+Aidan
 Alessandro
 Alexandrov
 Allar
+Alwash
 Anar
 Andarta
 Animationsinstitut
@@ -213,9 +215,11 @@ BCON
 BOTW
 BPTC
 BSDF
+Badis
 Balatro
 Bammes
 Bardoux
+Bharathy
 Biava
 Binormals
 Bkgrd
@@ -243,12 +247,14 @@ CGMA
 CGNAT
 CGPROGRAM
 CIELAB
+CMYK
 COEP
 Caillaud
 Caillaud's
 Cappiello
 Cardoso
 Carotenuto
+Chandru
 Chema
 Chervenka
 Chervenka's
@@ -256,6 +262,7 @@ Christo
 Cinzel
 Ciri
 Ciro
+Clickme
 Cloward
 Cloward's
 Colyseus
@@ -283,11 +290,16 @@ Damiaan
 Damjanov
 Dawnosaur
 Decollider
+Defringe
+Dehaze
 Demucs
 Denoiser
 Denoisers
 Deoccluder
+Dewis
+Dharnyelpeter
 Dikko
+Dinda
 Dombrova
 Dondelinger
 Dont
@@ -317,6 +329,7 @@ FABRIK
 FACS
 FBIK
 FBXUE
+FCOO
 FKIK
 FMOD
 FXAA
@@ -354,6 +367,7 @@ Geert
 Gergely
 Giovannini
 Gleb
+Glyn
 Gobey
 Gobey's
 Godotneers
@@ -361,6 +375,7 @@ Goertzel
 Goralczyk
 Grassetti
 Greal
+Gress
 Grps
 Guignolle
 Guillaume
@@ -407,9 +422,12 @@ Infogrames
 Insta
 Instancer
 Interp
+Ioan
 JHILL
 JNLM
+Jafar
 Jarek
+Jesús
 Jixie
 Julan
 Juli
@@ -431,10 +449,12 @@ Kiraly
 Kiraly's
 Klimer
 Klimer's
+Kloskowski
 Kolja
 Kombat
 Konstantinos
 Kontext
+Kost
 Kosta
 Krita
 Krogh
@@ -523,6 +543,7 @@ NFOR
 NGSP
 NPOT
 NURBS
+Nace
 Nachman
 Nadro
 Nakama
@@ -550,6 +571,7 @@ Noobs
 Nostaria
 Nostdahl
 Noto
+Nour
 Nowak
 Nsight
 Nunk
@@ -566,19 +588,24 @@ Occl
 Occludee
 Occluder
 Octodemy
+Octopunish
 Ogawa
 Olle
 Omogonix
 Oodle
+Opra
 Opti
 Oriz
 Oskar
+Ostrovska
 Oyvind
 Oztalay
 Oztalay's
 PBAKE
+PHLEARN
 PRNG
 PROJEKT
+PSDT
 PSNR
 PSSM
 PVRTC
@@ -623,6 +650,7 @@ RTGI
 RTPC
 Raffaele
 Rakan
+Raskin
 Ratti
 Rawb
 Reanticipate
@@ -653,6 +681,7 @@ Roldan
 Rollerdrome
 Roselle
 Roselle's
+Rudis
 Ruud
 Ryse
 Ryuu
@@ -663,6 +692,7 @@ SARKAMARI
 SARKAMARI's
 SCAL
 SDFGI
+SKYL
 SMAA
 SMRT
 SPIR
@@ -670,6 +700,7 @@ SSAO
 SSGI
 SSIL
 SWRT
+SXVB
 Saby
 Santo
 Sarkamari
@@ -704,7 +735,9 @@ Spannule's
 Speculars
 Sponza
 Sprt
+Squircle
 Stampfli
+Stanik
 Starkie
 Starkie's
 Staso
@@ -732,6 +765,7 @@ Tiberghien
 Tindall
 Tokisan
 Tokisan's
+Toma
 Toney
 Tonko
 Toon
@@ -749,6 +783,8 @@ Trous
 Truchet
 Trümpler
 Trümpler's
+Tuffan
+Tunde
 Turntabler
 Tweener
 Txtr
@@ -769,6 +805,7 @@ Udemy
 Uldis
 Unhide
 Unkeyed
+Unmesh
 Unpulled
 Unquarantine
 Unsharp
@@ -806,6 +843,7 @@ Weta
 Widup
 Willem
 Wisconsi
+Woelfel
 Worley
 Wuerttemberg
 Wwise
@@ -933,6 +971,7 @@ gonial
 gons
 gozbruh
 gprims
+grapexels
 greeble
 greebles
 gular
@@ -1047,6 +1086,7 @@ prefs
 previs
 procerus
 proresks
+psjs
 pyflakes
 pymel
 ramus
@@ -1131,9 +1171,11 @@ spammy
 spctl
 specularly
 speculars
+squircle
 ssel
 steamcmd
 sternocleidomastoid
+storezar
 strobing
 strokey
 subd
@@ -1175,6 +1217,7 @@ unbeveled
 unblended
 unbuilt
 uncited
+unclips
 unconfigured
 uncreased
 uncreases
@@ -1222,6 +1265,7 @@ untick
 unticked
 untinted
 unvalidated
+unwarp
 unweld
 unwired
 upgrader
