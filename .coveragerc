@@ -1,0 +1,13 @@
+# Coverage for the Python scripts skills ship (see AGENTS.md "Validation and
+# testing"). Suites import or subprocess these scripts from tests/<name>/, so
+# only skills/ is instrumented, never the test files themselves.
+[run]
+branch = True
+source = skills
+relative_files = True
+parallel = True
+
+[report]
+omit =
+    */assets/*
+    */references/*

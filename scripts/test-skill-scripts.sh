@@ -11,10 +11,18 @@
 # - TypeScript suites (*.test.ts) run with vitest
 # Suites may need system tools such as ffmpeg, so this runs in CI and on
 # demand, not in the pre-commit hook.
+# With COVERAGE=1 (pnpm coverage), Python suites run under `coverage run
+# --parallel-mode` (configured in .coveragerc) and TypeScript suites run
+# with `vitest --coverage` (configured in vitest.config.ts), then combine
+# into coverage-python.xml and coverage/ts/cobertura-coverage.xml.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 fail=0
+coverage="${COVERAGE:-}"
+if [ -n "$coverage" ]; then
+  rm -f .coverage .coverage.*
+fi
 
 has_tests() {
   find "$1" -type f \( -name 'test_*.py' -o -name '*.test.ts' \) 2>/dev/null |
@@ -62,21 +70,46 @@ for dir in tests/*/; do
     # Without uv, python3 must already have them, as CI's pip step ensures.
     python=(python3)
     req="${dir}requirements.txt"
-    if [ -f "$req" ] && command -v uv >/dev/null; then
-      python=(uv run --quiet --no-project --python "$(command -v python3)"
-      --with-requirements "$req" python)
+    uv_with=()
+    if [ -n "$coverage" ]; then
+      uv_with=(--with coverage)
+    fi
+    if { [ -f "$req" ] || [ -n "$coverage" ]; } && command -v uv >/dev/null; then
+      python=(uv run --quiet --no-project --python "$(command -v python3)")
+      if [ -f "$req" ]; then
+        python+=(--with-requirements "$req")
+      fi
+      python+=("${uv_with[@]}" python)
     fi
     # No -t: hyphenated skill names are not importable as packages, so each
     # suite directory is its own top level and modules load as bare names.
-    "${python[@]}" -B -m unittest discover -s "$dir" || fail=1
+    if [ -n "$coverage" ]; then
+      "${python[@]}" -m coverage run --parallel-mode -m unittest discover -s "$dir" || fail=1
+    else
+      "${python[@]}" -B -m unittest discover -s "$dir" || fail=1
+    fi
   fi
   if find "$dir" -type f -name '*.test.ts' | grep -q .; then
     ran=1
     echo "== ${name}: vitest =="
-    pnpm exec vitest run "$dir" || fail=1
+    if [ -n "$coverage" ]; then
+      pnpm exec vitest run "$dir" --coverage || fail=1
+    else
+      pnpm exec vitest run "$dir" || fail=1
+    fi
   fi
 done
 
 [ "$ran" -eq 1 ] || echo "No skill-script test suites to run."
+
+if [ -n "$coverage" ]; then
+  combine=(coverage)
+  command -v coverage >/dev/null || combine=(uv run --quiet --no-project --with coverage coverage)
+  if ls .coverage.* >/dev/null 2>&1; then
+    echo "== combining Python coverage =="
+    "${combine[@]}" combine
+    "${combine[@]}" xml -o coverage-python.xml
+  fi
+fi
 
 exit $fail
