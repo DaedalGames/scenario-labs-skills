@@ -74,8 +74,17 @@ lead skill, `scenario-roblox-expert`.
     and Rojo 7.7.1);
   - `Net.touch` and MoveGuard's log-only tracking (Lune, fake engine services);
   - `rbx_net.vendor_kit`.
-- Their suites are in `tests/scenario-roblox-expert/`. The Lune ones skip where Lune is not
-  installed, as in CI.
+- Their suites are in `tests/scenario-roblox-expert/`. `.github/workflows/roblox.yml` runs them with
+  Lune 0.11.0 and Rojo 7.7.1 on every Roblox script or test change. Locally, `pnpm test` runs them
+  when `lune` and `rojo` are on `PATH` (the tooling template's `rokit.toml` pins both), and skips
+  them otherwise.
+- Open for the next Studio run, since only Studio can answer them:
+  - whether a client `CFrame` write of an anchored, server-owned part fires `Touched` on the server
+    (the negative control of networking's `Touched` exploit test);
+  - whether `screen_capture` honors `camera_position` and `look_at_position` during a playtest;
+  - the `PlaceId` a merged copy of a published place opens with (tooling's `check_target` expects 0
+    for a local file);
+  - `Net.touch`, MoveGuard's log-only tracking and the stored zstd payloads, live.
 
 ## In Studio
 

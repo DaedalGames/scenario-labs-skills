@@ -34,6 +34,11 @@ than the MCP server:
     toolkit's lock probe, process-table parsing, and signal handling in `pnpm test`.
     `.github/workflows/unity.yml` runs it on macOS, the OS the toolkit targets, whenever a Unity
     script changes.
+  - Roblox has no Studio in CI. `tests/scenario-roblox-expert/` runs AgentKit modules under Lune
+    with fake engine services (`lune/`), and builds places with Rojo to read back with Lune
+    (`test_live_rojo.py`). `.github/workflows/roblox.yml` installs the Lune and Rojo versions the
+    tooling skill pins, whenever a Roblox script or test changes, and fails if those suites skip.
+    Without the tools they skip in `pnpm test`.
 - A link to a subfolder (`scripts/AgentKit/`, never `scripts/` itself) covers the files under it:
   these skills ship code trees an agent copies into a project whole.
 - cspell skips code, fenced and inline, and YouTube video ids. Prose is checked as everywhere else
