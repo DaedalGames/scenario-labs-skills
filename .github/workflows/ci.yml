@@ -76,8 +76,58 @@ jobs:
           for req in tests/*/requirements.txt; do
             pip install -r "$req"
           done
+      # Only one leg generates coverage: it reflects which lines ran, not
+      # which ffmpeg produced the frames, so duplicating it across the
+      # matrix would only double the upload for the same numbers.
+      - name: Install coverage.py
+        if: matrix.os == 'ubuntu-24.04'
+        run: pip install coverage==7.16.2
       - name: Run skill-script test suites
-        run: pnpm test
+        run: ${{ matrix.os == 'ubuntu-24.04' && 'pnpm coverage' || 'pnpm test' }}
+      - name: Upload coverage artifact
+        if: matrix.os == 'ubuntu-24.04' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage-report
+          path: |
+            coverage-python.xml
+            coverage/ts/cobertura-coverage.xml
+
+  upload-coverage-python:
+    needs: script-tests
+    if: ${{ !cancelled() && needs.script-tests.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      code-quality: write
+    steps:
+      - name: Download coverage artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: coverage-report
+      - uses: actions/upload-code-coverage@2b21a77928be8d5168c2b9581a67f2adbebacc52 # v1.4.4
+        with:
+          file: coverage-python.xml
+          language: Python
+          label: code-coverage-agent
+
+  upload-coverage-javascript:
+    needs: script-tests
+    if: ${{ !cancelled() && needs.script-tests.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      code-quality: write
+    steps:
+      - name: Download coverage artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: coverage-report
+      - uses: actions/upload-code-coverage@2b21a77928be8d5168c2b9581a67f2adbebacc52 # v1.4.4
+        with:
+          file: coverage/ts/cobertura-coverage.xml
+          language: JavaScript
+          label: code-coverage-agent
 
   commitlint:
     if: github.event_name == 'pull_request'
