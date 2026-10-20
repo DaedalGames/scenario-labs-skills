@@ -45,6 +45,11 @@ which commit types release and which files release-please owns.
   - When a newer LTS runner ships, add it as a new entry rather than renaming an existing one.
   - Never hardcode a count derived from a probed duration in a test. ffmpeg 8 reports an MP3's
     gapless duration, while 6.1 and 7.1 include the encoder padding.
+  - The `ubuntu-24.04` leg runs with `COVERAGE=1` and posts the Python table to its job summary. The
+    vitest table stays in the step log.
+  - Coverage spans core skills only (`.coveragerc`). Expert-tool scripts mostly run inside their
+    host application, which coverage.py cannot follow.
+  - It reports without a threshold, so a drop never fails CI.
 - Dependabot (`.github/dependabot.yml`) proposes one grouped `ci(deps)` PR a week, for releases at
   least seven days old. It skips release-please-action, which moves by hand together with the
   `release-please` pin in `package.json`.

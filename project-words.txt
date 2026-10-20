@@ -879,6 +879,7 @@ chongdashu
 civis
 classdb
 contrapposto
+coveragerc
 criss
 csound
 cycs

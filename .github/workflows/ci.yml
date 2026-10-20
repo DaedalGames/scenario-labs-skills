@@ -76,8 +76,15 @@ jobs:
           for req in tests/*/requirements.txt; do
             pip install -r "$req"
           done
+          pip install "coverage>=7.10"
       - name: Run skill-script test suites
+        # One leg measures coverage: line coverage does not depend on the ffmpeg version.
+        env:
+          COVERAGE: ${{ matrix.os == 'ubuntu-24.04' && '1' || '' }}
         run: pnpm test
+      - name: Coverage summary
+        if: ${{ !cancelled() && matrix.os == 'ubuntu-24.04' && hashFiles('coverage/report.md') != '' }}
+        run: cat coverage/report.md >> "$GITHUB_STEP_SUMMARY"
 
   commitlint:
     if: github.event_name == 'pull_request'

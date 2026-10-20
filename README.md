@@ -11,6 +11,9 @@
   <a href="https://skills.sh/scenario-labs/skills">
     <img alt="skills.sh" src="https://skills.sh/b/scenario-labs/skills" />
   </a>
+  <a href="https://github.com/scenario-labs/skills/actions/workflows/ci.yml">
+    <img alt="CI" src="https://github.com/scenario-labs/skills/actions/workflows/ci.yml/badge.svg?branch=main" />
+  </a>
   <a href="https://mcp.scenario.com/docs">
     <img alt="MCP documentation" src="https://img.shields.io/badge/documentation-mcp-black.svg" />
   </a>

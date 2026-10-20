@@ -443,6 +443,8 @@ applications installed on the user's machine through their Python, bridges, and 
   on PATH, and falls back to the bare `python3` only when uv is missing.
 - `pnpm test` runs the command, plugin-manifest, style, readme, and test-runner regression suites as
   well as the shipped-script suites.
+- `pnpm test:coverage` runs the shipped-script suites with line coverage of core skills, report only
+  ([docs/ci-and-releases.md](docs/ci-and-releases.md#ci)).
 - Before merging a new or changed skill, run the application test. Mechanical validation checks the
   format; the application test checks whether the skill actually teaches.
 - `/skills:validate <name>` (`.claude/commands/skills/`) drives that test:
