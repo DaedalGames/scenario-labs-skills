@@ -28,9 +28,10 @@ updates:
     ignore:
       # Must stay the version release-please-action bundles (see above).
       - dependency-name: release-please
+    # A fixed scope: `include: scope` writes `deps-dev` for these devDependencies, which commitlint
+    # rejects.
     commit-message:
-      prefix: chore
-      include: scope
+      prefix: chore(deps)
   - package-ecosystem: pip
     directories: ["/tests/*"]
     schedule:
