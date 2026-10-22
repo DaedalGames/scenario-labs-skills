@@ -304,3 +304,15 @@ test("accepts AGENTS.md of exactly 32 KiB", (t) => {
   write("AGENTS.md", "x".repeat(32768));
   assert.ok(!style().includes(AGENTS_CAP));
 });
+
+test("leaves the version stamp out of the body word cap", (t) => {
+  const { write, style } = repo(t);
+  const skill = (body) =>
+    `---\nname: scenario-demo\ndescription: Use when testing.\nlicense: MIT\n---\n\n${body}\n`;
+  const stamp =
+    "<!-- scenario-skills-version: 1.2.3 x-release-please-version -->";
+  write("skills/scenario-demo/SKILL.md", skill(`${words(2500)}\n\n${stamp}`));
+  assert.ok(!style().includes("hard cap"));
+  write("skills/scenario-demo/SKILL.md", skill(`${words(2501)}\n\n${stamp}`));
+  assert.throws(style, (error) => error.stdout.includes("2501 words"));
+});

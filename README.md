@@ -104,8 +104,8 @@ tags a version, updates `CHANGELOG.md` in this repository, publishes a
   `npx skills add` command.
 - To see which release an installed copy comes from, read the last line of its `SKILL.md`:
   `<!-- scenario-skills-version: X.Y.Z ... -->`. Compare it with the latest
-  [release](https://github.com/scenario-labs/skills/releases). The Scenario MCP server makes the
-  same comparison and suggests `npx skills update` when your copy is older.
+  [release](https://github.com/scenario-labs/skills/releases), and run `npx skills update` when your
+  copy is older.
 
 ## Skills
 

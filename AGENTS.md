@@ -93,7 +93,7 @@ uvx --from "git+https://github.com/agentskills/agentskills.git#subdirectory=skil
 - Body: 1000 words is the target; the build fails past 2500 (`pnpm style`). Structure: Overview,
   Quick reference, one excellent worked example, Common mistakes.
 - Measure before trimming: `awk '/^---$/{c++; next} c>=2' skills/<name>/SKILL.md | wc -w` is the
-  exact number `pnpm style` checks.
+  number `pnpm style` checks, plus the four words of the version stamp it skips.
 - Why a budget: agents load only `name` and `description` at startup. The body enters context only
   when the skill triggers, and then every word competes with the user's task. Spend words on facts
   an agent would otherwise guess wrong, not on prose.
