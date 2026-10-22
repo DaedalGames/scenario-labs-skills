@@ -21,8 +21,9 @@
 /.github/workflows/release-please.yml @hervenivon @scenario-labs/platform
 /.github/workflows/publish-changelog.yml @hervenivon @scenario-labs/platform
 
-# Security: the policy, dependency updates, and the file that decides who
-# reviews them.
+# Security: the policy, the supply-chain report, dependency updates, and the
+# file that decides who reviews them.
 /SECURITY.md @hervenivon @scenario-labs/platform
+/.github/workflows/scorecard.yml @hervenivon @scenario-labs/platform
 /.github/dependabot.yml @hervenivon @scenario-labs/platform
 /.github/CODEOWNERS @hervenivon @scenario-labs/platform

@@ -17,6 +17,9 @@
   <a href="https://github.com/scenario-labs/skills/actions/workflows/ci.yml">
     <img alt="CI" src="https://github.com/scenario-labs/skills/actions/workflows/ci.yml/badge.svg?branch=main" />
   </a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/scenario-labs/skills">
+    <img alt="OpenSSF Scorecard" src="https://img.shields.io/ossf-scorecard/github.com/scenario-labs/skills?label=openssf+scorecard&style=flat" />
+  </a>
   <a href="LICENSE">
     <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-blue" />
   </a>
