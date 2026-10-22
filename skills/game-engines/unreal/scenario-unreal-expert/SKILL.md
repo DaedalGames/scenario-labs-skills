@@ -1,6 +1,6 @@
 ---
 name: scenario-unreal-expert
-description: "Use when an agent drives Unreal Engine 5.8 on a Mac for any task: editing a project through Epic's Unreal MCP toolsets (list_toolsets, describe_toolset, call_tool), Editor Python in a headless or open editor, Remote Control, console commands and cvars; when a call or script breaks on 5.8 (huge describe_toolset payloads, execute_tool_script has no unreal module, Python Remote Execution finds no editor, EditorLevelLibrary, Substrate materials black); when work must be judged by numbers and a screenshot before it is called done; when generated assets must land in a project; or when a brief must go to the right scenario-unreal-* specialist. Works with Epic's own skills."
+description: "Use when an agent drives Unreal Engine 5.8 on a Mac for any task: editing a project through Epic's Unreal MCP toolsets (list_toolsets, describe_toolset, call_tool), Editor Python in a headless or open editor, Remote Control, console commands and cvars; when a call or script breaks on 5.8 (huge describe_toolset payloads, execute_tool_script has no unreal module, Python Remote Execution finds no editor, EditorLevelLibrary, Substrate materials black); when work must be judged by numbers and a screenshot before it is called done; when generated assets must land in a project; or when a brief must go to the right scenario-unreal-* specialist. Works with Epic's own skills and the Scenario for Unreal plugin."
 license: MIT
 ---
 
@@ -112,15 +112,19 @@ template: [`references/toolkit-map.md`](references/toolkit-map.md).
 
 Never report a level, material, shot or build as done without numbers and a frame you looked at.
 
-## 4. Generated assets
+## 4. Generated assets and the Scenario plugin
 
-Assets made with Scenario (through the Scenario MCP) arrive as GLB or FBX meshes, PNG or EXR
-textures, equirectangular skies and audio. They are finished in this team's skills, not in the
-generator: scale and axes on import, texture roles and sRGB flags, collision, LODs and Nanite,
-naming and folders. Route them to `scenario-unreal-pipeline-automation` (import and validation),
-then `scenario-unreal-materials` (PBR hookup, masked or packed maps),
+Assets made with Scenario (through the Scenario MCP or the Scenario for Unreal plugin,
+https://github.com/scenario-labs/unreal-plugin) arrive as GLB or FBX meshes, PNG or EXR textures,
+equirectangular skies and audio. They are finished in this team's skills, not in the generator:
+scale and axes on import, texture roles and sRGB flags, collision, LODs and Nanite, naming and
+folders. Route them to `scenario-unreal-pipeline-automation` (import and validation), then
+`scenario-unreal-materials` (PBR hookup, masked or packed maps),
 `scenario-unreal-lighting-rendering` (skies, HDRIs) or `scenario-unreal-world-building` (placement).
-Intake rules and what a commandlet can and cannot import:
+With the plugin installed, the `scenario-unreal` skill covers its local MCP server (price, generate,
+import, place, save); generation spends credits, so the plugin asks for approval in the editor. Read
+its tool results before polishing: they say what was imported and where. Intake rules and what a
+commandlet can and cannot import:
 `scenario-unreal-pipeline-automation/references/generated-assets.md`; generated skies:
 `scenario-unreal-lighting-rendering/references/generated-skies.md`.
 

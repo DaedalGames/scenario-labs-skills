@@ -2,7 +2,7 @@
 
 Agent skills that let Claude (Claude Code) or Codex drive Unreal Engine 5.8 the way the experts in
 the best tutorials, conference talks and official documentation do. Built on 2026-09-24 and updated
-on 2026-10-21 with the same method as [Blender Expert Skills](../../dcc/blender/README.md),
+on 2026-10-22 with the same method as [Blender Expert Skills](../../dcc/blender/README.md),
 [Maya Expert Skills](../../dcc/maya/README.md) and
 [ZBrush Expert Skills](../../dcc/zbrush/README.md): transcripts of top-rated videos, cited expert
 notes, then skills with tools and review rubrics, graded blind against the same model without them.
@@ -19,7 +19,7 @@ Start with the lead skill, `scenario-unreal-expert`.
 | `scenario-unreal-lighting-rendering`  | lighting or rendering in Unreal Engine 5.8: physical light units and exposure (EV100, lux, lumens), a sun, sunset or dusk rig, Lumen GI and...           |
 | `scenario-unreal-materials`           | a UE5 task involves materials or textures: a master material and instances for a kit, Substrate or legacy, Blendable vs Adaptive GBuffer, glass...       |
 | `scenario-unreal-performance`         | an Unreal Engine 5.8 project misses its frame rate or stutters: "optimize to 60 fps", "we run at 38 fps", CPU or GPU bound, game or render thread too... |
-| `scenario-unreal-pipeline-automation` | importing FBX, USD, OBJ or glTF from Maya, ZBrush, Blender or an AI generator (such as Scenario MCP) into Unreal Engine 5.8, in bulk or as changed...    |
+| `scenario-unreal-pipeline-automation` | importing FBX, USD, OBJ or glTF from Maya, ZBrush, Blender or an AI generator (Scenario MCP, the Scenario for Unreal plugin) into Unreal Engine 5.8...   |
 | `scenario-unreal-vfx`                 | a UE5 task involves Niagara or Chaos destruction: a Niagara fireball, projectile trail, impact explosion, muzzle flash, spell, smoke, sparks, debris...  |
 | `scenario-unreal-world-building`      | building or fixing an Unreal Engine 5 level or open world: World Partition, OFPA, Data Layers, Level Instances, Packed Level Actors, HLOD, landscape...  |
 
@@ -29,8 +29,8 @@ Start with the lead skill, `scenario-unreal-expert`.
   h) and 82 official documentation pages, each with references and a `ue_<domain>.py` module. The
   lead carries the shared toolkit (`ue_env`, `ue_run`, `ue_remote`, `ue_review`, `ue_audit`,
   `ue_stat`, `ue_mcp`).
-- Version 0.2 (2026-10-21) was run in Unreal Engine 5.8.3 on macOS, Apple Silicon. The lead skill's
-  live runs covered the MCP catalog (52 toolsets, 830 tools), Python Remote Execution, the
+- Version 0.2.1 (2026-10-22) was run in Unreal Engine 5.8.3 on macOS, Apple Silicon. The lead
+  skill's live runs covered the MCP catalog (52 toolsets, 830 tools), Python Remote Execution, the
   project-local Python toolset, headless and offscreen editor launches, screenshots, Remote Control
   and the job protocol. Each specialist's SKILL.md has a Status line naming what ran and what did
   not, and the procedures mark every block that has not been run in the engine as `[not yet run]`.
@@ -61,7 +61,7 @@ The installer puts the skills side by side, which the specialists need: they imp
 ## Provenance
 
 Ported from [edemaistre/unreal-expert-skills](https://github.com/edemaistre/unreal-expert-skills),
-version 0.2 (2026-10-21), built from the 2026-09-24 skills, with these changes: the `scenario-`
+version 0.2.1 (2026-10-22), built from the 2026-09-24 skills, with these changes: the `scenario-`
 prefix on every skill name and on every reference to a sibling skill, this repository's frontmatter
 (`name`, `description`, `license`), no version line in the skill bodies, the sibling-install line in
 each `SKILL.md`, links from each `SKILL.md` to its supporting files, American spelling, unused
