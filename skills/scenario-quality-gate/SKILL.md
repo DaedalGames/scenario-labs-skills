@@ -2,6 +2,8 @@
 name: scenario-quality-gate
 description: "Use when a generated Scenario image needs a quality check or a brand-brief compliance verdict before it ships: pass/warn/fail scoring, on-brand review against a configured brief, QA gating a batch, pricing or refreshing a stored verdict, or iterating a generation until it clears the gate. Keywords: quality gate, quality check, QA, verdict, brief compliance, on-brand, brand brief, pass fail, score, review, asset_quality_gate_run."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Quality Gate
@@ -132,5 +134,3 @@ number.
   stricter scoring of an already-scored asset requires `rerun: true`.
 - Retrying the entitlement failure: Quality Gate is an Enterprise add-on. Degrade to the
   `asset_analyze` review in `scenario-asset-analysis` and tell the user why.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

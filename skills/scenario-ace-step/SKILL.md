@@ -2,6 +2,8 @@
 name: scenario-ace-step
 description: "Use when creating or editing music with ACE-Step models on Scenario via MCP: text-to-music songs with sung vocals from a lyric sheet, instrumental tracks, covering or restyling an existing song, repainting one section in place, changing sung lyrics, adding an instrument layer, completing a partial recording into a full arrangement, extracting stems, or choosing between Turbo and Quality lanes. Keywords: ACE-Step 1.5, cover strength, repaint, Vocal2BGM, stem separation, karaoke, BPM."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario ACE-Step Music
@@ -121,5 +123,3 @@ music is `instrumental: true`, not "no vocals" in the caption. Tempo and key hav
 - Expecting Repaint to change track length: the window regenerates in place. A longer version of the
   same track is the extend lane the `scenario-audio` skill teaches, run by another family's member;
   a different length from scratch is a new Text to Music run.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

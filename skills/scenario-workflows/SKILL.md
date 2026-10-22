@@ -2,6 +2,8 @@
 name: scenario-workflows
 description: "Use when a task involves running a Scenario workflow through MCP, including anything the user calls a Scenario app, a saved pipeline, or a multi-step generation graph. Triggers include listing workflows, building workflow_run's inputs object, pricing a run with a dry run, approving or rejecting a stuck approval node, a run rejected for input length, or a workflows_list reply flooding the context. Creating or editing graphs is scenario-workflow-authoring. Keywords: workflow, app, approval gate."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Workflows
@@ -108,5 +110,3 @@ contiguous nor ordered.
   Find the run with `jobs_list`, read it with `job_get` `verbose=true` (compact replies omit
   `metadata`): `metadata.flow` lists per-node statuses, the pending approval node's id is `node_id`,
   the job's id is `workflow_job_id`, its `workflowId` the `workflow_id`. Reject cancels the run.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

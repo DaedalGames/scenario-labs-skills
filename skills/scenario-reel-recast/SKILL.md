@@ -2,6 +2,8 @@
 name: scenario-reel-recast
 description: "Use when recreating a trending reel, TikTok or Short with a different performer: the same dance, moves, timing and camera, performed by the user's own character from a reference sheet, optionally in another outfit or a redecorated room, keeping the original song in sync. Keywords: reel recast, trend remake, TikTok dance, replace the dancer, character swap, choreography transfer, video to video, keep the music, Seedance edit mode."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Reel Recast
@@ -128,5 +130,3 @@ Outcomes at authoring time, best first:
 - Promising to keep an approved performer while changing only the room: every edit re-renders the
   performer, so a room change means new takes. Say so before spending (unattended: run the new takes
   from the approved prompt and report it).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

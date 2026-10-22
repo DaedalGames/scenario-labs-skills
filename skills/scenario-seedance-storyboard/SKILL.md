@@ -2,6 +2,8 @@
 name: scenario-seedance-storyboard
 description: "Use when a Seedance video must hold continuous movement across shots: dance choreography, fights, sports, or any performance where limbs teleport, feet slide, or motion resets at every cut, or when turning a storyboard and character sheet into a multi-shot sequence that plays as one take. Keywords: storyboard to video, choreography, movement control, pose chain, timecoded shot script, first and last frame chaining, character sheet, multi-shot continuity, Seedance 2.5 and 2.0."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Seedance Storyboard
@@ -130,5 +132,3 @@ seconds. The disciplines and the repair path are in
 - Getting the ratios wrong: each panel must carry the delivery ratio, since a reframe moves the
   poses the chain depends on, and the composed board must land inside a 0.4 to 2.5 aspect ratio or
   Seedance rejects it as a reference and the run fails.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

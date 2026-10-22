@@ -2,6 +2,8 @@
 name: scenario-grok-imagine-image
 description: "Use when generating or editing images with Grok Imagine models on Scenario via MCP: text-to-image, instruction editing with up to three reference images, posters, packaging, ads, or infographics with exact in-image text, photoreal shots from camera and lighting cues, extended aspect ratios up to 20:9 and 9:20, quality and resolution tiers, or batches of variations. Keywords: Grok Imagine Image 2.0, Image Quality, xAI, Aurora, Grok, txt2img, img2img, typography, 2K."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Grok Imagine Images
@@ -86,5 +88,3 @@ output inherits the source's proportions, so reframe before the edit, never with
 - Carrying `quality` beyond 2.0: at authoring time no other member had the field; check the live
   schema before reusing parameters across members.
 - Fine print at 1k: small type blurs; render text-heavy finals at 2k.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

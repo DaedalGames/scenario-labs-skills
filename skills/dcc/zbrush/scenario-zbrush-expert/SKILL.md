@@ -2,6 +2,8 @@
 name: scenario-zbrush-expert
 description: "Use when an agent drives Maxon ZBrush 2026 for any task (sculpt in ZBrush, DynaMesh, ZRemesher, UVs, export, polypaint, posing, 3D print, clean up an AI mesh in ZBrush), when writing ZBrush Python (zbrush.commands) or ZScript, when the ZBrush bridge is not answering, a palette path or set() does nothing, a scripted stroke does not sculpt or a dialog blocks a script, or when a ZBrush result has to be judged the way a professional artist would."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # ZBrush expert (router and agent protocol)
@@ -210,5 +212,3 @@ zl.stop()
 - [`references/zbrush-2026-traps.md`](references/zbrush-2026-traps.md): automation and modeling
   traps with fixes. Load when a call does nothing, hangs, or a tutorial step does not match 2026.
 - [`references/sources.md`](references/sources.md): every source, with credentials and URLs.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

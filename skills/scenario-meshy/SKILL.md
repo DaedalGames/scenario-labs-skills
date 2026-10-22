@@ -2,6 +2,8 @@
 name: scenario-meshy
 description: "Use when creating or refining 3D assets with Meshy models on Scenario via MCP: image-to-3D from one photo or 1-4 multi-view angles, text-to-3D, retexturing an existing GLB, remeshing to a target polycount, UV unwrapping, auto-rigging a humanoid character, or applying a library animation clip. Keywords: Meshy 7 and Meshy 6, Ultra mode, Smart Topology, PBR maps, texture prompt, triangle or quad topology, game-ready mesh, A-pose, T-pose, GLB pipeline."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Meshy 3D
@@ -95,5 +97,3 @@ clips; go straight to Animation for a moving character, optionally setting `post
 - A bare string where the schema says array: one photo goes as `["asset_x"]`.
 - Pricing step 5 with a placeholder asset id: file ids resolve before plan access is checked, so the
   dry run returns 404 and proves neither price nor access.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

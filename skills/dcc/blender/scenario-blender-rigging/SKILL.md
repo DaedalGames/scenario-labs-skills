@@ -2,6 +2,8 @@
 name: scenario-blender-rigging
 description: 'Use when rigging a character, creature or prop in Blender through Python: "rig this character", Rigify metarig fitting or generation errors, automatic weights or "Bone Heat Weighting failed", weight painting fixes, clothes that do not follow, IK/FK switch, foot roll, twist bones, drivers and custom properties, corrective shape keys, a stylized face rig, ARKit 52 blend shapes or viseme shape keys for face capture, lip sync or a game engine, a mechanical or hard-surface rig, or testing how a rig deforms.'
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Blender rigging
@@ -216,5 +218,3 @@ export [verified], so the file looks complete.
 - [`references/face-shapes.md`](references/face-shapes.md): ARKit, viseme and Roblox FACS names with
   their sources; load when naming face shapes for an engine or capture app.
 - [`references/sources.md`](references/sources.md): videos, experts, best timestamps.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

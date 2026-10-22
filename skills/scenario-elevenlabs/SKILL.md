@@ -2,6 +2,8 @@
 name: scenario-elevenlabs
 description: "Use when generating or transforming audio with ElevenLabs models on Scenario via MCP: text-to-speech with inline emotion tags, music from a prompt or sectioned songs, sound effects and loops, dubbing audio or video into another language, re-voicing a recording with a preset or cloned voice, or isolating speech from noise. Keywords: ElevenLabs, Eleven v3, Multilingual v2, Turbo 2.5, Music v2, Sound Effects 2, Dubbing, Voice Changer, Speech to Speech, Voice Isolator, TTS, SFX, localization."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario ElevenLabs Audio
@@ -108,5 +110,3 @@ contract in `scenario-video-assembly`.
   take without changing `seed`: same seed and settings reproduce the same music.
 - Carrying one member's caps to another: 40,000 characters, 600 seconds, 30 sections, and 5 minutes
   of input audio are each true of one lane and false of the next.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

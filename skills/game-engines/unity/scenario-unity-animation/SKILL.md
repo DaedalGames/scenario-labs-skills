@@ -2,6 +2,8 @@
 name: scenario-unity-animation
 description: "Use when a Unity 6.3 task involves character animation or cameras: Mixamo or mocap humanoid import and retargeting, Animator Controllers, blend trees, layers and avatar masks, root motion, foot sliding, IK and Animation Rigging, Playables, Timeline cutscenes, custom tracks and markers, Cinemachine 3 cameras, camera jitter, flipping blends or cameras hitting walls; or when clips import with no animation, a character T-poses, an idle drifts, feet slide or the head misses its aim target."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Unity animation (animator and technical animator)
@@ -203,5 +205,3 @@ reads): `references/procedures.md`.
 - [`references/gui-paths.md`](references/gui-paths.md): windows and menus for the same work.
 - [`references/sources.md`](references/sources.md): every source, credential, URL, best timestamps,
   revision history.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

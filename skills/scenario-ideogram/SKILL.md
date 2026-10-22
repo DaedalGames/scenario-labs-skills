@@ -2,6 +2,8 @@
 name: scenario-ideogram
 description: "Use when generating or editing images with Ideogram models on Scenario via MCP: posters, logos, menus, packaging, or signage with exact in-image text, editing an image in place while keeping its exact size, transparent PNG generation, background removal that keeps hair and glass edges, editable text layers for localization, or one consistent character from a reference. Keywords: Ideogram 4.5, Precise Edit, V4, V3, typography, aspect ratio, layerize, character reference, inpainting."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Ideogram Image
@@ -132,5 +134,3 @@ background" there yields an opaque image.
 - Setting `fontNameH1` and `fontFileH1` together on Layerize: a tier's font comes from a font name
   or a font file, never both. `upload_asset` has no font kind, so with only a local font file use
   the font name route and flag the gap.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

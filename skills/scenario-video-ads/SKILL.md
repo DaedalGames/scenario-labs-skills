@@ -2,6 +2,8 @@
 name: scenario-video-ads
 description: "Use when producing a video ad with Scenario from a product shot or brand assets: a mobile 9:16 or landscape 16:9 commercial, a TikTok, Reels, Shorts, YouTube, or CTV spot, or campaign creative needing a creative brief, storyboard, cinematic camera work, brand-faithful product footage, music and voiceover, captions, ad variants, budget planning, or platform delivery specs. Keywords: video ad, commercial, product video, advert, hook, CTA, end card, campaign, ad creative."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Video Ads
@@ -81,5 +83,3 @@ approval.
   from one board instead.
 - Shipping without the pre-flight: a sensual perfume cut or a wrong-length CTV file dies in ad
   review, not in generation.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

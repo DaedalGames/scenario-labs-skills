@@ -2,6 +2,8 @@
 name: scenario-blender-lighting-rendering
 description: "Use when lighting, rendering or compositing in Blender: light a character, product or hero shot, interior at dusk or night, three-point or motivated lighting, sun and sky, HDRI, EEVEE vs Cycles settings, light leaks or noise, flat or muddy renders, subject not standing out, AgX/ACES color management, render passes, EXR, light groups, bloom and vignette in the 5.x compositor, rule of thirds and value checks, toon/NPR looks, or judging a render like a lighter."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Lighting, rendering and compositing
@@ -201,5 +203,3 @@ first read, value structure, form, motivation, color, composition, artifacts, fi
   plus the disagreements table. Load for judgment calls and attribution.
 - [`references/sources.md`](references/sources.md): the 15 videos, credentials, best timestamps, and
   which to consult for which question.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

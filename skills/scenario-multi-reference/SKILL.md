@@ -2,6 +2,8 @@
 name: scenario-multi-reference
 description: "Use when one image must be composed from several reference pictures through the Scenario MCP server, each lending one thing: the character from one, the place, pose, style, light, palette, material, outfit, or layout from others. Also when a reference leaks into the result (its object, colors, or face showing where it should not) or a reference's role is ignored. Keywords: multi-reference, reference roles, combine references, style reference, pose reference, give each picture a job."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Multi-Reference Composition
@@ -144,5 +146,3 @@ dropped silently, so no wording brings its job back.
   not change, and move only what should.
 - **Hardcoding a model id or price.** Discover with `recommend`, read caps off `model_schema_get`,
   price with `dry_run=true`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

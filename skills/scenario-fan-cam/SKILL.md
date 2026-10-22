@@ -2,6 +2,8 @@
 name: scenario-fan-cam
 description: "Use when putting a person from a photo into live-broadcast crowd footage with Scenario: a stadium or arena fan-cam reaction, a jumbotron or kiss-cam moment, a spectator cutaway at a match or concert, a courtside or front-row sighting, or a personalized sports-TV still that then animates into video. Keywords: fan cam, crowd reaction, jumbotron, stadium screen, kiss cam, broadcast cutaway, spectator, crowd shot, sports TV, courtside, arena."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Fan Cam
@@ -107,5 +109,3 @@ prompting per the video family's contract keeps the turn inside one clip.
 - A flat emotional state for the whole clip: without the notice-then-react turn, the result is a
   looping portrait, not a fan cam.
 - Compound camera moves: one reframing drift; the crowd and the reaction supply the motion.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

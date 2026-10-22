@@ -2,6 +2,8 @@
 name: scenario-skyboxes
 description: Use when a task involves generating or iterating on skyboxes, 360 panoramas, equirectangular images, environment maps, HDRI-style backdrops, or VR backdrops through the Scenario MCP. Triggers include text-to-skybox, turning a photo into a 360 environment, restyling a panorama's mood, upscaling a skybox without breaking the seam wrap, or exporting equirectangular or cubemap layouts for game engines such as Unity, Unreal, or Godot.
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Skyboxes and 360 Panoramas
@@ -89,5 +91,3 @@ pipeline the `scenario-3d-worlds` skill teaches end to end.
   keep 2:1 (for example 2048x1024) for correct 360 viewing.
 - Skipping `model_schema_get`: skybox models carry model-specific fields (style,
   geometryEnforcement, quality) that generic assumptions miss.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

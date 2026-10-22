@@ -2,6 +2,8 @@
 name: scenario-image
 description: "Use when generating or editing images with Scenario through MCP: text-to-image, image-to-image, instruction editing, inpainting or outpainting with a mask, background control, aspect ratio or resolution sizing, several outputs per run, or choosing between Scenario image models. Also when a run fails on prompt length, a plan-restricted model, or a reference image that was silently ignored. Keywords: txt2img, img2img, image edit, inpaint, mask, reference image, aspect ratio."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Image Generation and Editing
@@ -136,5 +138,3 @@ size and position". Anything unnamed is open to change.
   others silently substitute a size for one below their floor. Generate near, then resize (Landing
   an exact size), and confirm what landed with `asset_get`, which reports `properties.width` and
   `properties.height`; `jobs_wait` returns asset ids only.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

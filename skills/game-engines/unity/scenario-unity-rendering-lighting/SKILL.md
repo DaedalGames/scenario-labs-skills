@@ -2,6 +2,8 @@
 name: scenario-unity-rendering-lighting
 description: "Use when setting up URP (or choosing URP vs HDRP), configuring URP assets and quality tiers for PC and phones, lighting a stylized or realistic Unity scene (sun, sky, baked or mixed lightmaps, Shadowmask, Adaptive Probe Volumes, reflection probes), or fixing blurry shadows, light leaks, gray bakes, washed-out images, tonemapping and grading, bloom too expensive on mobile, TAA, STP or MSAA choices, GPU Resident Drawer setup, shader warm-up hitches, or a custom shader that vanished or lost its baked light."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Rendering and lighting (lighter / graphics TA)
@@ -195,5 +197,3 @@ args in `<job>/args.json`, result on the `AGENT_RESULT` line. Full code and resu
 - [`scripts/ut_lighting.py`](scripts/ut_lighting.py),
   [`scripts/AgentKit/Lighting/*.cs`](scripts/AgentKit/Lighting/),
   [`scripts/Runtime/*.cs`](scripts/Runtime/) (player helpers: verification builds only).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

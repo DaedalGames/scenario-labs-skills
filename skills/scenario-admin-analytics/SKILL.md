@@ -2,6 +2,8 @@
 name: scenario-admin-analytics
 description: "Use when answering Scenario admin analytics questions about Creative Unit consumption, most-used models, usage by user or project, AI adoption observability, cached usage data, CSV exports, enterprise PDF reports with charts, or a local analytics dashboard. Keywords: usage API, CU, analytics, adoption, reporting, consumption, cache."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Admin Analytics
@@ -155,5 +157,3 @@ job counts, a three-month CSV, and a PDF."
   complete usage.
 - Calling CU "adoption rate" without a denominator, exposing customer snapshots, or using a non-MCP
   fallback.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

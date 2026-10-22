@@ -2,6 +2,8 @@
 name: scenario-seedance-drafts
 description: "Use when exploring several Seedance video takes before paying for a final: cheap 480p previews, variations of one shot to compare, reviewing and ranking takes before a pick, or finalizing a chosen preview to 1080p without regenerating it, including within its 7-day window. Keywords: Seedance draft, draft mode, draft complete, finalize, 480p preview, variations, takes, review, rank, pick, Seedance 2.5."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Seedance Drafts
@@ -101,5 +103,3 @@ criteria and report the checks it did not get.
 - Laying music on the drafts and completing those: the completion carries only what the draft
   generated. Review copies with music are fine; lay the delivery audio once, on the completion.
 - Ranking from one look at the first take, or from contact sheets alone.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -2,6 +2,8 @@
 name: scenario-mai-image
 description: "Use when generating or editing images with Microsoft MAI Image models on Scenario via MCP: photoreal or stylized text-to-image with legible in-image typography, posters, packaging, magazine covers, ads, key art, or instruction-based editing such as text swaps, recoloring, object removal or replacement, background swaps, lighting changes, and full restyles. Keywords: MAI Image 2.5, 2.5 Pro, 2.5 Edit, 2.5 Pro Edit, Microsoft, txt2img, img2img, typography, text rendering, image edit."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario MAI Image
@@ -87,5 +89,3 @@ four times an Edit asset, so `dry_run` both and start with Edit.
 - Re-running for a pixel-identical result: no seed exists; keep the winning asset and edit it
   forward.
 - Shipping the 1K output to print: upscale downstream (see the `scenario-image` skill).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

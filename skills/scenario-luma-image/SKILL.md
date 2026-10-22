@@ -2,6 +2,8 @@
 name: scenario-luma-image
 description: "Use when generating or editing images with Luma Uni-1 models on Scenario via MCP: text-to-image, prompt-based editing of an existing image, style or character reference images with named roles, web search grounding for real-world subjects, rendering exact title text into posters, aspect ratio control, or choosing between Uni-1 Max and Uni-1. Keywords: Luma Labs, Uni-1, Photon, txt2img, img2img, image edit, reference images, webSearch, reasoning image model."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Luma Image
@@ -84,5 +86,3 @@ pin what must not move ("Change X to Y. Keep Z exactly as it is."). One scene or
   `model_schema_get` instead of assuming.
 - Carrying the Max member's reference cap or price to the standard one: they share field names, not
   numbers.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

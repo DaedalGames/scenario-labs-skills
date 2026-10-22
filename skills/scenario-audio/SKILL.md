@@ -2,6 +2,8 @@
 name: scenario-audio
 description: Use when generating or handling audio on Scenario via MCP. Triggers include music tracks, full-length songs with vocals written from lyrics, background scores, soundtracks, game sound effects, SFX, foley, ambience, looping audio, voiceover, narration, speech, TTS, text-to-speech, dialogue, voice cloning, re-voicing a recording, scoring or adding sound to a video, transcription, or requests to create, wait on, play, or download audio files (MP3, WAV) with Scenario tools.
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Audio Generation
@@ -167,5 +169,3 @@ so do not take that pick.
   duration, the second loses the song; the extend lane above keeps the slices the user chose.
 - Putting `dry_run` or `wait` inside `parameters`: they are `model_run`'s own arguments, so a stray
   `dry_run` still charges and a stray `wait` blocks up to 180s.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

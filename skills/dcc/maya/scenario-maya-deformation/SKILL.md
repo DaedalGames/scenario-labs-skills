@@ -2,6 +2,8 @@
 name: scenario-maya-deformation
 description: 'Use when skinning a character in Maya ("bind skin", "fix the weights", weight painting, Skin Tools or ngSkinTools layers), when deformation looks wrong (pinching, candy-wrapper wrist, collapsing elbow or shoulder, volume loss, clothes poking through), when mirroring, copying or capping skin weights for Unreal or Unity, building blend shapes, corrective shapes or pose space deformation (Pose Editor on IK-driven joints), a face rig with shapes or joints, multiple skinClusters, Delta Mush or the ML Deformer, or running a range-of-motion deformation test.'
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Maya deformation (character TD)
@@ -199,5 +201,3 @@ lifting the foot, feet, neck, clothing; faces: mouth corners, cheek squash, lids
   Deformer menus; in the GUI.
 - [`references/sources.md`](references/sources.md): sources, credentials, URLs, timestamps; to trace
   a claim.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

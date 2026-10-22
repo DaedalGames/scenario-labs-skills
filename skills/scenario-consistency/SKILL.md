@@ -2,6 +2,8 @@
 name: scenario-consistency
 description: "Use when one look must hold across Scenario generations: one character across scenes, a turnaround, or a video animated from its references, one product across angles, one style across icon sets, a character from an uploaded drawing, a variant off an approved baseline, or deciding when references stop scaling and a trained model is due. Triggers: make this match, same character, on-model, reference to video, style reference. Keywords: consistency, identity, control map, seed, LoRA."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Consistency
@@ -194,5 +196,3 @@ instead of a generation per frame.
   individual approved shots.
 - Re-describing the character in a reference-to-video prompt: the images carry the look; the prompt
   carries action, camera, and timing.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -2,6 +2,8 @@
 name: scenario-blender-expert
 description: "Use when doing any 3D work in Blender through Python or an MCP bridge, headless or in a live session: modeling, sculpting a character or head, retopology, UV unwrapping, baking, texturing, rigging, animating, previs, geometry nodes, lighting and rendering, grease pencil, or finishing an AI-generated mesh into a production asset. Also before exporting or handing off an asset, to check it is ready for a game engine, a render or a 3D print (floating parts, z-fighting, inside-out normals, unapplied scale, missing UVs). Also when a bpy script fails on Blender 5.x API changes, a brush or sculpt operator fails or crashes headless, or a result has to be judged like a professional 3D artist would."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Blender expert (router and agent protocol)
@@ -187,5 +189,3 @@ Blender. Check the path in the first call (`result["ok"] = os.path.isdir(path)`)
   script.
 - `references/blender-5.2-deltas.md`: full, cited list of what changed from 2.8x to 5.2 per domain
   (load before writing code from memory or following an old tutorial).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

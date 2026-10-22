@@ -105,9 +105,8 @@ for f in $skill_files; do
   }
 
   # 1000-word target, 2500-word hard cap; AGENTS.md "Authoring contract" carries
-  # the why. Body is everything after the closing frontmatter ---, less the
-  # release version stamp (scripts/version-stamp.mjs), which is not prose.
-  body=$(awk 'BEGIN { fm = 0 } /^---$/ { fm++; next } fm >= 2 && !/^<!-- scenario-skills-version: / { print }' "$f")
+  # the why. Body is everything after the closing frontmatter ---.
+  body=$(awk 'BEGIN { fm = 0 } /^---$/ { fm++; next } fm >= 2 { print }' "$f")
   words=$(printf '%s\n' "$body" | wc -w | tr -d ' ')
   if [ "$words" -gt 2500 ]; then
     echo "$f: body is $words words, over the 2500-word hard cap"

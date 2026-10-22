@@ -2,6 +2,8 @@
 name: scenario-blender-texturing-shading
 description: "Use when texturing, shading or look-developing in Blender: building a PBR material from a texture set, displacement, procedural materials, edge wear, dirt, grime, color variation, decals, box or triplanar mapping on meshes without UVs, stylized character skin (subsurface, pores), eyes and cornea, hand-painted stylized textures, texture painting or painting masks headless. Also when a material looks plastic, CG, waxy or blown out, color spaces are wrong, or EEVEE and Cycles disagree."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Texturing and shading (Blender 5.2)
@@ -186,5 +188,3 @@ per-layer mute renders each add something (Price); scale against a human referen
 - [`references/critique.md`](references/critique.md): rubric for judging your own renders and node
   trees.
 - [`references/sources.md`](references/sources.md): every source video, credential, best timestamps.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -2,6 +2,8 @@
 name: scenario-roblox-tooling
 description: "Use when setting up or repairing a Roblox team project outside Studio: Rojo or Script Sync, Wally packages, Rokit pins, luau-lsp type checking, Selene, StyLua, unit tests in Lune or the engine, GitHub Actions CI on pull requests, Open Cloud place publishing, Luau Execution or API key scopes, merging builders' Team Create map with code from files, Studio plugins, or proving a pipeline works. Also when users say \"set up Rojo\", \"CI for my Roblox game\", \"run tests in CI\", \"publish from GitHub\", \"Script Sync stopped syncing\", \"Rojo deleted my parts\", \"wally packages not found\", \"luau-lsp can't find ReplicatedStorage\", \"selene errors on types\", \"the release wiped the map\" or \"my LocalScript doesn't run\"."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Roblox Tooling and Build Pipeline
@@ -251,5 +253,3 @@ modals `screen_capture` misses: ask the user ([gui-paths.md](references/gui-path
   [tools/place_versions.luau](scripts/template/tools/place_versions.luau),
   [tools/restart_servers.luau](scripts/template/tools/restart_servers.luau) and
   [tools/testkit/EngineTests.luau](scripts/template/tools/testkit/EngineTests.luau).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

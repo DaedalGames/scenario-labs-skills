@@ -2,6 +2,8 @@
 name: scenario-runway
 description: "Use when generating or editing video with Runway models on Scenario via MCP: text-to-video or image-to-video from a first frame with Gen4.5 (cinematic motion, sequenced actions, camera choreography), or video-to-video editing of real footage with Aleph 2 (remove objects, swap products, restyle or relight shots, keyframe-pinned reference images, motion and audio preserved). Keywords: Runway ML, Gen4.5, Gen-4.5, Aleph, T2V, I2V, V2V, first frame."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Runway Video
@@ -74,5 +76,3 @@ generate with Gen4.5. To steer the edit, pin up to 5 reference images: `keyframe
 - Passing `aspectRatio` as `"16:9"` or alongside `image`: pixel pairs only, and a first frame
   overrides it.
 - Asking Aleph for new motion or camera moves: the source's motion persists by design.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

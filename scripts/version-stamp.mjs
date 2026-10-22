@@ -1,12 +1,9 @@
 #!/usr/bin/env node
-// Every SKILL.md ends with the release version it was published with, so an
-// agent holding an installed copy can tell which release it comes from. The
-// stamp is a body comment, not frontmatter: Claude Code strips frontmatter
-// before the agent sees the skill.
-//
-// release-please rewrites the version on every line carrying
-// x-release-please-version, through the globbed extra-files entry in
-// release-please-config.json, so a release PR updates every stamp at once.
+// Every SKILL.md frontmatter ends with `metadata.version`, the release it was
+// published with, as the Agent Skills spec's own example does. The line
+// carries a YAML comment, x-release-please-version, so the globbed generic
+// extra-files entry in release-please-config.json rewrites every copy in the
+// release PR.
 //
 // The check accepts any version up to version.txt, not only an equal one:
 // main does not require branches to be up to date, so a skill stamped before
@@ -20,71 +17,118 @@ import { fileURLToPath } from "node:url";
 import { listSkills } from "./lib/skills.mjs";
 
 export const STAMP_GLOB = "skills/**/SKILL.md";
-export const stampLine = (version) =>
-  `<!-- scenario-skills-version: ${version} x-release-please-version -->`;
-// The whole line, so prose that mentions the stamp is never taken for one.
-export const STAMP_PATTERN =
-  /^<!-- scenario-skills-version: (\d+)\.(\d+)\.(\d+) x-release-please-version -->$/;
+export const stampLines = (version) => [
+  "metadata:",
+  `  version: "${version}" # x-release-please-version`,
+];
+const VERSION_PATTERN =
+  /^ {2}version: "(\d+)\.(\d+)\.(\d+)" # x-release-please-version$/;
 
-const semver = (match) => match.slice(1, 4).map(Number);
 const shorten = (line) => (line.length > 80 ? `${line.slice(0, 77)}...` : line);
 const newer = (a, b) => {
   const i = a.findIndex((part, n) => part !== b[n]);
   return i >= 0 && a[i] > b[i];
 };
 
+// [frontmatter lines, rest of the file], or null without a frontmatter block.
+function split(content) {
+  const lines = content.split("\n");
+  const end = lines.indexOf("---", 1);
+  if (lines[0] !== "---" || end < 0) return null;
+  return [lines.slice(1, end), lines.slice(end)];
+}
+
+// Drops a `metadata:` block: the key and the indented lines under it.
+function withoutMetadata(frontmatter) {
+  const kept = [];
+  let inMetadata = false;
+  for (const line of frontmatter) {
+    if (line === "metadata:") {
+      inMetadata = true;
+      continue;
+    }
+    if (inMetadata && /^\s/.test(line)) continue;
+    inMetadata = false;
+    kept.push(line);
+  }
+  return kept;
+}
+
+function problem(content, version) {
+  const parts = split(content);
+  if (!parts) return "no frontmatter";
+  const [frontmatter] = parts;
+  const found = `found: "${shorten(frontmatter.slice(-2).join(" / "))}"`;
+  if (frontmatter.filter((line) => line === "metadata:").length !== 1) {
+    return `needs one metadata block, ${found}`;
+  }
+  const [key, value] = frontmatter.slice(-2);
+  const match = value.match(VERSION_PATTERN);
+  if (key !== "metadata:" || !match) {
+    return `frontmatter must end with ${stampLines(version).join(" / ")}, ${found}`;
+  }
+  const stamped = match.slice(1, 4).map(Number);
+  if (newer(stamped, version.split(".").map(Number))) {
+    return `metadata.version ${stamped.join(".")} is newer than version.txt ${version}`;
+  }
+  return null;
+}
+
 function main() {
   process.chdir(path.join(path.dirname(fileURLToPath(import.meta.url)), ".."));
   const version = readFileSync("version.txt", "utf8").trim();
-  const current = version.split(".").map(Number);
   const check = process.argv.includes("--check");
   const errors = [];
 
   for (const { dir } of listSkills()) {
     const file = path.join(dir, "SKILL.md");
     const content = readFileSync(file, "utf8");
-    const lines = content.trimEnd().split("\n");
-    if (!check) {
-      const body = lines
-        .filter((line) => !STAMP_PATTERN.test(line))
-        .join("\n")
-        .trimEnd();
-      const stamped = `${body}\n\n${stampLine(version)}\n`;
-      if (stamped !== content) writeFileSync(file, stamped);
+    if (check) {
+      const error = problem(content, version);
+      if (error) errors.push(`${file}: ${error}`);
       continue;
     }
-    const stamps = lines.filter((line) => STAMP_PATTERN.test(line));
-    const last = lines.at(-1).match(STAMP_PATTERN);
-    if (stamps.length !== 1 || !last) {
-      errors.push(
-        `${file}: must end with one line "${stampLine(version)}" (found ${stamps.length} stamp lines; last line: "${shorten(lines.at(-1))}")`,
-      );
-    } else if (newer(semver(last), current)) {
-      errors.push(
-        `${file}: stamp ${semver(last).join(".")} is newer than version.txt ${version}`,
-      );
+    const parts = split(content);
+    if (!parts) {
+      errors.push(`${file}: no frontmatter`);
+      continue;
     }
+    const [frontmatter, rest] = parts;
+    const stamped = [
+      "---",
+      ...withoutMetadata(frontmatter),
+      ...stampLines(version),
+      ...rest,
+    ].join("\n");
+    if (stamped !== content) writeFileSync(file, stamped);
   }
 
-  if (!check) return;
-  const config = JSON.parse(readFileSync("release-please-config.json", "utf8"));
-  const extraFiles = config.packages?.["."]?.["extra-files"] ?? [];
-  if (
-    !extraFiles.some(
-      (entry) =>
-        entry.type === "generic" && entry.glob && entry.path === STAMP_GLOB,
-    )
-  ) {
-    errors.push(
-      `release-please-config.json: extra-files needs { "type": "generic", "path": "${STAMP_GLOB}", "glob": true }, or releases stop updating the stamps`,
+  if (check) {
+    const config = JSON.parse(
+      readFileSync("release-please-config.json", "utf8"),
     );
+    const extraFiles = config.packages?.["."]?.["extra-files"] ?? [];
+    if (
+      !extraFiles.some(
+        (entry) =>
+          entry.type === "generic" && entry.glob && entry.path === STAMP_GLOB,
+      )
+    ) {
+      errors.push(
+        `release-please-config.json: extra-files needs { "type": "generic", "path": "${STAMP_GLOB}", "glob": true }, or releases stop updating metadata.version`,
+      );
+    }
   }
   if (errors.length > 0) {
     for (const error of errors) console.error(error);
-    console.error("Run `pnpm stamp` to stamp every SKILL.md with version.txt.");
+    console.error(
+      "Run `pnpm stamp` to set metadata.version in every SKILL.md from version.txt.",
+    );
     process.exit(1);
   }
-  console.log(`Every SKILL.md carries a version stamp up to ${version}`);
+  if (check) {
+    console.log(`Every SKILL.md carries metadata.version up to ${version}`);
+  }
 }
 
 // realpath: a temporary directory on macOS is reached through a symlink, and

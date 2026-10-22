@@ -2,6 +2,8 @@
 name: scenario-maya-expert
 description: 'Use when doing any Autodesk Maya task through Python or a bridge, headless or live: maya.cmds or OpenMaya 2.0 scripts, mayapy or maya.standalone batch jobs, a commandPort or MCP connection into a running Maya, "Maya 2027", validating or exporting scenes, or a maya.cmds script that fails after the 2025 to 2027 changes (PySide6, OpenPBR, renamed math nodes, removed flags). Also when a Maya model, rig, shot or render must be judged like a professional before it is called done, or a brief must be routed to the right Maya specialist.'
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Maya expert (router and agent protocol)
@@ -194,5 +196,3 @@ to Maya's `sys.path`, so `Bridge().call("mx_audit", "audit", "crate_geo")` works
   with what each is best for.
 - Related skills outside this set: scenario-3d (generate meshes to finish in Maya),
   scenario-zbrush-expert and scenario-blender-expert (sister teams with the same protocol).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

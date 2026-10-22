@@ -2,6 +2,8 @@
 name: scenario-refine-loop
 description: "Use when a Scenario output must be checked and improved rather than accepted first roll: iterating a generation until it matches the brief, fixing a batch that came back off-brief, retrying failed shots methodically, wiring an automated generate, review, revise loop, or deciding whether to re-prompt, swap references, inpaint, post-process, or change model. Keywords: refine, iterate, critique, review loop, QA, self-correction, verify, acceptance criteria, retry, drift."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Refine Loop
@@ -85,5 +87,3 @@ attribute the improvement, so the next failure restarts from zero.
   and answer the report after the run, not the mid-run gate.
 - Retrying a criterion a third time on the same model: two misses under two different fixes is
   evidence about the model, not bad luck.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

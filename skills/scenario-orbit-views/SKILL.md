@@ -2,6 +2,8 @@
 name: scenario-orbit-views
 description: "Use when a single image of a character, creature, prop, vehicle, or building must be seen from new camera angles through the Scenario MCP server: turnarounds, a 360 orbit, views from behind, above, below, or straight down, consistent multi-angle renders on the same grounded background or on transparency, or novel views that go through a 3D intermediary instead of guessing."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Orbit Views
@@ -114,5 +116,3 @@ three need Python with Pillow and numpy. Each prints its usage when run without 
 - Passing more than 32 ids to `jobs_wait`, or polling `job_get`.
 - Trusting a view without looking: check contact sheets for extra limbs, wrong sides, and leftover
   gray clay.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

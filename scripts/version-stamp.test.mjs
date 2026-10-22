@@ -14,11 +14,9 @@ import test from "node:test";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { listSkills } from "./lib/skills.mjs";
-import { STAMP_GLOB, stampLine } from "./version-stamp.mjs";
+import { STAMP_GLOB, stampLines } from "./version-stamp.mjs";
 
 const scripts = dirname(fileURLToPath(import.meta.url));
-const STAMP =
-  "<!-- scenario-skills-version: 1.2.3 x-release-please-version -->";
 const CONFIG = {
   packages: {
     ".": {
@@ -59,48 +57,55 @@ function repo(t, { core, expert, config = CONFIG }) {
   return { run, read };
 }
 
-const SKILL = "---\nname: x\n---\n\n# X\n\nBody.\n";
+const FRONTMATTER =
+  "---\nname: x\ndescription: Use when testing.\nlicense: MIT\n";
+const BODY = "---\n\n# X\n\nBody.\n";
+const SKILL = `${FRONTMATTER}${BODY}`;
+const skill = (version, extra = "") =>
+  `${FRONTMATTER}${stampLines(version).join("\n")}\n${BODY}${extra}`;
 
-test("stamping appends one stamp to every skill and is idempotent", (t) => {
-  const { run, read } = repo(t, { core: SKILL, expert: `${SKILL}\n\n` });
+test("stamping ends every frontmatter with metadata.version and is idempotent", (t) => {
+  const { run, read } = repo(t, { core: SKILL, expert: SKILL });
   assert.equal(run().status, 0);
-  assert.equal(read("core"), `${SKILL}\n${STAMP}\n`);
-  assert.equal(read("expert"), `${SKILL}\n${STAMP}\n`);
+  assert.equal(read("core"), skill("1.2.3"));
+  assert.equal(read("expert"), skill("1.2.3"));
   assert.equal(run("--check").status, 0);
   run();
-  assert.equal(read("core"), `${SKILL}\n${STAMP}\n`);
+  assert.equal(read("core"), skill("1.2.3"));
 });
 
-test("stamping replaces a stale stamp rather than adding a second", (t) => {
-  const stale = `${SKILL}\n${STAMP.replace("1.2.3", "1.0.0")}\n`;
-  const { run, read } = repo(t, { core: stale, expert: stale });
+test("stamping replaces an old metadata block rather than adding a second", (t) => {
+  const old = `${FRONTMATTER}metadata:\n  version: "1.0.0"\n  other: x\n${BODY}`;
+  const { run, read } = repo(t, { core: old, expert: skill("1.0.0") });
   run();
-  assert.equal(read("core"), `${SKILL}\n${STAMP}\n`);
+  assert.equal(read("core"), skill("1.2.3"));
+  assert.equal(read("expert"), skill("1.2.3"));
 });
 
-test("stamping keeps prose that mentions the stamp", (t) => {
-  const prose = `${SKILL}The scenario-skills-version: comment ends the file.\n`;
-  const { run, read } = repo(t, { core: prose, expert: prose });
+test("stamping leaves the body alone", (t) => {
+  const body = `${SKILL}metadata:\n  version: "9.9.9"\n`;
+  const { run, read } = repo(t, { core: body, expert: SKILL });
   run();
-  assert.equal(read("core"), `${prose}\n${STAMP}\n`);
+  assert.equal(read("core"), skill("1.2.3", 'metadata:\n  version: "9.9.9"\n'));
 });
 
-test("the check accepts a stamp older than version.txt", (t) => {
-  const older = `${SKILL}\n${STAMP.replace("1.2.3", "1.1.9")}\n`;
-  const { run } = repo(t, { core: older, expert: `${SKILL}\n${STAMP}\n` });
+test("the check accepts a version older than version.txt", (t) => {
+  const { run } = repo(t, { core: skill("1.1.9"), expert: skill("1.2.3") });
   assert.equal(run("--check").status, 0);
 });
 
-test("the check fails on a missing, newer, misplaced, doubled or malformed stamp", (t) => {
+test("the check fails on a missing, newer, misplaced, doubled or malformed version", (t) => {
+  const stamp = stampLines("1.2.3").join("\n");
   const cases = {
     missing: SKILL,
-    newer: `${SKILL}\n${STAMP.replace("1.2.3", "1.10.0")}\n`,
-    misplaced: `${STAMP}\n${SKILL}`,
-    doubled: `${SKILL}\n${STAMP}\n${STAMP}\n`,
-    malformed: `${SKILL}\n<!-- scenario-skills-version: 1.2.3 -->\n`,
+    newer: skill("1.10.0"),
+    misplaced: `---\n${stamp}\nname: x\ndescription: Use when testing.\nlicense: MIT\n${BODY}`,
+    doubled: `${FRONTMATTER}${stamp}\n${stamp}\n${BODY}`,
+    unquoted: `${FRONTMATTER}metadata:\n  version: 1.2.3 # x-release-please-version\n${BODY}`,
+    unmarked: `${FRONTMATTER}metadata:\n  version: "1.2.3"\n${BODY}`,
   };
   for (const [name, content] of Object.entries(cases)) {
-    const { run } = repo(t, { core: `${SKILL}\n${STAMP}\n`, expert: content });
+    const { run } = repo(t, { core: skill("1.2.3"), expert: content });
     const result = run("--check");
     assert.equal(result.status, 1, name);
     assert.match(result.stderr, /scenario-demo-expert\/SKILL\.md/, name);
@@ -108,19 +113,17 @@ test("the check fails on a missing, newer, misplaced, doubled or malformed stamp
 });
 
 test("the check names the newer version it found", (t) => {
-  const newer = `${SKILL}\n${STAMP.replace("1.2.3", "2.0.0")}\n`;
-  const { run } = repo(t, { core: newer, expert: `${SKILL}\n${STAMP}\n` });
+  const { run } = repo(t, { core: skill("2.0.0"), expert: skill("1.2.3") });
   assert.match(
     run("--check").stderr,
-    /stamp 2\.0\.0 is newer than version\.txt 1\.2\.3/,
+    /metadata\.version 2\.0\.0 is newer than version\.txt 1\.2\.3/,
   );
 });
 
 test("the check fails when releases would stop updating the stamps", (t) => {
-  const stamped = `${SKILL}\n${STAMP}\n`;
   const { run } = repo(t, {
-    core: stamped,
-    expert: stamped,
+    core: skill("1.2.3"),
+    expert: skill("1.2.3"),
     config: { packages: { ".": {} } },
   });
   const result = run("--check");
@@ -139,12 +142,12 @@ const { Minimatch } = createRequire(
   requireFromReleasePlease.resolve("@google-automations/git-file-utils"),
 )("minimatch");
 
-test("release-please rewrites the stamp and nothing else", () => {
-  const before = `${SKILL}Version 1.2.3 in prose stays.\n\n${stampLine("1.2.3")}\n`;
+test("release-please rewrites metadata.version and nothing else", () => {
+  const before = skill("1.2.3", "Version 1.2.3 in prose stays.\n");
   const updater = new Generic({ version: Version.parse("1.3.0") });
   assert.equal(
     updater.updateContent(before),
-    before.replace(stampLine("1.2.3"), stampLine("1.3.0")),
+    skill("1.3.0", "Version 1.2.3 in prose stays.\n"),
   );
 });
 

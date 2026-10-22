@@ -2,6 +2,8 @@
 name: scenario-maya-retopology-uv
 description: 'Use when turning a dense sculpt, scan, ZBrush export or AI-generated mesh into animation-ready or game-ready topology in Maya without a mouse ("clean up this AI mesh", "retopo this character", Quad Draw, Retopologize), testing it deforms before rigging (bad elbow or wrist bend, lids popping through the eyes), or unwrapping UVs, cutting seams, setting texel density, mip-safe padding, UDIMs, lightmap UVs, stacking mirrored shells, or preparing a low poly and cage for baking. Keywords: edge flow, eye and mouth loops, Unfold3D, bake prep.'
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Maya retopology and UVs
@@ -218,5 +220,3 @@ views plus the closest shot; overlap diff images (red: high outside the low). Sc
   Retopologize, test bind, UV Toolkit).
 - [`references/sources.md`](references/sources.md): every source with credentials, URL and
   timestamps.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

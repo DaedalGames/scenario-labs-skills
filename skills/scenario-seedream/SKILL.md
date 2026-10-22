@@ -2,6 +2,8 @@
 name: scenario-seedream
 description: "Use when generating or editing images with Seedream models on Scenario via MCP: text-to-image, image-to-image editing with reference images, posters or packaging with exact in-image text (non-Latin scripts too), subject-preserving edits, sets of related images in one run, editing a transparent asset without losing its alpha, or splitting an image into transparent PNG layers with Layerize. Keywords: Seedream 5.0 Pro, Lite, Flash, 4.5, Layerize, ByteDance, txt2img, img2img, layer extraction."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Seedream Images
@@ -111,5 +113,3 @@ there is no PSD export.
 - Moving a 3000-character prompt from Pro to Lite: prompt caps are per member.
 - Setting Flash's `background` to `transparent` on a text-only run or a flattened reference: it is
   silently ignored, and the image comes back opaque.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -2,6 +2,8 @@
 name: scenario-video-color-grade
 description: "Use when color grading, color correcting, or relighting an existing video or still with deterministic code instead of a generative model: cinematic looks (teal and orange, film stock, bleach bypass, noir, duotone, faded 70s), golden hour, blue hour or day-for-night, log footage (S-Log3) to Rec.709, matching a reference image's colors, black and white with one kept or swapped color, .cube LUT export, a look comparison grid, or a grading showreel."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Video Color Grade
@@ -171,5 +173,3 @@ music. The grades themselves cost nothing.
   loop breaks. The scripts avoid it; keep it that way in custom commands.
 - **Grading alone.** Grading is taste: show grids and short previews, and iterate on what the user
   points at.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

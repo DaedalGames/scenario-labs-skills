@@ -2,6 +2,8 @@
 name: scenario-minimax-video
 description: "Use when generating or editing video with MiniMax Hailuo models on Scenario via MCP: text-to-video, image-to-video, first and last frame anchors, reference images, videos, or audio, native stereo audio, bracketed camera commands, extending a clip, inserting a new scene into one, or recasting the people in it from photos. Keywords: MiniMax, Hailuo 3.0, H3, H3 Max, Turbo, Extend Video, Insert Video, Recast, Hailuo 2.3, T2V, I2V, V2V, 2K."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario MiniMax Video
@@ -123,5 +125,3 @@ to the action; no audio parameter exists to switch instead.
   `scenario-video-assembly` skill), take `continuation` and cut from `startTime` 1.7: the cut tool
   steps by 0.1 s and 1.6 keeps a source frame (the `scenario-video-editing` skill).
 - Stacking camera moves: past 2 or 3 cues the background wobbles and textures flicker.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

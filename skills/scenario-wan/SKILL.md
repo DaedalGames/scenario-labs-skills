@@ -2,6 +2,8 @@
 name: scenario-wan
 description: "Use when generating or editing video with Wan models on Scenario via MCP: text-to-video, image-to-video from a still, first and last frame brackets, extending a clip, instruction-based video editing, character motion transfer or person replacement (Animate), aspect ratio reframing, video outpainting, uploaded-audio sync or auto-generated audio, or multi-shot prompts with timing brackets. Keywords: Wan 2.7, 2.6, 2.5, 2.2, Alibaba, VACE, T2V, I2V, V2V, lip-sync, multiShots."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Wan Video
@@ -97,5 +99,3 @@ which 2.6 lip-syncs. Video Edit's `audioSetting` decides the track: `origin` kee
   other member reads brackets.
 - Re-describing the still or requesting content changes in an I2V prompt: I2V animates; Video Edit
   changes content.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

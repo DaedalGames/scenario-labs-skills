@@ -2,6 +2,8 @@
 name: scenario-ad-variants
 description: "Use when making multiple independent ad or campaign edits from existing footage with Scenario: hook, CTA, copy, end-card, placement, or targeted visual variants. Also for revising one variant or resuming a partially completed batch. Not for a new commercial from a still image, ordinary single-clip grading, or automatic Cartesian combinations."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Ad Variants
@@ -114,5 +116,3 @@ asks for sound.
   campaign experiment.
 - Source reconstruction is not byte identity after re-encoding. Check preserved content and measured
   synchronization; promise lossless delivery only when the route supports it.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

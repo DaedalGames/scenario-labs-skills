@@ -2,6 +2,8 @@
 name: scenario-roblox-expert
 description: "Use when an agent builds, fixes or tests anything in Roblox Studio: \"make a Roblox game\", \"Roblox Studio\", a Luau script, \"my Roblox game lags\", agent control of Studio, the Studio MCP server (execute_luau, start_stop_play, screen_capture), Rojo or Script Sync projects, offline Luau checks, playtests driven by code; when the MCP server lists no Studio, a playtest hangs, or 2019 to 2023 Roblox code breaks; or when a Roblox brief (UI, data, networking, combat, monetization, assets, performance) must go to the right scenario-roblox-* specialist."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Roblox expert (technical director and agent protocol)
@@ -239,5 +241,3 @@ replies), process hazards, Rojo and Script Sync traps, and live corrections to t
   GUI-only steps.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs and best
   timestamps.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

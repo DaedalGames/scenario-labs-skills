@@ -2,6 +2,8 @@
 name: scenario-brand-kit
 description: "Use when building a visual identity or brand kit with Scenario: a logo, wordmark, or icon as editable SVG, a color palette and typography spec, logo variants (mono, reversed, favicon), and brand applications like social templates, avatars, banners, or merchandise mockups. Also for a rebrand or refreshing an existing mark. Keywords: brandkit, brand kit, visual identity, logo, monogram, wordmark, SVG, vectorize, color palette, typography, brand guidelines, brand board, launch kit."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Brand Kit
@@ -125,5 +127,3 @@ drawn once into the mark, gated letter by letter, and reused as artwork from the
   uploading.
 - Deriving a variant from a mockup instead of the master: derivative-of-derivative compounds
   artifacts (`scenario-formats` has the order of operations).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

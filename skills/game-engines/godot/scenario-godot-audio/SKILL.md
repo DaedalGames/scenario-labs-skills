@@ -2,6 +2,8 @@
 name: scenario-godot-audio
 description: "Use when adding or fixing sound in Godot 4.7: audio buses and effects, volume sliders, 'too many sounds', combat audio with hundreds of enemies, sounds clipping or distorting, 3D sound too quiet or not panning, reverb zones not working, occlusion, adaptive or interactive music (AudioStreamInteractive, layers, stingers), music loops with gaps, SFX that repeat, AudioStreamRandomizer, AudioStreamGenerator, import settings, or importing AI-generated music, SFX and voice from Scenario or ElevenLabs."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Godot audio (audio implementer)
@@ -208,5 +210,3 @@ tests all pass in Godot 4.7.2 ([`references/procedures.md`](references/procedure
   tracking, AI intake, movie audio, pictures.
 - [`scripts/agentkit/audio/`](scripts/agentkit/audio/): `audio_meter`, `audio_buses`,
   `music_builder`, `sfx_pool`, `occluder_3d`, `tone_generator`, `audio_audit`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

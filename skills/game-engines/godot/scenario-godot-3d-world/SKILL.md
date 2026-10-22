@@ -2,6 +2,8 @@
 name: scenario-godot-3d-world
 description: "Use when building 3D levels and worlds in Godot 4.7: third-person or FPS controller, player stuck on stairs, spring arm camera clipping, blockout with CSG, GridMap and MeshLibrary, terrain (heightmap, HeightMapShape3D, Terrain3D regions, textures, painting), scattering trees with MultiMesh, streaming a big world, procedural meshes with SurfaceTool, Jolt physics settings, importing GLB or glTF from Blender or AI generators (Scenario, Tripo, Meshy, Hitem3D), import scripts, name suffixes, model facing, collision generation, LODs."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Godot 3D world (level and environment artist)
@@ -204,5 +206,3 @@ cylinder for clean wall-run and slide normals. CharacterBody3D (GDQuest, Juli) o
 - [`references/gui-paths.md`](references/gui-paths.md): editor paths for viewport-only work, with
   the code substitute for each.
 - [`references/sources.md`](references/sources.md): videos, docs, add-ons, versions.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

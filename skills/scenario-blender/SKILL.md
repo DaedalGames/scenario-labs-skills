@@ -2,6 +2,8 @@
 name: scenario-blender
 description: "Use when an agent works in an open Blender scene through the Scenario for Blender extension's local MCP server (scenario-blender on 127.0.0.1:9876): connecting Claude Code, Cursor, Claude Desktop or Codex to Blender, the headless scenario_blender command, quoting and generating Scenario images, PBR materials, 3D meshes, video, audio or 360 environments from the scene, capturing the viewport or selected meshes as references, placing saved results, Render Video camera paths, or execute_python."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario for Blender
@@ -145,5 +147,3 @@ panorama goes into the World through `prepare_result_application` with `purpose:
   was quoted, submitted or changed, so call again. Missing credentials in the extension's
   preferences keep the catalog from loading.
 - Assuming the file is saved: no tool saves the `.blend`, so ask the user to save it.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

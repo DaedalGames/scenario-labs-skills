@@ -2,6 +2,8 @@
 name: scenario-unity-gameplay
 description: "Use when building or debugging Unity gameplay systems: enemy AI that patrols, chases and attacks, NavMesh baking and agents (AI Navigation 2), feet sliding on agents, state machines or behavior trees, physics projectiles that tunnel, the physics spiral, layers and the collision matrix, CharacterController vs Rigidbody characters, object pooling, 'hundreds of enemies', DOTS, Burst or Jobs decisions, Netcode for GameObjects multiplayer, audio mixers, snapshots, volume sliders and 3D combat sounds."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Unity gameplay systems (gameplay systems programmer)
@@ -205,5 +207,3 @@ enemies at 10 Hz, one mixer Master > Music, SFX, UI.
 - [`scripts/AgentKit/Gameplay/`](scripts/AgentKit/Gameplay/): editor jobs.
   [`scripts/Runtime/`](scripts/Runtime/): brains, director, hub, queries, sweeps, coupling, Burst
   jobs, meters, pools, audio, controller, netcode model.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

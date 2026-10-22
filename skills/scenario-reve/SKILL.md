@@ -2,6 +2,8 @@
 name: scenario-reve
 description: "Use when generating or editing images with Reve models on Scenario via MCP: text-to-image from a prompt alone, instruction edits (swap poster text, recolor a product, change materials, relight or restyle a scene), merging references with consistent subjects, blending up to 6 images into one composite, or choosing between Reve v2.1 and Reve Remix. Keywords: Reve v2.1, Reve Remix, Reve AI, txt2img, img2img, frame tags, compositing, style blending, text swap."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Reve Image
@@ -81,5 +83,3 @@ use a model that exposes a `mask` field (see `scenario-image`).
   size control.
 - Treating a v2.1 `jobs_wait` timeout as an error: p50 latency topped a minute at authoring time;
   re-call with `pending_job_ids`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

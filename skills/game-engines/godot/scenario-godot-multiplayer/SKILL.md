@@ -2,6 +2,8 @@
 name: scenario-godot-multiplayer
 description: "Use when a Godot 4 game goes online or co-op: host and join with ENet, WebSocket for a web build, RPCs (@rpc, rpc_id, any_peer), MultiplayerSpawner and MultiplayerSynchronizer, player authority, lobbies and login, a dedicated or headless server export, lag, rubber-banding, prediction or netfox, cheating, bandwidth, Steam, Nakama or WebRTC. Symptoms: players do not appear on the client, 'rpc node checksum failed', 'node not found' on an RPC, desync, the server build is huge, a client never connects."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Godot multiplayer (network programmer)
@@ -224,5 +226,3 @@ account or a signalling server. Verify against the installed release before quot
   Profiler), [`references/sources.md`](references/sources.md).
 - [`scripts/gd_net.py`](scripts/gd_net.py),
   [`scripts/agentkit/multiplayer/`](scripts/agentkit/multiplayer/): the harness and kit.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

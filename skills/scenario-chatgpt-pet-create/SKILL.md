@@ -2,6 +2,8 @@
 name: scenario-chatgpt-pet-create
 description: "Use when creating a ChatGPT pet or Codex pet with Scenario: hatching an animated companion from a text idea, a character, mascot or brand cue, or reference photos and art; making the 1536x2288 v2 pet sprite sheet with nine animation states and sixteen look directions, the 1536x1872 v1 sheet ChatGPT web uploads, a pixel-perfect pixel-art pet, an animated GIF of the pet, or a Codex pet.json package."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario ChatGPT Pet: Create
@@ -169,5 +171,3 @@ only the look rows are left, deliver v1 without them; otherwise stop and report.
   upload, which is `spritesheet-v1.png`.
 - Installing over an existing Codex pet without asking: `install` needs `--force` for that, and the
   user's yes.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

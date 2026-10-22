@@ -2,6 +2,8 @@
 name: scenario-unity-performance
 description: "Use when a Unity 6.3 game is slow or stutters: low fps, frame spikes, hitches when entering areas or on first effects, GC spikes, too many draw calls or SetPass calls, CPU vs GPU bound questions, Profiler, Profile Analyzer, Memory Profiler, Frame Debugger or Project Auditor work, GPU Resident Drawer or SRP Batcher setup, LOD and Mesh LOD, shader warm-up and variants, memory or VRAM budgets, IL2CPP and build size, or proving a fix with numbers from a player."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Unity performance (performance engineer)
@@ -206,5 +208,3 @@ e-book p. 31); VSync off in release; the benchmark path between before and after
 - [`scripts/ut_perf.py`](scripts/ut_perf.py) (runner side),
   [`scripts/AgentKit/Performance/*.cs`](scripts/AgentKit/Performance/) (Editor jobs),
   [`scripts/Runtime/Performance/*.cs`](scripts/Runtime/Performance/) (PerfProbe, AllocScope).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

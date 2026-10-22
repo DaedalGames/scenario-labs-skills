@@ -2,6 +2,8 @@
 name: scenario-unreal-materials
 description: 'Use when a UE5 task involves materials or textures: a master material and instances for a kit, Substrate or legacy, Blendable vs Adaptive GBuffer, glass, emissive screens, decals, edge wear and dirt, landscape layers and RVT, toon or cel shading, "too many shaders" or shader permutations, static switches, usage flags, texture compression (BC7, normal maps, ORM packing, sRGB), texture memory, or "is this material expensive".'
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Unreal materials (master materials, Substrate, textures, shader cost)
@@ -206,5 +208,3 @@ yet run in Unreal**: run P0 first.
   revision history.
 - [`scripts/ue_materials.py`](scripts/ue_materials.py): texture policy, value checks, cost census,
   graph lint, permutation census, Substrate ini, builders, cooked texture memory, probe.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

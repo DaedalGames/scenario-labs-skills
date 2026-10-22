@@ -2,6 +2,8 @@
 name: scenario-roblox-performance
 description: "Use when a Roblox experience is slow, laggy, stuttering, crashing or out of memory, or before shipping or updating one: my game lags on mobile, low FPS, frame spikes, server lag or low heartbeat, physics lag, network lag or high KB/s, memory leaks or memory that keeps growing, crashes on phones, long join or load times, too many parts, instances, draw calls or triangles, MicroProfiler, Script Profiler, Luau heap, Developer Console memory, Scene Analysis, StreamingEnabled tuning, performance budgets, and publishing, releasing an update, restarting servers or rolling back a version."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Roblox Performance and Release
@@ -217,5 +219,3 @@ claim cites it ([gui-paths.md](references/gui-paths.md)). The full rubric is in
   Client windows, compare with a noise floor, profiler wrappers.
 - [scripts/agentkit/performance/](scripts/agentkit/performance/): `PerfProbe`, `ScriptProf`,
   `MicroProf`, `HeapProf`, `SceneScan`, `PerfAudit`, `lune_perf_audit.luau`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

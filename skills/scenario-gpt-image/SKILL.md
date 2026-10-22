@@ -2,6 +2,8 @@
 name: scenario-gpt-image
 description: "Use when generating or editing images with OpenAI's GPT Image models on Scenario via MCP: text-to-image, edits from reference images, inpainting with an alpha mask, in-image text for logos and infographics, transparent cutouts, pixel sizing up to 4K, quality tiers up to xhigh and max, input fidelity for product or face detail, or choosing between Flare, Sunburst, GPT Image 2 and 1.5. Keywords: GPT Image 2.5, GPT Image 2, OpenAI, DALL-E, gpt-image, ChatGPT image, txt2img, img2img, background."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario GPT Image
@@ -146,5 +148,3 @@ two minutes: wait through `jobs_wait` rather than re-running.
   succeeds at a different size, and an over-wide edit source gains white bands.
 - Leaving `inputFidelity` at its high default on 1.5 when you wanted reinterpretation: drop it to
   low and re-`dry_run`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

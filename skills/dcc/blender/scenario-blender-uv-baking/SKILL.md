@@ -2,6 +2,8 @@
 name: scenario-blender-uv-baking
 description: "Use when UV unwrapping, placing seams, straightening or packing UVs, setting texel density, laying out UDIMs or mirrored UVs, or baking normal, AO, curvature, ID or displacement maps from a sculpt or high poly onto a low poly or retopo in Blender, including Multires bakes. Also when a bake has black or inverted patches, flat areas, cracks, seams, wavy lines or AO ghosts, bpy.ops.object.bake returns CANCELED, or uv.unwrap silently fails."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # UV unwrapping and baking
@@ -183,5 +185,3 @@ maps, `bake_review` sheet (high, low, low + maps), `map_problem_review` when san
 - [`references/sources.md`](references/sources.md): videos, credentials, URLs, best timestamps, web
   references.
 - `scripts/bx_uvbake.py`: the module (docstrings list every function).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

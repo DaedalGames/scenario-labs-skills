@@ -2,6 +2,8 @@
 name: scenario-godot-shaders
 description: "Use when writing or fixing Godot 4.7 shaders: .gdshader code (spatial, canvas_item, particles, sky, fog), VisualShader graphs built in code, stylized or toon water, dissolve or burn effects, hit flash, outlines, X-ray or portals with the stencil buffer, depth or screen-texture post-processing, global or per-instance uniforms, compute shaders and Texture2DRD, the shader baker; or when 'shader compiles but looks wrong', 'black screen from my post effect', 'my Godot 3 shader breaks', 'colors look washed out', 'first-launch shader stutter'."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Godot shaders (technical artist, shading)
@@ -228,5 +230,3 @@ schemas and flag the gap.
   [`shader_tools.gd`](scripts/agentkit/shaders/shader_tools.gd),
   [`dissolve_swap.gd`](scripts/agentkit/shaders/dissolve_swap.gd), `game_time.gd` and the templates
   (water HQ and LITE, dissolve, fullscreen_depth, portal writer and reader, sky_toon, hit_flash).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

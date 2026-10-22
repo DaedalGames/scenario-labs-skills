@@ -2,6 +2,8 @@
 name: scenario-identity-library
 description: "Use when a named character or prop must become a reusable identity in Scenario: creating a character or prop from a brief or interview, building its approved image collection (character: <name> or props: <name>), assembling a character sheet or turnaround, or generating new images of an established one. Triggers include create a new character, design a prop, character sheet, turnaround, more images of this character. Keywords: character design, identity, library, collection, grid."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Identity Library
@@ -108,5 +110,3 @@ slot-starved; with slots to spare, prefer the individual approved shots.
   `props: ` prefixes are the lookup contract.
 - A different model per view: reference behavior differs per family; one schema-checked model
   carries the whole identity.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

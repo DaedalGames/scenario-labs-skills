@@ -2,6 +2,8 @@
 name: scenario-godot-performance-export
 description: "Use when a Godot game stutters, drops frames, hitches when entering new areas, overheats a phone, or must ship: profiling and Performance monitors, CPU or GPU bound, draw calls, MultiMesh, occlusion culling, LOD, shader compilation hitches, export to macOS, Windows, Linux, Steam, Android (APK, AAB, keystore), iOS (Xcode), web (itch.io, COOP/COEP headers, SharedArrayBuffer, JavaScript interop), build size budgets, demo and DLC builds, signing and notarization."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Godot performance and release
@@ -257,5 +259,3 @@ App Store Connect, Play Console, Steamworks, consoles, IAP products. Audit flags
 - [`scripts/gd_perf.py`](scripts/gd_perf.py) and [`scripts/agentkit/perf/`](scripts/agentkit/perf/)
   (`perf_stress`, `perf_fixes`, `perf_audit`, `perf_bench`, `perf_logger`, `ship_boot`,
   `web_bridge`, `mobile_touch`).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

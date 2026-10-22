@@ -2,6 +2,8 @@
 name: scenario-patina-retexture
 description: "Use when retexturing an existing 3D asset with PATINA PBR materials through the Scenario MCP server: a GLB or Blender scene (an image-to-3D result with flat colors, a prop, a diorama) whose surfaces need basecolor, normal, roughness, metalness, and height maps per material family with geometry untouched, or a matched before-and-after comparison film rendered in Blender with one camera path, lighting, and cut. Keywords: PATINA, PBR retexture, material families, Blender EEVEE, comparison video."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario PATINA retexture
@@ -167,5 +169,3 @@ defect that fades in mid-shot. A clean encoder log is not visual approval.
 - Editing the config or a script mid-run and expecting the render to resume: the fingerprint
   changed, so it starts fresh.
 - Hardcoding the PATINA id or the 17 CU figure: re-discover with `search`, re-price with `dry_run`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

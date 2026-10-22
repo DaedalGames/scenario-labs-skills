@@ -2,6 +2,8 @@
 name: scenario-maya-fx
 description: 'Use when a Maya task involves simulation or procedural effects: nCloth or Nucleus (a cape, skirt, flag or garment on an animated character, cloth through the body, jittery or stretchy cloth), nParticles, Bifrost graphs (Aero smoke, dust puff, mist, fire, liquids, MPM cloth, snow, sand, "Bifrost smoke"), MASH scattering or motion graphics, sim caches (nCache, Alembic, OpenVDB, file_cache, USD) or FX delivered to lighting or a game engine (flipbook sprites).'
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Maya FX (Nucleus, Bifrost, MASH, caches)
@@ -220,5 +222,3 @@ every Maya call is **not yet run in Maya**; names marked [verify] are answered b
 - [`references/sources.md`](references/sources.md): every source, credential, URL and best
   timestamps.
 - `scripts/mx_fx.py`: the toolkit (docstring lists every function). Tests: `tests/code/maya-fx/`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

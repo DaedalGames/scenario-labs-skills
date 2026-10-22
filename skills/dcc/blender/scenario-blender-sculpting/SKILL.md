@@ -2,6 +2,8 @@
 name: scenario-blender-sculpting
 description: "Use when sculpting in Blender through Python: sculpt a head, face or bust, a stylized or cartoon character, a creature or a realistic portrait; block out from primitives; cut planes, a jaw or gonial angle, cheekbones; fix a jaw or face that looks like a ball or balloon; stylized hair clumps; eyelids; an expression or smirk; plan remesh or multires resolution; reproduce Clay Strips, Crease, Draw Sharp, Scrape, Grab or mask moves without a tablet; final clay renders; or when a sculpt operator crashes headless."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Sculpting (heads and characters, Blender 5.2)
@@ -181,5 +183,3 @@ while the render looks wrong means the render wins.
 - [`references/sources.md`](references/sources.md): the 27 source videos with best timestamps.
 - Example: `tests/code/blender-sculpting/stylized_head_blockout.py` (13 s, renders in
   `stylized_head/stage_N/`); comparison: `tests/code/blender-sculpting/compare/compare_sheet.png`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

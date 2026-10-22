@@ -2,6 +2,8 @@
 name: scenario-blender-2d-animation
 description: "Use when a 2D side-scroller shot, platformer cutscene, game trailer or parallax animation has to be built in Blender from Scenario-generated pictures (flat image cards, an orthographic camera, keyed jumps, rigid-body props), or when a finished shot needs a new theme or look without re-animating. Also use when image planes in Blender float above the ground, a tiled parallax layer shows a seam, or physics props leave the picture plane."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Blender 2D animation
@@ -152,5 +154,3 @@ Pass `team_id` and `project_id` on every call (the `scenario` skill covers picki
 Changing `build_scene.py` itself (depths, parallax factors, physics): read
 [references/pipeline.md](references/pipeline.md) first, which records the decisions the reference
 shot paid for.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

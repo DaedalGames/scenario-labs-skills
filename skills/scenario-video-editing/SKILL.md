@@ -2,6 +2,8 @@
 name: scenario-video-editing
 description: "Use when editing footage that already exists on Scenario through MCP with a tool model instead of a new generation: 3D LUT grading, color correction, film grain, vignette, blur, sharpen, glow, tint, desaturate, posterize, solarize, cubism, crystallize, oilify, chromatic aberration or dodge and burn on a clip; trimming to a time range, splitting at cut points, reversing, resizing, re-encoding, frame extraction, image sequences, background removal, segmentation masks, subjects as layers."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Video Editing
@@ -137,5 +139,3 @@ reads its asset.
 - Polling `job_get` in a loop instead of `jobs_wait`, whose timeout is not an error.
 - Trusting a Grain profile to add grain: the 22 profiles are looks, not intensities, and some soften
   the picture instead. Compare a frame against the input.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

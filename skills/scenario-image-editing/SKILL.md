@@ -2,6 +2,8 @@
 name: scenario-image-editing
 description: "Use when editing an existing image on Scenario through MCP with a tool model, not a new generation: upscale or enhance to 2x, 4K, 8K, super resolution, 3D LUT color grade, color correction, posterize, solarize, vignette, film grain, blur, sharpen, glow, chromatic aberration, oilify, cubism, crystallize, dodge and burn, tint, desaturate, expand or uncrop, reframe an aspect ratio, resize to exact pixels, slice tiles, contact sheet, split into layers, remove a background or watermark, vectorize."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Image Editing
@@ -134,5 +136,3 @@ are `array: true`, where a bare id is silently dropped and the run succeeds havi
   needs its own run.
 - Saving a traced SVG with `asset_download`: it comes back rasterized, so take the stored file from
   `asset_get`'s `url` with `curl -L`.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

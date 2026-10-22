@@ -2,6 +2,8 @@
 name: scenario-godot-vfx
 description: "Use when making or fixing particle effects and game feel in Godot 4.7: GPUParticles3D or GPUParticles2D explosion, fireball projectile with trail, impact, sparks, smoke, shockwave, ribbon trails, sub-emitters, particle collision, color curve does nothing, particles pop out or vanish, effect too heavy on mobile, CPUParticles fallback for Compatibility or web, overdraw, hit-stop, freeze frame, screen shake, juice."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Godot VFX
@@ -233,5 +235,3 @@ explosion is oriented to the surface normal, and each tier holds up on its rende
   to_cpu, maths.
 - [`scripts/agentkit/vfx/`](scripts/agentkit/vfx/): vfx_build, vfx_recipes, vfx_audit, vfx_capture,
   vfx_jobs, vfx_selftest; `shaders/` (including `fx_smoke_lod`) and `runtime/` ship with the game.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

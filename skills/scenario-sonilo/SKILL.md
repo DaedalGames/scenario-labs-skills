@@ -2,6 +2,8 @@
 name: scenario-sonilo
 description: "Use when adding sound to a video or generating standalone audio with Sonilo models on Scenario via MCP: text-to-sound-effects, text-to-music, video-to-sound-effects or video-to-music from a clip, scoring silent AI video, foley, ambience, muxed video-to-video variants returning the clip with the new track mixed in, keeping speech while replacing music, or per-segment sound control. Keywords: Sonilo V1.1, SFX, soundtrack, score, keepSpeechVocal, segments, royalty-free."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Sonilo Audio
@@ -86,5 +88,3 @@ Video to Music and mix in post. Music comes back instrumental.
 - Packing sequenced events into one Text to SFX prompt: it has no timing control; one event per run.
 - Asking any member for speech or vocals: no member produces dialogue, narration, or singing; SFX
   and instrumental music are the whole surface.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

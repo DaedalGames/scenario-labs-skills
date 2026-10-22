@@ -2,6 +2,8 @@
 name: scenario-maya-pipeline-scripting
 description: "Use when writing or fixing Maya pipeline code in Python: mayapy batch jobs over many scenes, validating and auto-fixing scenes, FBX export for Unreal or Unity (static, skeletal, animation clips, Game Exporter), Alembic or GPU caches, USD export, stages and layers, references and namespaces, PySide6 tool windows, OpenMaya 2.0 plug-ins, or slow playback. Also when an FBX lands with wrong scale, normals, tangents or extra takes, a USD export has one frame or smoothed meshes, or one bad file kills a batch."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Maya pipeline scripting (pipeline TD)
@@ -208,5 +210,3 @@ weights), E02, E13 and E27 to scenario-maya-rigging or scenario-maya-animation.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs and best
   timestamps.
 - `scripts/mx_pipeline.py`: the tested-offline module (docstring lists every function).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

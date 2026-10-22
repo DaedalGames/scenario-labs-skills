@@ -2,6 +2,8 @@
 name: scenario-storyboards
 description: "Use when a story must unfold across a sequence of Scenario images: a comic page or strip, manga or webtoon panels, a children's storybook, a film, game, or ad storyboard, animatic pre-viz frames, or any shot list where the same characters and world must persist from panel to panel and dialogue must stay legible. Keywords: storyboard, comic, panel, sequential art, storybook, shot list, pre-viz, animatic, scene to scene, character consistency."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Storyboards and Comics
@@ -91,5 +93,3 @@ shot's exit pose to the next shot's entry.
 - Abandoning a moderation-blocked action beat: providers can reject a weapon or fight panel
   (`moderation_blocked`); soften that panel's clause, de-emphasizing the weapon, and re-run from the
   baseline.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

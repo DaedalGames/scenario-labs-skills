@@ -2,6 +2,8 @@
 name: scenario-product-shots
 description: "Use when producing product photography with Scenario from a real product photo: e-commerce packshots on white, transparent, or brand backgrounds, lifestyle scenes placing the product in an environment, hero shots for a landing page or marketplace listing, angle and colorway sets, relighting or shadow fixes, or any shot where the label, logo, and shape must stay exact. Keywords: product photo, packshot, e-commerce, lifestyle shot, compositing, relight, label fidelity, catalog."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Product Shots
@@ -81,5 +83,3 @@ that rebuilds shadows, or name one in the edit prompt ("soft contact shadow fall
   prompt a new one.
 - One run with a batch count for "the same scene, four angles": per-angle clauses need one run each
   (`scenario-image`).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -2,6 +2,8 @@
 name: scenario-text-overlay
 description: "Use when text must appear letter-perfect on generated media: taglines, CTAs, prices, legal supers, lower thirds, end cards, nameplates, or styled rich cards composited over Scenario images and video. Keywords: text overlay, text card, caption card, CTA, legal super, tagline, end card, lower third, price card, HUD text, transparent PNG."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Text Overlay
@@ -113,5 +115,3 @@ face turns generic.
   Chromium-family browser installed.
 - Trusting `wrap` with a hard box: it lets text spill below; use `shrink` (fits or fails loudly) or
   `clip` when the box is binding.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

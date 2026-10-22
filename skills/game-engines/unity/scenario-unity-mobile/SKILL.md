@@ -2,6 +2,8 @@
 name: scenario-unity-mobile
 description: "Use when a Unity 6.3 game targets Android or iOS: phone frame budget, overheating after 20 minutes, 'my game stutters on phones', ASTC or ETC2 textures, audio import, URP mobile settings, touch controls, on-screen joystick, UI under the notch or safe area, slow startup, ANRs, 'Android build fails', AAB, keystore signing, target API 36, Google Play upload, iOS Xcode export or archive, privacy manifest, app size, in-app purchases (IAP 5), rewarded ads (LevelPlay), ad consent."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Unity mobile (mobile specialist)
@@ -210,5 +212,3 @@ OpenGLES3, Minimal stripping to start.
   store consoles.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs, best
   timestamps, and the revision history.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -2,6 +2,8 @@
 name: scenario-sprite-animation
 description: "Use when animating 2D game art with Scenario: walk, idle or attack cycles in 4 or 8 directions, isometric sprite sheets, animated GIFs, frame-by-frame pixel art animation, VFX loops such as fire or smoke, looping a sprite seamlessly, animating an existing character image, a full animation sheet from one prompt, extracting animation frames from a generated video, or slicing a sprite sheet into engine-ready frames for Unity, Godot, or Unreal. Keywords: spritesheet, keyframes, frame grid, GIF."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Sprite Animation
@@ -188,5 +190,3 @@ listings, timestamps, or `search`.
 - Softening an attack brief after a moderation block: the filter is the provider's, so try another
   general image model first per `scenario-moderation`, grid spec unchanged; rewording the beats
   loses what the lane exists to honor.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

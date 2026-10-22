@@ -2,6 +2,8 @@
 name: scenario-vidu
 description: "Use when generating video with Vidu models on Scenario via MCP: text-to-video, image-to-video from a single still, start and end frame interpolation, reference-to-video keeping characters and props consistent from up to 7 reference images or reference videos, anime-style motion, movement amplitude control, or deciding between Q3, Q2, Q1, and 2.0 tiers. Keywords: Vidu Q3 Pro, Q2 Turbo, Shengshu Technology, T2V, I2V, R2V, Reference2V, start end frame, background music toggle."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Vidu Video
@@ -87,5 +89,3 @@ snowstorm". Prompt length caps differ per member, 2000 to 5000 characters.
   shapes.
 - Passing `videos` to any Reference2V member: at authoring time only one took reference videos; read
   the schema first.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

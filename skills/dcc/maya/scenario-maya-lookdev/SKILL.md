@@ -2,6 +2,8 @@
 name: scenario-maya-lookdev
 description: "Use when shading an asset in Maya with Arnold: OpenPBR or aiStandardSurface materials, hooking up Substance Painter or UDIM texture sets, color spaces (sRGB, Raw, ACEScg), a normal map that looks wrong, displacement with black holes or faceting, skin SSS, chrome and metals, glass or crystal, car paint, aiStandardHair, porting Standard Surface to OpenPBR, or a lookdev turntable with chrome and gray balls. Also when textures render washed out, too dark or plastic in Arnold."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Look development in Maya 2027 (Arnold)
@@ -199,5 +201,3 @@ All stages run headless through scenario-maya-expert's `mx_run.py --plugins mtoa
   Painter paths for a computer-use agent or a human.
 - [`references/sources.md`](references/sources.md): sources, credentials, URLs, timestamps.
 - `scripts/mx_shade.py`: the toolkit (docstring lists every call).
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

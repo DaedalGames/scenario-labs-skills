@@ -2,6 +2,8 @@
 name: scenario-veo
 description: "Use when generating or extending video with Google Veo models on Scenario via MCP: text-to-video, image-to-video from a first frame, first and last frame transitions, reference-to-video (R2V) with asset or style reference images, native audio with dialogue, sound effects, and ambience, negative prompts, seeded reruns, extending a 16:9 clip, or choosing a quality, fast, or lite tier. Keywords: Veo 3.1, Veo 3.1 Fast, Veo 3.1 Lite, Extend Video, Google, T2V, I2V, V2V, 720p, 1080p."
 license: MIT
+metadata:
+  version: "0.59.0" # x-release-please-version
 ---
 
 # Scenario Veo Video
@@ -83,5 +85,3 @@ lines work (`[00:00-00:02] Medium shot...`), spans fitting inside the chosen dur
 - Extending a 9:16 clip: Extend takes 16:9 sources with a 720p or 1080p short side only.
 - Writing the prompt as a list of negatives: describe the wanted scene, reserve `negativePrompt` for
   what to discourage.
-
-<!-- scenario-skills-version: 0.59.0 x-release-please-version -->
