@@ -215,3 +215,5 @@ code: [`references/procedures.md`](references/procedures.md).
 - `references/sources.md`: sources, credentials, URLs, timestamps; revision history.
 - `scripts/ue_cine.py` (toolkit; its docstring lists every call) and
   `scripts/cine_render_callbacks.py` (the Execute Script class).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

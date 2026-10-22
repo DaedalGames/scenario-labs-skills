@@ -87,3 +87,5 @@ subject alone.
 - Prompting the whole scene on Reframe: the prompt describes only the added canvas; the source
   subject stays.
 - Vibrant, whimsical, or hyper-realistic in a Ray prompt: they degrade quality in this family.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

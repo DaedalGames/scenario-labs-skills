@@ -125,3 +125,5 @@ drawn once into the mark, gated letter by letter, and reused as artwork from the
   uploading.
 - Deriving a variant from a mockup instead of the master: derivative-of-derivative compounds
   artifacts (`scenario-formats` has the order of operations).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

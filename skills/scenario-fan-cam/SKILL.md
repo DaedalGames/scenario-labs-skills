@@ -107,3 +107,5 @@ prompting per the video family's contract keeps the turn inside one clip.
 - A flat emotional state for the whole clip: without the notice-then-react turn, the result is a
   looping portrait, not a fan cam.
 - Compound camera moves: one reframing drift; the crowd and the reaction supply the motion.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -198,3 +198,5 @@ rule (in place or root motion), loop seam and speed reports.
   computer-use agent or a human.
 - [`references/sources.md`](references/sources.md): every source, credential, URL and best
   timestamp.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

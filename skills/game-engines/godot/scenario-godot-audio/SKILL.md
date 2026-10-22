@@ -208,3 +208,5 @@ tests all pass in Godot 4.7.2 ([`references/procedures.md`](references/procedure
   tracking, AI intake, movie audio, pictures.
 - [`scripts/agentkit/audio/`](scripts/agentkit/audio/): `audio_meter`, `audio_buses`,
   `music_builder`, `sfx_pool`, `occluder_3d`, `tone_generator`, `audio_audit`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -201,3 +201,5 @@ first read, value structure, form, motivation, color, composition, artifacts, fi
   plus the disagreements table. Load for judgment calls and attribution.
 - [`references/sources.md`](references/sources.md): the 15 videos, credentials, best timestamps, and
   which to consult for which question.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

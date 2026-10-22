@@ -85,3 +85,5 @@ attribute the improvement, so the next failure restarts from zero.
   and answer the report after the run, not the mid-run gate.
 - Retrying a criterion a third time on the same model: two misses under two different fixes is
   evidence about the model, not bad luck.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -234,3 +234,5 @@ color.
   contrast.
 - [scripts/agentkit/ui/](scripts/agentkit/ui/): UIKit, UIStyle, UIInput, UILayout, UIAudit,
   UISettings, and the templates (BuildMenuHud, MenuController, ShopServer, Catalog).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

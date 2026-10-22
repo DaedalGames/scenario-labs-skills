@@ -231,3 +231,5 @@ Thumbnail, pack, CI and time-factor numbers are in procedures.md.
   `addons/prop_pipeline` plugin), [`scripts/ci/`](scripts/ci/) (workflow and CI script),
   [`scripts/gdunit/`](scripts/gdunit/) (gdUnit4 tests), [`scripts/examples/`](scripts/examples/)
   (EditorScript tools, a level importer, a C GDExtension).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

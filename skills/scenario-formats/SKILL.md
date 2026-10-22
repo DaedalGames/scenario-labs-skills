@@ -87,3 +87,5 @@ as its own composition.
   ladder exists to be climbed.
 - Skipping `dry_run` on reframes: generative canvas work is the expensive step in the chain, tens of
   times an effect's price (`scenario-image-editing`).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

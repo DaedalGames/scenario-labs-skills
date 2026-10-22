@@ -219,3 +219,5 @@ Score the result with [critique.md](references/critique.md) before calling it do
   prep pass.
 - [scripts/agentkit/assets/](scripts/agentkit/assets/): `Payload`, `MeshBuild`, `AssetAudit`,
   `UGCCheck`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

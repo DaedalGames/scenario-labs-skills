@@ -89,3 +89,5 @@ established light and cast, and restate the audio.
 - Reading Extend's `duration` as total length: it counts only new footage.
 - Stacking camera moves or contradictory directions ("zoom in as the camera pulls back"): one
   dominant move per shot.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

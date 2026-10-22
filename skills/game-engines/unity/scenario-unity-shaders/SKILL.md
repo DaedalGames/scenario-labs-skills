@@ -221,3 +221,5 @@ PSO proof, 32 offline checks, all passing; evidence in `archive/tests/unity-shad
   `RendererFeatureJobs`, `VariantJobs`, `PsoJobs`, `ComputeJobs`, `GpuCostJobs`, `ShaderGraphJobs`.
 - [`scripts/Runtime/`](scripts/Runtime/): `AgentFullscreenFeature.cs`, `AgentPsoProbe.cs` (runtime
   assembly); `scripts/Shaders/` (templates).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

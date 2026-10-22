@@ -257,3 +257,5 @@ App Store Connect, Play Console, Steamworks, consoles, IAP products. Audit flags
 - [`scripts/gd_perf.py`](scripts/gd_perf.py) and [`scripts/agentkit/perf/`](scripts/agentkit/perf/)
   (`perf_stress`, `perf_fixes`, `perf_audit`, `perf_bench`, `perf_logger`, `ship_boot`,
   `web_bridge`, `mobile_touch`).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

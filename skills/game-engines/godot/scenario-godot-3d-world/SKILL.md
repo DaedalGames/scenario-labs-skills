@@ -204,3 +204,5 @@ cylinder for clean wall-run and slide normals. CharacterBody3D (GDQuest, Juli) o
 - [`references/gui-paths.md`](references/gui-paths.md): editor paths for viewport-only work, with
   the code substitute for each.
 - [`references/sources.md`](references/sources.md): videos, docs, add-ons, versions.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

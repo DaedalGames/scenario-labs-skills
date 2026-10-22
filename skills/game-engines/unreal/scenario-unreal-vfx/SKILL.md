@@ -222,3 +222,5 @@ Unreal**; `job_00_vfx_probe.py` answers the `[verify]` names.
   revision history.
 - [`scripts/ue_vfx.py`](scripts/ue_vfx.py): offline verdicts and metrics; in-editor helpers (not yet
   run).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

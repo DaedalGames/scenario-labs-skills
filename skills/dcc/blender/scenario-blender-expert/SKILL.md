@@ -187,3 +187,5 @@ Blender. Check the path in the first call (`result["ok"] = os.path.isdir(path)`)
   script.
 - `references/blender-5.2-deltas.md`: full, cited list of what changed from 2.8x to 5.2 per domain
   (load before writing code from memory or following an old tutorial).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

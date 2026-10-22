@@ -199,3 +199,5 @@ All stages run headless through scenario-maya-expert's `mx_run.py --plugins mtoa
   Painter paths for a computer-use agent or a human.
 - [`references/sources.md`](references/sources.md): sources, credentials, URLs, timestamps.
 - `scripts/mx_shade.py`: the toolkit (docstring lists every call).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

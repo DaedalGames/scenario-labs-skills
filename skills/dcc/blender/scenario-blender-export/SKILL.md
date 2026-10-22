@@ -153,3 +153,5 @@ the parts selected) for a single static prop, then gate again.
   the file. Extract Textures (Materials tab) into the model's folder assigns them.
 - An STL at Blender scale: a 10 cm part prints at 0.1 mm.
 - LODs exported without a look: decimation can collapse thin parts.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

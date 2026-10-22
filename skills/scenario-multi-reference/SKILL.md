@@ -144,3 +144,5 @@ dropped silently, so no wording brings its job back.
   not change, and move only what should.
 - **Hardcoding a model id or price.** Discover with `recommend`, read caps off `model_schema_get`,
   price with `dry_run=true`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

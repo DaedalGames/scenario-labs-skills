@@ -209,3 +209,5 @@ flips, candy-wrapper wrists, collapsing shoulders, sliding feet.
 - `references/critique.md`: the rubric; at every gate.
 - [`references/gui-paths.md`](references/gui-paths.md): menus, Profiler, HUD; when driving the GUI.
 - [`references/sources.md`](references/sources.md): sources, URLs, timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

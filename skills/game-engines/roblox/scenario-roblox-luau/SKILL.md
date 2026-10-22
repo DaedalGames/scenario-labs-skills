@@ -222,3 +222,5 @@ capture taken by hand ([GUI paths](references/gui-paths.md)).
   buffer schemas.
 - [scripts/agentkit/luau/templates/Class.luau](scripts/agentkit/luau/templates/Class.luau): typed
   class with idempotent `Destroy`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

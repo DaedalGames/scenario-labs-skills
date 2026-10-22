@@ -206,3 +206,5 @@ flag the gap.
 - [`references/sources.md`](references/sources.md): sources, credentials, URLs, timestamps.
 - [`scripts/zb_stylized.py`](scripts/zb_stylized.py): the module; reach its ZBrush side with
   `zb_stylized.call()`, not `zb_launch.call`. Tests: `tests/code/zbrush-stylized/`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

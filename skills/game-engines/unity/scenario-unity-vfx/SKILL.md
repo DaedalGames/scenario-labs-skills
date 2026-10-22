@@ -206,3 +206,5 @@ F.
   projectile glue, `VfxTier`, `VfxSeed`); [`scripts/Shaders/`](scripts/Shaders/) (`VfxUber.shader`,
   `VfxOverdraw.shader`); [`scripts/EditorGraph/`](scripts/EditorGraph/) (unsupported graph
   authoring, SDF bake).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

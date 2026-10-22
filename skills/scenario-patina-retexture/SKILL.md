@@ -167,3 +167,5 @@ defect that fades in mid-shot. A clean encoder log is not visual approval.
 - Editing the config or a script mid-run and expecting the render to resume: the fingerprint
   changed, so it starts fresh.
 - Hardcoding the PATINA id or the 17 CU figure: re-discover with `search`, re-price with `dry_run`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

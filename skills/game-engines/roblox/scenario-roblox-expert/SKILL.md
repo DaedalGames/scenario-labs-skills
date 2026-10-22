@@ -239,3 +239,5 @@ replies), process hazards, Rojo and Script Sync traps, and live corrections to t
   GUI-only steps.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs and best
   timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -104,3 +104,5 @@ Retrieval is `search` with `target="assets"`, and at least one of `query`, `filt
   not retry the same call.
 - Asking `asset_analyze` to produce an image. It returns text; control maps come from `asset_detect`
   and final renders from `model_run`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

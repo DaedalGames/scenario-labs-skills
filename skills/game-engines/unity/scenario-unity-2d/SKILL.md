@@ -207,3 +207,5 @@ platforms; input devices. Then `ut_2d.project(P)`.
   `Hazard2D`, `FallDampingSwitch`, `PlatformerAnimatorBridge`, `HitStop`, `CameraShake2D`,
   `TopDownMover2D`; [`scripts/Runtime/TwoDCinemachine/`](scripts/Runtime/TwoDCinemachine/):
   `Cinemachine2DRig`, `CinemachineFallDamping`, `CinemachineRoomSwap` (compile only with CM3).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

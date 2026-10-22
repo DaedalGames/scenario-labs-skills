@@ -200,3 +200,5 @@ Each stage is one `ut_world` call; engine calls, arguments and recorded results 
   Splines, NavMesh, multi-scene, profiling windows.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs, best
   timestamps, revision history.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

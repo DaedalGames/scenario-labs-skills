@@ -211,3 +211,5 @@ Delivers a diagnosis report plus JSON change requests with measured deltas and p
   history.
 - `scripts/ue_perf.py`: plans, A/B plans, trace analysis, suspect trees, parsers, config writers,
   proof, audits.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

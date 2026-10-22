@@ -208,3 +208,5 @@ function: `references/toolkit-map.md`.
   write lock and source control, latent work, imports, raw screenshot loop).
 - [`references/sources.md`](references/sources.md): every source, with credentials, URLs and best
   timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -87,3 +87,5 @@ snowstorm". Prompt length caps differ per member, 2000 to 5000 characters.
   shapes.
 - Passing `videos` to any Reference2V member: at authoring time only one took reference videos; read
   the schema first.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

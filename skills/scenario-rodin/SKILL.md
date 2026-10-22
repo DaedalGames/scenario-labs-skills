@@ -83,3 +83,5 @@ asset than a default generator run: `dry_run` it like any other member.
 - Handing Bang! an image as `model`: `model` is a 3D asset; the `image` guides the regenerated
   textures.
 - Freeform enum strings: values are exact, "Gen-2.5-Medium", "18K Quad", not "medium" or "18k quad".
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -74,3 +74,5 @@ generate with Gen4.5. To steer the edit, pin up to 5 reference images: `keyframe
 - Passing `aspectRatio` as `"16:9"` or alongside `image`: pixel pairs only, and a first frame
   overrides it.
 - Asking Aleph for new motion or camera moves: the source's motion persists by design.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

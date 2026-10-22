@@ -194,3 +194,5 @@ instead of a generation per frame.
   individual approved shots.
 - Re-describing the character in a reference-to-video prompt: the images carry the look; the prompt
   carries action, camera, and timing.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

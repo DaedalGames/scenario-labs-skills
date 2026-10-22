@@ -87,3 +87,5 @@ four times an Edit asset, so `dry_run` both and start with Edit.
 - Re-running for a pixel-identical result: no seed exists; keep the winning asset and edit it
   forward.
 - Shipping the 1K output to print: upscale downstream (see the `scenario-image` skill).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

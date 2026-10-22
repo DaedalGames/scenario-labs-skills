@@ -198,3 +198,5 @@ live-shot content). Comic timing and sound stay a human call (Hjalti).
   every Look gate.
 - [`references/sources.md`](references/sources.md): the seven source videos, what each is best for,
   best timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

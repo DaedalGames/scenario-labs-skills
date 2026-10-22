@@ -199,3 +199,5 @@ lifting the foot, feet, neck, clothing; faces: mouth corners, cheek squash, lids
   Deformer menus; in the GUI.
 - [`references/sources.md`](references/sources.md): sources, credentials, URLs, timestamps; to trace
   a claim.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

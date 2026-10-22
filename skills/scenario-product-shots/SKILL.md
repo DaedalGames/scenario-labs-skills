@@ -81,3 +81,5 @@ that rebuilds shadows, or name one in the edit prompt ("soft contact shadow fall
   prompt a new one.
 - One run with a batch count for "the same scene, four angles": per-angle clauses need one run each
   (`scenario-image`).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

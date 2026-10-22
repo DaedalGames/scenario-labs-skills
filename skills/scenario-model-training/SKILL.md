@@ -148,3 +148,5 @@ Nearly every `train` failure is dataset handling, not hyper-parameters.
 Voice cloning starts from the same `recommend_training` call with `modality: "voice"` and
 `dataset_shape: "short_audio"` or `"long_audio"`; the returned `type` feeds `model_create` the same
 way.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

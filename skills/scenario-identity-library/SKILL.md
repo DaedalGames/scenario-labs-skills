@@ -108,3 +108,5 @@ slot-starved; with slots to spare, prefer the individual approved shots.
   `props: ` prefixes are the lookup contract.
 - A different model per view: reference behavior differs per family; one schema-checked model
   carries the whole identity.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

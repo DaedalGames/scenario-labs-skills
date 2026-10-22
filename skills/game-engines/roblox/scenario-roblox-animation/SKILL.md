@@ -210,3 +210,5 @@ Visual (contact sheets of at most 1,600 px, `rbx_review.contact_sheet`):
   audit, FBX export, re-import and samples.
 - [`scripts/agentkit/animation/`](scripts/agentkit/animation/): AnimRig, AnimClip, AnimAudit, AnimIK
   and AnimFace Luau modules.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

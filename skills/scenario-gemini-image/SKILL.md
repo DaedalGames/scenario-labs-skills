@@ -84,3 +84,5 @@ batch, and re-estimate whenever `resolution`, `numOutputs`, references, or `useG
 - Several references with no roles: outputs blend them; say which image is which by position.
 - Enabling `useGoogleSearch` for stylistic work: it raises cost and earns it only on factual,
   real-world subjects.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

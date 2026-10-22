@@ -97,3 +97,5 @@ reproduces against a public equivalent.
 - Three problems in one issue: each needs its own reproduction and its own close.
 - Reporting the hypothesis ("the API is down") instead of the observation. Observation first,
   hypothesis last and marked as one.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

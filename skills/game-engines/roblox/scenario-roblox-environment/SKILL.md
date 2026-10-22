@@ -239,3 +239,5 @@ with its background; no plastic or near-black materials; distance haze leaves si
   [`WorldCheck`](scripts/agentkit/environment/WorldCheck.luau),
   [`lune_env_audit`](scripts/agentkit/environment/lune_env_audit.luau),
   [`rbx_environment.py`](scripts/rbx_environment.py).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

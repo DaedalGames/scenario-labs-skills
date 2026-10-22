@@ -89,3 +89,5 @@ pipeline the `scenario-3d-worlds` skill teaches end to end.
   keep 2:1 (for example 2048x1024) for correct 360 viewing.
 - Skipping `model_schema_get`: skybox models carry model-specific fields (style,
   geometryEnforcement, quality) that generic assumptions miss.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

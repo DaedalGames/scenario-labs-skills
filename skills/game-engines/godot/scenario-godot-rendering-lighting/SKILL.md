@@ -223,3 +223,5 @@ Observed in 4.7.2 ([`references/expert-notes.md`](references/expert-notes.md), O
 - [`scripts/gd_lighting.py`](scripts/gd_lighting.py) and
   [`scripts/agentkit/rendering/`](scripts/agentkit/rendering/): lookdev, light_audit, sweep,
   gi_bake, graphics_tiers, compositor_tools, compositor/.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

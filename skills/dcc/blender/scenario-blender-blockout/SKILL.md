@@ -244,3 +244,5 @@ guard steps out at second 6; handheld 35 mm backing away."
   flat ground read flat.
 - **State drift**: render probes that leave resolution or file path changed; pre-existing objects
   adopted as your own; Blender 5 slotted actions hiding F-curves (use `B.fcurves`).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

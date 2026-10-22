@@ -218,3 +218,5 @@ views plus the closest shot; overlap diff images (red: high outside the low). Sc
   Retopologize, test bind, UV Toolkit).
 - [`references/sources.md`](references/sources.md): every source with credentials, URL and
   timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

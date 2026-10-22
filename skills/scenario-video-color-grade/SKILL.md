@@ -171,3 +171,5 @@ music. The grades themselves cost nothing.
   loop breaks. The scripts avoid it; keep it that way in custom commands.
 - **Grading alone.** Grading is taste: show grids and short previews, and iterate on what the user
   points at.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

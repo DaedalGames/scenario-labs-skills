@@ -190,3 +190,5 @@ More measured values: [`references/expert-notes.md`](references/expert-notes.md)
 - `scripts/ut_web.py`, `scripts/AgentKit/Web/WebJobs.cs`,
   [`scripts/AgentKitOptional/`](scripts/AgentKitOptional/) (Addressables job, EditMode policy
   tests), `scripts/WebRuntime/` (bridge, error reporter, `.jslib`, AgentWeb template).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

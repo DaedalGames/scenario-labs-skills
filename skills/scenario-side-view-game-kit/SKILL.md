@@ -181,3 +181,5 @@ with a pickaxe, and two levels, a mushroom forest and a crystal mine." Pass `tea
   another provider (same `recommend`, `endImage` feature kept) per `scenario-moderation` before
   softening the beat.
 - **Lossy sprite strips.** Lossy WebP shifts the shared palette; only the HD layers ship lossy.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

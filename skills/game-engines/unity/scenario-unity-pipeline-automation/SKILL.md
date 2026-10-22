@@ -211,3 +211,5 @@ this Mac against a 200-FBX Blender drop: `tests/code/unity-pipeline-automation/`
   content tests), [`scripts/AgentKit/PipelineCli/`](scripts/AgentKit/PipelineCli/),
   [`scripts/Runtime/`](scripts/Runtime/),
   [`scripts/templates/PipelineAsmdef/`](scripts/templates/PipelineAsmdef/): the code.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

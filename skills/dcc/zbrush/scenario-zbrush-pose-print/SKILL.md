@@ -197,3 +197,5 @@ Seam smoothing and Move Topological have agent forms in `procedures.md` P6, stil
 - [`scripts/zb_pose.py`](scripts/zb_pose.py) (inside ZBrush) and
   [`scripts/zb_print.py`](scripts/zb_print.py) (agent side, numpy): offline tests in
   `tests/code/zbrush-pose-print/`; live tests `live_p01` to `live_p08` not yet run in ZBrush.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

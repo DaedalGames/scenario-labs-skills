@@ -84,3 +84,5 @@ pin what must not move ("Change X to Y. Keep Z exactly as it is."). One scene or
   `model_schema_get` instead of assuming.
 - Carrying the Max member's reference cap or price to the standard one: they share field names, not
   numbers.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

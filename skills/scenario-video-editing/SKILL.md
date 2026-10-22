@@ -137,3 +137,5 @@ reads its asset.
 - Polling `job_get` in a loop instead of `jobs_wait`, whose timeout is not an error.
 - Trusting a Grain profile to add grain: the 22 profiles are looks, not intensities, and some soften
   the picture instead. Compare a frame against the input.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

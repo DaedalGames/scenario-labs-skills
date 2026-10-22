@@ -217,3 +217,5 @@ claim cites it ([gui-paths.md](references/gui-paths.md)). The full rubric is in
   Client windows, compare with a noise floor, profiler wrappers.
 - [scripts/agentkit/performance/](scripts/agentkit/performance/): `PerfProbe`, `ScriptProf`,
   `MicroProf`, `HeapProf`, `SceneScan`, `PerfAudit`, `lune_perf_audit.luau`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

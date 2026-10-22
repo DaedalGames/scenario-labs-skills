@@ -210,3 +210,5 @@ data:Start()
 - [scripts/rbx_data.py](scripts/rbx_data.py): budget, ProfileStore fetch, place build, probe, audit.
 - [scripts/agentkit/data/](scripts/agentkit/data/): MockDataStore, ServerSim, DataCheck, Migrate,
   KeyQueue, Receipts, Trade, PlayerData, SafeTeleport, DataAudit.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

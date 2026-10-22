@@ -194,3 +194,5 @@ via `zb_character.call(...)`, OBJ, alpha and render checks) on the lead's toolki
   computer-use agent.
 - [`references/sources.md`](references/sources.md): sources, credentials, URLs, best timestamps,
   revision log.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

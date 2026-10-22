@@ -221,3 +221,5 @@ in grayscale (Rawb Herb).
   timestamps.
 - [`scripts/gd_ui.py`](scripts/gd_ui.py), [`scripts/agentkit/ui/*.gd`](scripts/agentkit/ui/),
   [`scripts/agentkit/ui/examples/build_g7.gd`](scripts/agentkit/ui/examples/build_g7.gd).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

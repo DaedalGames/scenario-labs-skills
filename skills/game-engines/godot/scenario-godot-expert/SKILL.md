@@ -243,3 +243,5 @@ Metal profiling; then the Windows paths and the `PYTHONUTF8=1` rule.
   tasks.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs and best
   timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

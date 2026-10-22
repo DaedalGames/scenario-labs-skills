@@ -216,3 +216,5 @@ export [verified], so the file looks complete.
 - [`references/face-shapes.md`](references/face-shapes.md): ARKit, viseme and Roblox FACS names with
   their sources; load when naming face shapes for an engine or capture app.
 - [`references/sources.md`](references/sources.md): videos, experts, best timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

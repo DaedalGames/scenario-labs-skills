@@ -219,3 +219,5 @@ Each stage is an `ue_run` job or a live call; code in procedures (P-numbers).
 - [`references/gui-paths.md`](references/gui-paths.md): editor menus for every procedure.
 - [`references/sources.md`](references/sources.md): sources, credentials, URLs, timestamps, revision
   history.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

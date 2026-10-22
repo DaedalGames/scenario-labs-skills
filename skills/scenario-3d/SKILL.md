@@ -227,3 +227,5 @@ place an `outputFormat` enum picks the engine target.
   member does not document: pick the closest body plan, then finish in a DCC.
 - Sending a biped to a `rigType` model: the enum has no biped value; humanoids have their own
   riggers.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

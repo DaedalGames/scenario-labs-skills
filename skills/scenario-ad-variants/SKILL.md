@@ -114,3 +114,5 @@ asks for sound.
   campaign experiment.
 - Source reconstruction is not byte identity after re-encoding. Check preserved content and measured
   synchronization; promise lossless delivery only when the route supports it.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

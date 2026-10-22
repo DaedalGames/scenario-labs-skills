@@ -201,3 +201,5 @@ not locked.
   thresholds and their calibration, how these animators phrase notes; load at every gate.
 - [`references/sources.md`](references/sources.md): the 14 source videos, what each is best for,
   best timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -86,3 +86,5 @@ Video to Music and mix in post. Music comes back instrumental.
 - Packing sequenced events into one Text to SFX prompt: it has no timing control; one event per run.
 - Asking any member for speech or vocals: no member produces dialogue, narration, or singing; SFX
   and instrumental music are the whole surface.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -146,3 +146,5 @@ two minutes: wait through `jobs_wait` rather than re-running.
   succeeds at a different size, and an over-wide edit source gains white bands.
 - Leaving `inputFidelity` at its high default on 1.5 when you wanted reinterpretation: drop it to
   low and re-`dry_run`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

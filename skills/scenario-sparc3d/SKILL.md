@@ -74,3 +74,5 @@ polling.
   `resolution` on 2.0 Portrait.
 - Expecting `pbr` to texture a mesh-only run: it acts only when `requestType` asks for texture.
 - Sending a creature or prop to Portrait: a head and face specialist, not a higher-quality tier.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

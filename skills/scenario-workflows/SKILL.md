@@ -108,3 +108,5 @@ contiguous nor ordered.
   Find the run with `jobs_list`, read it with `job_get` `verbose=true` (compact replies omit
   `metadata`): `metadata.flow` lists per-node statuses, the pending approval node's id is `node_id`,
   the job's id is `workflow_job_id`, its `workflowId` the `workflow_id`. Reject cancels the run.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

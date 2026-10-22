@@ -193,3 +193,5 @@ walls. A straight-down shiny view saturates white: use matcap or hsgrey from the
   and deciding conditions, with timestamps. Load when a choice is not covered here.
 - [`references/sources.md`](references/sources.md): the nine videos, who, what each is best for,
   best timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

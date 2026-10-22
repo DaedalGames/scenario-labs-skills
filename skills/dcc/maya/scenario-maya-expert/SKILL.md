@@ -194,3 +194,5 @@ to Maya's `sys.path`, so `Bridge().call("mx_audit", "audit", "crate_geo")` works
   with what each is best for.
 - Related skills outside this set: scenario-3d (generate meshes to finish in Maya),
   scenario-zbrush-expert and scenario-blender-expert (sister teams with the same protocol).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

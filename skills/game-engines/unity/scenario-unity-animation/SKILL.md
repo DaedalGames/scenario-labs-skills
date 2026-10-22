@@ -203,3 +203,5 @@ reads): `references/procedures.md`.
 - [`references/gui-paths.md`](references/gui-paths.md): windows and menus for the same work.
 - [`references/sources.md`](references/sources.md): every source, credential, URL, best timestamps,
   revision history.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

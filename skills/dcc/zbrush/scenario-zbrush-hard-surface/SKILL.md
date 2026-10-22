@@ -210,3 +210,5 @@ Toolkit: [`scripts/zb_hardsurface.py`](scripts/zb_hardsurface.py)
 - [`references/gui-paths.md`](references/gui-paths.md): palettes, hotkeys, brushes; load when a step
   is GUI only.
 - [`references/sources.md`](references/sources.md): every source, credential, URL and timestamp.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

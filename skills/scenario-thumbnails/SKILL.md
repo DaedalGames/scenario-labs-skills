@@ -119,3 +119,5 @@ new overlay, not another image generation.
 - Decorative UI, rewards and mechanics that were never supplied misrepresent the game.
 - Readability and reference fidelity are observable; click-through improvement is not established by
   a thumbnail review.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -219,3 +219,5 @@ and write its answers into the plan.
 - [`references/sources.md`](references/sources.md): sources, credentials, URLs, best timestamps,
   revision history.
 - `scripts/ut_arch.py`, `scripts/AgentKit/Architecture/*.cs`, `scripts/templates/`: the tested code.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

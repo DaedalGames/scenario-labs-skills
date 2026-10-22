@@ -17,6 +17,17 @@ which commit types release and which files release-please owns.
 - Merging the release PR tags `skills-vX.Y.Z`, titles the GitHub release `skills: vX.Y.Z`, rewrites
   `CHANGELOG.md`, `version.txt`, and `.release-please-manifest.json`, and publishes the GitHub
   release.
+- Every SKILL.md ends with `<!-- scenario-skills-version: X.Y.Z x-release-please-version -->`, so an
+  agent holding an installed copy, and the Scenario MCP server it talks to, can tell how old the
+  copy is.
+  - It is a body comment, not frontmatter, because Claude Code strips frontmatter before the agent
+    sees a skill.
+  - The `extra-files` entry `skills/**/SKILL.md` (`"glob": true`) makes the release PR rewrite every
+    stamp, new skills included, since release-please expands the glob over `main` at release time.
+  - `pnpm stamp` writes the stamps from `version.txt`; `pnpm stamp:check` fails validation and CI on
+    a missing or stale stamp, or when the `extra-files` entry is gone.
+  - A PR opened before a release and merged after it carries the older version; rerun `pnpm stamp`
+    after rebasing. The next release PR rewrites it anyway.
 - `.github/workflows/publish-changelog.yml` then posts the notes to the public changelog at
   [scenario.com/changelog](https://www.scenario.com/changelog). It hangs off the
   `release: published` event, not the release-please run, because release-please reports a created

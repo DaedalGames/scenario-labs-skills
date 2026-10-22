@@ -84,3 +84,5 @@ deliberately never repeated.
   the lens, posed, evenly lit, everything in focus, a processed gloss. Every axis a prompt leaves
   open (framing, moment, lens, time of day, light) is filled with the model's most average answer,
   so name each one.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

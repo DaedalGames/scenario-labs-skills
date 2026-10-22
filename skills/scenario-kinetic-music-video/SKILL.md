@@ -260,3 +260,5 @@ Skip this for a graphics-only video, apart from any stills or 3D props. Otherwis
   agent reads
 - [references/lessons.md](references/lessons.md): production gotchas and direction defaults that
   held
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

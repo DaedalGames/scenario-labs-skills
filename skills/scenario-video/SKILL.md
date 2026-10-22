@@ -215,3 +215,5 @@ the song.
 - Excluding music in an audio-enabled prompt: the soundtrack is moderated on its own, and "no music"
   or a named genre or instrument trips it even inside an exclusion. Describe diegetic sound
   positively ("room tone, footsteps, one voice"), or turn the audio field off.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

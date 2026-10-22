@@ -222,3 +222,5 @@ scenario-unreal-performance as archive path, UAT verdict, BootTest result and ch
   history.
 - `scripts/ue_pipeline.py`, [`scripts/ue_pipeline_job.py`](scripts/ue_pipeline_job.py),
   [`scripts/ue_contact_sheet_job.py`](scripts/ue_contact_sheet_job.py).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -201,3 +201,5 @@ across levels; the budget (default: idle HUD adds no GC, 1 batch, 0 panel change
   menus.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs and best
   timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

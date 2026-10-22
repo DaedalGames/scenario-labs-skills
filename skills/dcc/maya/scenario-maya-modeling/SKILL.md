@@ -215,3 +215,5 @@ two-sided lighting off or backface culling. Judge with
 - [`references/gui-paths.md`](references/gui-paths.md): menus and hotkeys for a GUI or computer-use
   session.
 - [`references/sources.md`](references/sources.md): sources, credentials, best timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

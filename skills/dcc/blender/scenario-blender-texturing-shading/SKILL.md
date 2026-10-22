@@ -186,3 +186,5 @@ per-layer mute renders each add something (Price); scale against a human referen
 - [`references/critique.md`](references/critique.md): rubric for judging your own renders and node
   trees.
 - [`references/sources.md`](references/sources.md): every source video, credential, best timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

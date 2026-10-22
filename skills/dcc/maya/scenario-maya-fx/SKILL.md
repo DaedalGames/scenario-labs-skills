@@ -220,3 +220,5 @@ every Maya call is **not yet run in Maya**; names marked [verify] are answered b
 - [`references/sources.md`](references/sources.md): every source, credential, URL and best
   timestamps.
 - `scripts/mx_fx.py`: the toolkit (docstring lists every function). Tests: `tests/code/maya-fx/`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

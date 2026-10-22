@@ -160,3 +160,5 @@ back flagged.
   unrelated.
 - Reading an empty model list as moderation: a team blocklist or a plan restriction removes models
   before any prompt is judged.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

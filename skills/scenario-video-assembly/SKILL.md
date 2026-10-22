@@ -131,3 +131,5 @@ Trim, split and resize have their own tool models. Note `model_scenario-video-cu
   the most structurally complex in the catalog.
 - Captioning a concatenated master before checking its sync: the captioner times its lines to the
   audio it hears, so drifted audio ships drifted captions on top of it.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

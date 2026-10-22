@@ -104,3 +104,5 @@ into the conversation.
 - Sending `workflow_id` to `workflow_copy`: get, update, publish, run and delete take `workflow_id`,
   but copy takes `source_workflow_id`; the copy inherits everything verbatim and needs its own
   publish.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -205,3 +205,5 @@ enemies at 10 Hz, one mixer Master > Music, SFX, UI.
 - [`scripts/AgentKit/Gameplay/`](scripts/AgentKit/Gameplay/): editor jobs.
   [`scripts/Runtime/`](scripts/Runtime/): brains, director, hub, queries, sweeps, coupling, Burst
   jobs, meters, pools, audio, controller, netcode model.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

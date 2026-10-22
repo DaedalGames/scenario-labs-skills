@@ -101,3 +101,5 @@ criteria and report the checks it did not get.
 - Laying music on the drafts and completing those: the completion carries only what the draft
   generated. Review copies with music are fine; lay the delivery audio once, on the completion.
 - Ranking from one look at the first take, or from contact sheets alone.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

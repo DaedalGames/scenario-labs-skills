@@ -224,3 +224,5 @@ account or a signalling server. Verify against the installed release before quot
   Profiler), [`references/sources.md`](references/sources.md).
 - [`scripts/gd_net.py`](scripts/gd_net.py),
   [`scripts/agentkit/multiplayer/`](scripts/agentkit/multiplayer/): the harness and kit.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

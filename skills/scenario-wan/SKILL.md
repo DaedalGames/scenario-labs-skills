@@ -97,3 +97,5 @@ which 2.6 lip-syncs. Video Edit's `audioSetting` decides the track: `origin` kee
   other member reads brackets.
 - Re-describing the still or requesting content changes in an I2V prompt: I2V animates; Video Edit
   changes content.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

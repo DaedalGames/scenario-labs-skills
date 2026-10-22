@@ -86,3 +86,5 @@ output inherits the source's proportions, so reframe before the edit, never with
 - Carrying `quality` beyond 2.0: at authoring time no other member had the field; check the live
   schema before reusing parameters across members.
 - Fine print at 1k: small type blurs; render text-heavy finals at 2k.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

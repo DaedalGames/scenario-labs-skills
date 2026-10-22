@@ -212,3 +212,5 @@ pass. Full table: procedures P15.
   spec checks, trace analysis, handoffs; in-editor helpers (not yet run).
 - [`scripts/ue_gameplay_cpp.py`](scripts/ue_gameplay_cpp.py): C++ source templates (logic in a C++
   base class, data-only Blueprint children); not yet compiled.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

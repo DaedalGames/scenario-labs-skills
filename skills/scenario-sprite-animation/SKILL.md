@@ -188,3 +188,5 @@ listings, timestamps, or `search`.
 - Softening an attack brief after a moderation block: the filter is the provider's, so try another
   general image model first per `scenario-moderation`, grid spec unchanged; rewording the beats
   loses what the lane exists to honor.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

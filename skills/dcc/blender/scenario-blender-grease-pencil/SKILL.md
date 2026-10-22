@@ -201,3 +201,5 @@ against [`references/critique.md`](references/critique.md).
   load at every review gate.
 - [`references/sources.md`](references/sources.md): the five source videos, what each is best for,
   best timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

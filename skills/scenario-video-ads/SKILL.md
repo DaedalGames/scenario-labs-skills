@@ -81,3 +81,5 @@ approval.
   from one board instead.
 - Shipping without the pre-flight: a sensual perfume cut or a wrong-length CTV file dies in ad
   review, not in generation.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

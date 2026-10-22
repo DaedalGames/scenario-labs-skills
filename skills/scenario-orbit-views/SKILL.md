@@ -114,3 +114,5 @@ three need Python with Pillow and numpy. Each prints its usage when run without 
 - Passing more than 32 ids to `jobs_wait`, or polling `job_get`.
 - Trusting a view without looking: check contact sheets for extra limbs, wrong sides, and leftover
   gray clay.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

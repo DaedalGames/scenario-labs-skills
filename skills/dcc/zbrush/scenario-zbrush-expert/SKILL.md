@@ -210,3 +210,5 @@ zl.stop()
 - [`references/zbrush-2026-traps.md`](references/zbrush-2026-traps.md): automation and modeling
   traps with fixes. Load when a call does nothing, hangs, or a tutorial step does not match 2026.
 - [`references/sources.md`](references/sources.md): every source, with credentials and URLs.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

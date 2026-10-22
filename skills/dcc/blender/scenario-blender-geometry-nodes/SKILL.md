@@ -176,3 +176,5 @@ only.
   best timestamps.
 - `scripts/bx_gn.py`: builder, modifier, evaluation, simulation, snapshot helpers and recipes
   (docstrings list the traps).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

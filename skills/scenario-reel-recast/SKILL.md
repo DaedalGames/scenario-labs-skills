@@ -128,3 +128,5 @@ Outcomes at authoring time, best first:
 - Promising to keep an approved performer while changing only the room: every edit re-renders the
   performer, so a room change means new takes. Say so before spending (unattended: run the new takes
   from the approved prompt and report it).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

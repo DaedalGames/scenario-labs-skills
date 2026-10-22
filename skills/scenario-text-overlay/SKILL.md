@@ -113,3 +113,5 @@ face turns generic.
   Chromium-family browser installed.
 - Trusting `wrap` with a hard box: it lets text spill below; use `shrink` (fits or fails loudly) or
   `clip` when the box is binding.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

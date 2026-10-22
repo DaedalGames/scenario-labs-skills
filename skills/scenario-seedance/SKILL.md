@@ -141,3 +141,5 @@ failed job id.
 - Rendering captions, prices, logos, or UI: reserve clean space and composite text in post.
 - Retrying an output moderation block on Seedance or a Seedance sibling: the filter is the family's,
   so switch provider first (the `scenario-moderation` skill).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

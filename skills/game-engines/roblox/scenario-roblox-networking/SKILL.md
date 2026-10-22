@@ -223,3 +223,5 @@ Score the result with [critique.md](references/critique.md) before calling it do
   helpers.
 - [scripts/agentkit/networking/](scripts/agentkit/networking/): `Guard`, `RateLimit`, `Suspicion`,
   `Net`, `HitCheck`, `MoveGuard`, `Exploit`, `NetAudit`, `lune_net_audit.luau`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

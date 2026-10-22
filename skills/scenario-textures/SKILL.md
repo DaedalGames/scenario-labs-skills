@@ -97,3 +97,5 @@ flag the gap.
   defaults to 1024x1024, 1:1). The generator accepts any multiple of 16, so choose 1024 or 2048
   deliberately.
 - Hardcoding model IDs: availability differs per team. Re-discover each session.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

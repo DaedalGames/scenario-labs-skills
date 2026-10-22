@@ -229,3 +229,5 @@ Redshift, vector displacement and full rows: `rx.RENDERERS`, `references/procedu
   for a human or computer-use agent.
 - [`references/sources.md`](references/sources.md): every source with credential, URL and best
   timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

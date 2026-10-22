@@ -251,3 +251,5 @@ modals `screen_capture` misses: ask the user ([gui-paths.md](references/gui-path
   [tools/place_versions.luau](scripts/template/tools/place_versions.luau),
   [tools/restart_servers.luau](scripts/template/tools/restart_servers.luau) and
   [tools/testkit/EngineTests.luau](scripts/template/tools/testkit/EngineTests.luau).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

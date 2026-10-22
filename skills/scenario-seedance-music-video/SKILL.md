@@ -111,3 +111,5 @@ that would clip, or delivered audio that is not the master.
 - Trusting the beat grid: sections and cut candidates are suggestions; check them against what you
   hear.
 - Calling it done without watching the delivery with sound, then muted.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

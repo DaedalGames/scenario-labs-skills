@@ -167,3 +167,5 @@ so do not take that pick.
   duration, the second loses the song; the extend lane above keeps the slices the user chose.
 - Putting `dry_run` or `wait` inside `parameters`: they are `model_run`'s own arguments, so a stray
   `dry_run` still charges and a stray `wait` blocks up to 180s.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

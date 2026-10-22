@@ -113,3 +113,5 @@ and adds the two look rows.
 - Changing the pet's id on a rename: Codex finds the pet by its folder, so keep the id and change
   `displayName`.
 - Handing a v2 result to someone uploading on ChatGPT web: give them `package/spritesheet-v1.png`.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

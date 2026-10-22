@@ -232,3 +232,5 @@ their depth order, and leave scroll speeds and looping to the engine.
 - Single-sampling lettered assets: the same recipe can render one word and fail another (dark
   embossed text, not the reference typography). Generate several samples per run (schema's
   sample-count parameter) and pin exact hex colors in the prompt when the palette drifts.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

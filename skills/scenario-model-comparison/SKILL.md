@@ -135,3 +135,5 @@ criteria.
 - Shipping the sheet as the deliverable: the table with costs and criteria is the result; the sheet
   is evidence.
 - Pasting signed download URLs into the report: file the assets and share the asset ids.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

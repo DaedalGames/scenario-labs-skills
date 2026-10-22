@@ -206,3 +206,5 @@ Viewport captures only after `G.viewport_aa(True)` (FlippedNormals, Fernandez). 
   (computer-use agent).
 - [`references/sources.md`](references/sources.md): every source, credentials, URLs, best
   timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

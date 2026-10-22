@@ -133,3 +133,5 @@ timeout. A world takes several minutes; a timeout is not a failure and never jus
   second run.
 - Running heavy local jobs in parallel (calibration, mesh conversion, splat level-of-detail builds):
   run them one or two at a time.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

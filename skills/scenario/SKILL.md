@@ -240,3 +240,5 @@ Uploading and filing alone are not publication.
   a capability.
 - Filtering `models_list` by `type` without `privacy: "public"`: a 400 says so. A private listing
   narrows by `status` or `modality`, or goes through `search` (private by default).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

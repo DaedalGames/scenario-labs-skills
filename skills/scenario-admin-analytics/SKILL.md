@@ -155,3 +155,5 @@ job counts, a three-month CSV, and a PDF."
   complete usage.
 - Calling CU "adoption rate" without a denominator, exposing customer snapshots, or using a non-MCP
   fallback.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

@@ -225,3 +225,5 @@ reproduces one piece of evidence before building on it.
 - [`references/gui-paths.md`](references/gui-paths.md): windows and menus for the same tasks.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs, timestamps;
   revision history.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

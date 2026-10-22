@@ -210,3 +210,5 @@ OpenGLES3, Minimal stripping to start.
   store consoles.
 - [`references/sources.md`](references/sources.md): every source with credentials, URLs, best
   timestamps, and the revision history.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

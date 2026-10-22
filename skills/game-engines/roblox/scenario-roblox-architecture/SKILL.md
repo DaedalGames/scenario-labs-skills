@@ -242,3 +242,5 @@ recorded results are in [`references/procedures.md`](references/procedures.md).
   the Lune runners.
 - [`scripts/templates/arena/`](scripts/templates/arena/): the tested arena core and its audit
   fixtures.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

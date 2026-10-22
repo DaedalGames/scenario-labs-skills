@@ -91,3 +91,5 @@ shot's exit pose to the next shot's entry.
 - Abandoning a moderation-blocked action beat: providers can reject a weapon or fight panel
   (`moderation_blocked`); soften that panel's clause, de-emphasizing the weapon, and re-run from the
   baseline.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

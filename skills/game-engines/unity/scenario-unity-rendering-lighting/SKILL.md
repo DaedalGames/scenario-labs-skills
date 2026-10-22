@@ -195,3 +195,5 @@ args in `<job>/args.json`, result on the `AGENT_RESULT` line. Full code and resu
 - [`scripts/ut_lighting.py`](scripts/ut_lighting.py),
   [`scripts/AgentKit/Lighting/*.cs`](scripts/AgentKit/Lighting/),
   [`scripts/Runtime/*.cs`](scripts/Runtime/) (player helpers: verification builds only).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

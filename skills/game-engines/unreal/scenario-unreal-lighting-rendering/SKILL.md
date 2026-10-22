@@ -211,3 +211,5 @@ call.
 - [`references/sources.md`](references/sources.md): every source, credential, URL, best timestamps,
   revision history.
 - `scripts/ue_light.py`: the toolkit; its docstring lists every call and where it runs.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

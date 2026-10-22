@@ -183,3 +183,5 @@ maps, `bake_review` sheet (high, low, low + maps), `map_problem_review` when san
 - [`references/sources.md`](references/sources.md): videos, credentials, URLs, best timestamps, web
   references.
 - `scripts/bx_uvbake.py`: the module (docstrings list every function).
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

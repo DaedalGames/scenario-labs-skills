@@ -132,3 +132,5 @@ background" there yields an opaque image.
 - Setting `fontNameH1` and `fontFileH1` together on Layerize: a tier's font comes from a font name
   or a font file, never both. `upload_asset` has no font kind, so with only a local font file use
   the font name route and flag the gap.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

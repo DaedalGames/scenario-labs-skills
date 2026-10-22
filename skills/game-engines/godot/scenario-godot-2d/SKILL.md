@@ -200,3 +200,5 @@ shadows from the right side). Rubric: critique.md.
 - [`scripts/gd_2d.py`](scripts/gd_2d.py): settings, import audit, pixel-grid checks, jump maths,
   placeholder atlases. [`scripts/agentkit/2d/`](scripts/agentkit/2d/): tileset, terrain, dual grid,
   bodies, cameras, pixel viewport, sprite frames, parallax, audit, light shader.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

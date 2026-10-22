@@ -189,3 +189,5 @@ held), then the cage alone: it must read without subdivision (Kaspar Finale [01:
   face, body, clothing or game mesh.
 - `references/critique.md`: the rubric to judge your own retopo. Load at every review.
 - [`references/sources.md`](references/sources.md): all 24 source videos with best timestamps.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->

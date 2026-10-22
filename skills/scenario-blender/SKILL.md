@@ -145,3 +145,5 @@ panorama goes into the World through `prepare_result_application` with `purpose:
   was quoted, submitted or changed, so call again. Missing credentials in the extension's
   preferences keep the catalog from loading.
 - Assuming the file is saved: no tool saves the `.blend`, so ask the user to save it.
+
+<!-- scenario-skills-version: 0.59.0 x-release-please-version -->
