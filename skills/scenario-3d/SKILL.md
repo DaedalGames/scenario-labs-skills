@@ -37,7 +37,7 @@ Sequence for "make a 3D treasure chest prop".
   retexture). An entry marked `requires_plan_upgrade` fails with a 403
   (`ModelAccessRestrictedError`) only after earlier steps were paid: settle the upgrade or pick
   another member first. If the `img23d` call answers `ask_user` about existing concepts, take the
-  concept-image branch unless the user asked for a prompt-only build: step 1 makes them.
+  concept-image branch: step 1 makes them.
 - **Batch price.** Price per asset from one real concept: `dry_run` each candidate on it (later legs
   per step 4), times the count. At authoring time one LLM-based member quoted 1,300 CU at its
   default effort, a single-image Tripo generator 45. Past the plan's credits, each job's wait grows
@@ -56,29 +56,30 @@ Sequence for "make a 3D treasure chest prop".
    - reconstruct one object from 1 to 8 photos or renders into an editable mesh with named parts and
      per-part PBR materials;
    - suit props and hard-surface subjects, not characters or creatures;
-   - also build from a prompt alone (`txt23d`): `images` empty, `prompt` describing the object. Skip
-     step 1 then only when the user wants no concept to approve. Name the parts the user needs in
-     `prompt`: a chest's `lid`, `body`, and `padlock` came back as those node names. A `standard`
-     build took about 15 minutes at authoring time;
    - price by `buildEffort`: `standard`, `high` (the default), `maximum`;
    - cap the exported triangle count with `faceBudget` (10k to 50k for a game-ready asset; the
      default is not game-ready);
    - change a result by editing it (see Refining meshes).
 3. `model_schema_get` on the chosen model: 3D schemas vary widely (single image or multi-view
    arrays, polycount targets, PBR toggles, topology).
-4. `model_run` with `parameters={"image": "asset_xxx", ...}` (field names from step 3; `images: []`
-   on the prompt-only route) and `dry_run=true` to price it. Then run it for real with `wait=false`
-   and pass its `job_id` to `jobs_wait` (`job_ids=["<job_id>"]`); a dry run creates no job. Re-call
-   `jobs_wait` with the returned `pending_job_ids` if it times out. A downstream step (rig,
-   retexture) has no payload to `dry_run` until its input mesh exists: quote it from `recommend`,
-   then re-price with `dry_run` on the real asset before launching. Never `dry_run` it with a
-   placeholder id: file ids resolve before plan access is checked, so it returns 404 and proves
-   nothing.
+4. `model_run` with `parameters={"image": "asset_xxx", ...}` and `dry_run=true` to price it. Then
+   run it for real with `wait=false` and pass its `job_id` to `jobs_wait` (`job_ids=["<job_id>"]`);
+   a dry run creates no job. Re-call `jobs_wait` with the returned `pending_job_ids` if it times
+   out. A downstream step (rig, retexture) has no payload to `dry_run` until its input mesh exists:
+   quote it from `recommend`, then re-price with `dry_run` on the real asset before launching. Never
+   `dry_run` it with a placeholder id: file ids resolve before plan access is checked, so it returns
+   404 and proves nothing.
 5. `asset_display` the output `asset_id`, then `asset_download` with `format: "glb"` and
    `curl -L -o chest.glb "<url>"`. `format` converts to `glb`, `fbx`, or `obj`; omitted, it returns
    the stored original, a Blender file for the LLM-based members. Ask for `fbx` for a Unity project
    without a glTF importer, and keep the GLB too: at authoring time the FBX embedded only two
    images, so it may miss PBR maps.
+
+**Prompt-only build.** The two LLM-based members also build from text alone (`txt23d`). When the
+user wants no concept to approve, skip step 1 and run steps 3 to 5 on either member with
+`images: []` and `prompt` describing the object. Name the parts the user needs in `prompt`: a
+chest's `lid`, `body`, and `padlock` came back as those node names. A `standard` build took about 15
+minutes at authoring time.
 
 Multi-view models take several images of one subject; read the count and fields off
 `model_schema_get`. Side fields follow the subject: on the Tripo multi-view members at authoring
