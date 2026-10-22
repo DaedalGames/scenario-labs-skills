@@ -5,9 +5,10 @@
 accept = ["200..=299", "429"]
 
 exclude = [
-  # Bot protection answers every automated request with 403.
+  # Bot protection answers automated requests with 403 (x.com only from CI runners).
   '^https://discussions\.unity\.com/',
   '^https://polycount\.com/',
+  '^https://x\.com/',
   # A URL pattern named in prose, read as a link.
   '^https://devforum\.roblox\.com/t/$',
   # A bare URL whose id holds two underscores, which Markdown reads as emphasis
