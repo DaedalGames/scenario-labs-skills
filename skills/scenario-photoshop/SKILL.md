@@ -90,7 +90,7 @@ Lanes, with the capture and landing each one takes:
 | Lane                | `capture_reference` `purpose`                                     | `prepare_result_application` `purpose` |
 | ------------------- | ----------------------------------------------------------------- | -------------------------------------- |
 | `image`             | none; quote with `canvas` {box} or `new_document` {width, height} | `new_layer` or `new_document`          |
-| `edit`              | `edit`, from a `selection`                                        | `edit_selection`                       |
+| `edit`              | `edit`, from a `selection`                                        | `edit_selection`, or `new_layer`       |
 | `upscale`           | `upscale`                                                         | `new_document`                         |
 | `expand`            | `expand`, with `expand` {left, top, right, bottom}                | `expand`                               |
 | `remove_background` | `remove_background`                                               | `cutout_mask`                          |
@@ -155,8 +155,8 @@ Errors that set the next step:
    `idempotency_key` such as `"lantern-edit-7f3a"`. It returns `local_id` and `awaiting_approval`:
    the user clicks **Approve**.
 7. `wait_for_job` with `{"local_id": "<local_id>"}` until `ready`. `inspect_result_previews`: keep
-   the takes with `edited` and `seam_ok` true and `polarity_suspect` false, and show them to the
-   user. A take that fails is never landed.
+   the takes with `aspect_ok`, `edited` and `seam_ok` true and `polarity_suspect` false, and show
+   them to the user. A take that fails is never landed.
 8. `prepare_result_application` with
    `{"local_id": "<local_id>", "expected_revision": <revision>, "purpose": "edit_selection", "takes": [<kept take numbers>]}`
    (`revision` from the last `wait_for_job`, takes counted from 1). Read `review` and `warnings`
