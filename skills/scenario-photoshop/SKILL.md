@@ -134,6 +134,8 @@ Errors that set the next step:
   again.
 - A job that ends `not_sent` (declined, card expired, rate limited after Approve) spent nothing; a
   new run needs a new quote, a new key and the user's yes.
+- `NotSignedIn`: no Scenario key in the panel; ask the user to sign in there. `DryRunCreatedJob`:
+  price checks are stopped for this session; tell the user.
 - `RequestInFlight`: the same request is running (find it with `list_local_jobs`) or `uncertain`
   (shown as Unknown; the user resolves it in **Jobs**).
 - `ApplicationExpired`, `ApplicationUsed`: call `prepare_result_application` again.
@@ -168,12 +170,13 @@ Errors that set the next step:
 7. `wait_for_job` with `{"local_id": "<local_id>"}` until `ready`. `inspect_result_previews`: keep a
    take when `aspect_ok` and `edited` are true and no badge reads "May be misaligned", and show the
    kept takes to the user. A take that fails is never landed. `seam_ok: false` alone does not fail a
-   take: with `shift_px` under 1 the model redrew around the edit ("Re-rendered around the edit"),
-   which the selection mask hides. Any other badge but "Seam ok" (edge tone, a patch at the
-   selection edge, part of it unchanged): keep the take, look at it at 100% after landing, and tell
-   the user. A null flag means the check did not run (a JPEG result, or a job from before a panel
-   reload): judge that take from its preview and say so. A server that returns no `badges` predates
-   this skill: treat `seam_ok: false` as a fail there.
+   take: the badge "Re-rendered around the edit" marks a redraw the selection mask hides. With
+   `shift_px` null (flat surroundings), "May be misaligned" rests on the seam alone: show that take
+   and its badge to the user and let them choose. Any other badge but "Seam ok" (edge tone, a patch
+   at the selection edge, part of it unchanged): keep the take, look at it at 100% after landing,
+   and tell the user. A null flag means the check did not run (a JPEG result, or a job from before a
+   panel reload): judge that take from its preview and say so. A server that returns no `badges`
+   predates this skill: treat `seam_ok: false` as a fail there.
 8. `prepare_result_application` with
    `{"local_id": "<local_id>", "expected_revision": <revision>, "purpose": "edit_selection", "takes": [<kept take numbers>]}`
    (`revision` from the last `wait_for_job` or `job_status`, takes counted from 1). Read `review`
@@ -219,8 +222,8 @@ Errors that set the next step:
 - Saving, closing or exporting through `execute_batchplay`: always refused, as are Actions, scripts
   and Adobe's generative features. Ask the user to save; export copies with the
   `scenario-photoshop-expert` toolkit.
-- Raising `wait_for_job`'s `timeout` past the client's own limit: many clients stop a call after 60
-  s.
+- Raising `wait_for_job`'s `timeout` past the client's own limit: some clients stop a long call
+  after about 60 s.
 - Expecting the panel's context card to follow a script. A document made or changed by ExtendScript
   sends the panel no event, so its card lags until the user clicks; this server's tools read
   Photoshop at call time.
