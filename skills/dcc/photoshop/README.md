@@ -37,10 +37,11 @@ lead skill, `scenario-photoshop-expert`.
   price check, a script-made document seen at once).
 - Not run live yet: `inspect_result_previews` on an edit, the toolkit gates after a plugin landing,
   the upload card on screen, and a masked edit landed through the proposal card with the agent
-  polling `job_status`. The take checks' `shift_px` and badges are tested automated in the plugin.
-  Paid upscale, expand and cutout landings through the agent tools have not run live either; the
-  panel's own runs of those are verified live. Each specialist's pipeline end to end through the
-  plugin is not tested.
+  polling `job_status`. The plugin's take checks (`shift_px`, badges), its `lands_unmasked` warning,
+  `DocumentClosed` refusal, apply retry after `PhotoshopBusy` and expand anchors are tested
+  automated only. Paid upscale, expand and cutout landings through the agent tools have not run live
+  either; the panel's own runs of those are verified live. Each specialist's pipeline end to end
+  through the plugin is not tested.
 - Blind grading on seven briefs, one per skill: the same model answered with the skills and from
   memory alone, and a separate grader scored the shuffled pairs without knowing which was which. On
   the final skills: 103 of 105 with the skills (four briefs won, three ties), 95 without. The gain

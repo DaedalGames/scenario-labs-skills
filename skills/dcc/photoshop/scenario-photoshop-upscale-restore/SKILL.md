@@ -89,10 +89,10 @@ Code: [procedures](references/procedures.md).
 **Scenario for Photoshop.** When the plugin's tools are connected and signed in, run this skill's
 image, edit, upscale, expand and background-removal steps through them, as the lead's Live channel
 maps them, gates included; other Scenario steps stay on hosted Scenario MCP. Not tested end to end.
-There, an upscale lands as a new document (`new_document`), outside this skill's stack (sRGB 8-bit
-from an Adobe RGB 16-bit source, measured through the panel): use it for a single upscale, converted
-to the source's profile and depth. A stack (stages 2 to 5), which the plugin cannot land, stays on
-hosted Scenario MCP and the toolkit.
+There, an upscale lands as a new document (`new_document`) in sRGB 8-bit, even from an Adobe RGB
+16-bit source (measured through the panel): use it for a single upscale; converting back does not
+restore gamut or depth. A stack (stages 2 to 5), which the plugin cannot land, stays on hosted
+Scenario MCP and the toolkit.
 
 1. **Intake.** `A.doc_state()`: name, size, mode, bits, profile, layers. Note faces, text, gradients
    and damage. For a colorize on a Grayscale master, ask before switching it to RGB (Dinda
