@@ -132,7 +132,7 @@ letter-perfect text overlay cards.
 | [scenario-product-shots](skills/scenario-product-shots/SKILL.md)     | Product photography from a real photo: packshots, lifestyle scenes, relighting, label-fidelity gates                  |
 | [scenario-brand-kit](skills/scenario-brand-kit/SKILL.md)             | Visual identities: SVG logos and wordmarks, palette and type specs, gated variants and applications, the filed kit    |
 | [scenario-image-editing](skills/scenario-image-editing/SKILL.md)     | Tool-model image edits: 3D LUT grades, effects, expand and reframe, resize, slicing, layers, background removal       |
-| [scenario-photoshop](skills/scenario-photoshop/SKILL.md)             | Open Photoshop documents through the Scenario for Photoshop plugin: price and run edits, land takes as layers         |
+| [scenario-photoshop](skills/scenario-photoshop/SKILL.md)             | Drive open Photoshop documents through the Scenario for Photoshop plugin: price and run edits, land takes as layers   |
 | [scenario-text-overlay](skills/scenario-text-overlay/SKILL.md)       | Letter-perfect text overlays: templated transparent PNG cards (taglines, CTAs, legal supers, rich cards) to composite |
 | [scenario-storyboards](skills/scenario-storyboards/SKILL.md)         | Comic pages, storybooks, and pre-viz storyboards: script first, one run per panel, a locked cast, lettering in post   |
 | [scenario-thumbnails](skills/scenario-thumbnails/SKILL.md)           | Finished video covers with character fidelity, exact copy and small-preview readability                               |
