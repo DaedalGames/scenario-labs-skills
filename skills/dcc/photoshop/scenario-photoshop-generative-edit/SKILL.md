@@ -89,10 +89,10 @@ Code: [procedures](references/procedures.md).
 image, edit, upscale, expand and background-removal steps through them, as the lead's Live channel
 maps them, gates included; other Scenario steps stay on hosted Scenario MCP. Not tested end to end.
 There, `capture_reference` (`purpose: "edit"`) replaces `GE.capture`, and `edit_selection` with the
-kept `takes` replaces `GE.place_edit`. `inspect_result_previews` returns stage 5's flags with the
-same thresholds plus `shift_px` and badges; a "Re-rendered around the edit" badge marks a redraw the
-mask hides (the width gate stays yours). The Live channel's outside gate is stage 7's
-`v["untouched"]`. `GE.check` and `GE.verify` need a toolkit capture.
+kept `takes` replaces `GE.place_edit`. `inspect_result_previews` replaces stage 5's code gates: keep
+a take when `aspect_ok` and `edited` are true and no badge reads "May be misaligned" (width gate:
+`resolution_ratio` at least 1). The Live channel's outside gate is stage 7's `v["untouched"]`.
+`GE.check` and `GE.verify` need a toolkit capture.
 
 1. **Intake.** `A.doc_state()`: name, size, mode, bits, profile, active layer, selection bounds.
    Write the brief as one line to change and one line to keep, then route (last Stance bullet).

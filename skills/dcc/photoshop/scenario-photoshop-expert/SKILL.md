@@ -14,8 +14,8 @@ ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`
 proceed from tool schemas and flag the gap.
 
 **Status (2026-10-23):** every toolkit call in the stages is verified live on Photoshop 27.11
-(macOS) by the family's live suites. The Live channel is verified live in part (a paid selection
-edit 2026-10-20, free steps 2026-10-23). Not tested: toolkit gates after a plugin landing,
+(macOS) by the live suites. The Live channel is verified live in part (a paid selection edit
+2026-10-20, free steps 2026-10-23). Not tested: toolkit gates after a plugin landing,
 `inspect_result_previews` on an edit, a masked proposal-card landing, the upload card, a
 specialist's pipeline through the plugin, the `social` profile, `app.doAction`, the batch loop, and
 Windows.
@@ -111,9 +111,9 @@ routes' Scenario calls inside one stage.
    unchanged by the agent.
 
 **Many files.** Prove stages 1 to 8 on one file, get one yes for the batch, then run one job per
-file that opens it, applies the recipe, exports and closes it. Skip files the user has open; stop at
-the first failure ([procedures](references/procedures.md) P10). **The user's Actions:** read the
-steps first, then `app.doAction` (P11).
+file that opens it, registers it, applies the recipe, exports and closes it. Skip files the user has
+open; stop at the first failure ([procedures](references/procedures.md) P10). **The user's
+Actions:** read the steps first, then `app.doAction` (P11).
 
 ## Numbers
 
@@ -165,7 +165,7 @@ Visual gates:
 - 100% crops: no seam, tone step, halo, soft or smeared patch, grain mismatch.
 - Must-keep elements unchanged; hands, eyes, text and logos intact.
 - Losing takes hidden and named in a group named "Takes", never deleted (`A.deliverable` accepts
-  hidden layers there); every agent layer named.
+  them there); every agent layer named.
 
 ## Common mistakes
 
