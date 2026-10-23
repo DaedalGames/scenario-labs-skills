@@ -28,14 +28,17 @@ lead skill, `scenario-photoshop-expert`.
   toolkit change. Steps no script reaches are listed as GUI paths and marked not tested.
 - The Scenario for Photoshop route: the core skill `scenario-photoshop` teaches the plugin's local
   Scenario MCP tools, the lead's Live channel maps the toolkit calls to them, and each specialist
-  points there. Verified live through the plugin: a paid selection edit in a Claude Code session
-  (2026-10-20, plugin 0.6.1 with its server 0.6.0: one take, Agents may modify the document on, the
-  approval card answered through the plugin's development tools, masked landing, nothing changed
-  outside), and the free steps on 2026-10-23 (status, document read, model list, ranking and schema,
-  an upscale capture and its price check, a script-made document seen at once). Not run live yet:
-  `inspect_result_previews` on an edit, the upload card on screen, a masked edit landed through the
-  proposal card with the agent polling `job_status`. Not tested through the plugin: each
-  specialist's pipeline end to end.
+  points there.
+- Verified live through the plugin: a paid selection edit in a Claude Code session on 2026-10-20, on
+  a development build of plugin 0.6.1 with its server 0.6.0. It ran one take with Agents may modify
+  the document on, the approval card answered through the plugin's development tools, and landed
+  masked with nothing changed outside. The free steps ran on 2026-10-23 (status, document read,
+  model list, ranking and schema, an upscale capture and its price check, a script-made document
+  seen at once).
+- Not run live yet: `inspect_result_previews` on an edit, the toolkit gates after a plugin landing,
+  the upload card on screen, and a masked edit landed through the proposal card with the agent
+  polling `job_status`. Its `shift_px` and badges are tested automated in the plugin. Each
+  specialist's pipeline end to end through the plugin is not tested.
 - Blind grading on seven briefs, one per skill: the same model answered with the skills and from
   memory alone, and a separate grader scored the shuffled pairs without knowing which was which. On
   the final skills: 103 of 105 with the skills (four briefs won, three ties), 95 without. The gain
