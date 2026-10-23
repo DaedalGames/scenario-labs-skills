@@ -193,10 +193,10 @@ npx skills add scenario-labs/skills --skill scenario scenario-game-assets scenar
 ### Marketing and brand visuals
 
 One product shot and a brief turned into on-brand stills, ads, UGC videos, and every placement size.
-22 skills.
+23 skills.
 
 ```bash
-npx skills add scenario-labs/skills --skill scenario scenario-product-shots scenario-brand-kit scenario-video-ads scenario-ugc scenario-formats scenario-inspiration scenario-image scenario-image-editing scenario-text-overlay scenario-video scenario-video-editing scenario-audio scenario-video-assembly scenario-consistency scenario-asset-analysis scenario-veo scenario-seedance scenario-kling scenario-elevenlabs scenario-ad-variants scenario-thumbnails
+npx skills add scenario-labs/skills --skill scenario scenario-product-shots scenario-brand-kit scenario-video-ads scenario-ugc scenario-formats scenario-inspiration scenario-image scenario-image-editing scenario-text-overlay scenario-video scenario-video-editing scenario-audio scenario-video-assembly scenario-consistency scenario-asset-analysis scenario-veo scenario-seedance scenario-kling scenario-elevenlabs scenario-ad-variants scenario-thumbnails scenario-photoshop
 ```
 
 ### Video, music video, and audio
