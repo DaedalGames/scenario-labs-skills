@@ -1,6 +1,6 @@
 ---
 name: scenario-photoshop-expert
-description: 'Use when an agent drives Adobe Photoshop on macOS for any task: running ExtendScript or Action Manager code in a live Photoshop 2026 (27.x), sending a selection, layer or canvas from an open PSD to a Scenario model (by script or through the Scenario for Photoshop plugin) and bringing the result back as a layer, checking a generated edit with numbers (pixels changed outside the mask, texture loss, edge halo, skin tone) or 100% crops, auditing a PSD before delivery (web, print, social, game texture, layered handoff), running one edit or a recorded Action over many files, turning a Photoshop frame into a video, or routing a Photoshop brief to a specialist. Also when a Photoshop script fails silently or oddly: a transform that does nothing, an interpolation name accepted but ignored, a reserved word, a layer kind that throws, error 8800, or an agent that saved or closed the user''s file.'
+description: 'Use when an agent drives Adobe Photoshop on macOS for any task: running ExtendScript or Action Manager code in a live Photoshop 2026 (27.x), sending a selection, layer or canvas from an open PSD to a Scenario model and bringing the result back as a layer, checking a generated edit with numbers (pixels changed outside the mask, texture loss, edge halo, skin tone) or 100% crops, auditing a PSD before delivery (web, print, social, game texture, layered handoff), running one edit or a recorded Action over many files, turning a Photoshop frame into a video, or routing a Photoshop brief to a specialist. Also when a Photoshop script fails silently or oddly: a transform that does nothing, an interpolation name accepted but ignored, a reserved word, a layer kind that throws, error 8800, or an agent that saved or closed the user''s file.'
 license: MIT
 ---
 
@@ -14,11 +14,9 @@ ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`
 proceed from tool schemas and flag the gap.
 
 **Status (2026-10-23):** every toolkit call in Workflow is verified live on Photoshop 27.11 (macOS)
-by the io, gates, audit, history and restore suites and the specialists' suites. `test_io_live.py`
-runs stage 5 as written; `test_history_live.py` runs the History gate and `step_back` at the History
-limit. The Live channel's tools are verified live through the plugin (a paid selection edit on
-2026-10-20, the free steps on 2026-10-23). Not tested: the toolkit gates after a plugin landing, the
-`social` profile, `app.doAction`, the batch loop, and Windows.
+by the family's live suites. The Live channel is verified live through the plugin (a paid selection
+edit on 2026-10-20, free steps on 2026-10-23). Not tested: a switch-off landing and a specialist's
+pipeline through the plugin, the `social` profile, `app.doAction`, the batch loop, and Windows.
 
 ## Stance (the expert delta)
 
@@ -47,7 +45,7 @@ limit. The Live channel's tools are verified live through the plugin (a paid sel
   [a7E4HlrAc3w 01:05]. Jared Verdi's agent renders the canvas and reads it before finishing
   [ojOTkInaZIk 11:08].
 - **Quote before every paid run; one yes for a batch.** A bad take still "counts against your
-  limits": Dinda [mSgSaisb6Kg 08:44]. [added] The user owns the spend, so the agent asks first.
+  limits": Dinda [mSgSaisb6Kg 08:44]. [added] The user owns the spend.
 
 ## Establish first
 
@@ -70,13 +68,18 @@ on failure (`ValueError` for a bad argument, before any job); a raw `ps_run.run`
 `error` and `exit`. The user keeps working meanwhile: never bring Photoshop to the front, click the
 screen, or open a modal dialog.
 
-**Live channel: Scenario for Photoshop.** When the plugin's local server `scenario-photoshop`
-answers `scenario_status`, stages 3 to 5 go through it, as the `scenario-photoshop` skill teaches:
-`capture_reference` replaces `IO.export_region` and `IO.export_mask`; `upload_reference`,
-`estimate_cost`, `generate` and `wait_for_job` replace the hosted calls;
-`prepare_result_application` then `apply_result_application` replace `IO.place`. Gate stage 5 on the
-returned `history_state` ("Scenario agent: <action>") and `outside_check`; stages 6 to 8 run as
-written. Without the plugin, use the stages below; never mix the two routes inside one stage.
+**Live channel: Scenario for Photoshop.** When the `scenario-photoshop` tools return
+`connected: true`, stages 3 to 5 go through them, as the `scenario-photoshop` skill teaches; never
+mix the two routes inside one stage.
+
+- Stage 3: `capture_reference` with the `model_id` replaces `IO.export_region` and `IO.export_mask`.
+- Stage 4: `list_models` and `model_schema` replace `recommend`; then `upload_reference`,
+  `estimate_cost`, `generate`, `wait_for_job`, and `inspect_result_previews` for the aspect gate.
+- Stage 5: `prepare_result_application` with the kept `takes`, then `apply_result_application`,
+  replace `IO.place`. Gate on the returned `history_state` ("Scenario agent: <action>") and
+  `outside_check`. Switch off, neither returns: poll `job_status` until `application.state` is
+  `committed`, gate on its `history_state`, and run stage 6's `G.diff` outside.
+- They replace a specialist's capture and History gates. Stages 6 to 8 run as written.
 
 1. **Connect and read.** `ps_run.find_photoshop()`, `ps_run.run("return app.version;")` (exit 3:
    `ps_run.py --launch`; exit 6: the user allows automation), then `A.doc_state()`. GATE: exit 0;
@@ -104,10 +107,10 @@ written. Without the plugin, use the stages below; never mix the two routes insi
    `psr_export` for copies (png, jpg, tif, psd, tga). GATE: `deliverable` returns `[]`; `saved` is
    unchanged by the agent.
 
-**Many files.** Prove stages 1 to 8 on one file, quote the whole batch once, then run one job per
-file that opens it, registers it as the job's own, applies the recipe, exports and closes it. Skip
-files the user has open; stop at the first failure ([procedures](references/procedures.md) P10).
-**The user's Actions:** read the steps first, then `app.doAction` (P11).
+**Many files.** Prove stages 1 to 8 on one file, get one yes for the whole batch, then run one job
+per file that opens it, registers it as the job's own, applies the recipe, exports and closes it.
+Skip files the user has open; stop at the first failure ([procedures](references/procedures.md)
+P10). **The user's Actions:** read the steps first, then `app.doAction` (P11).
 
 ## Numbers
 

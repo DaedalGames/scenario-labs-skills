@@ -84,9 +84,10 @@ Variables and Data Sets, the `social` profile, a paid plate, Windows.
 `ps_run` job and acts on the active document; after one raises or times out, recover as the lead's
 Quality gates say. Code: [procedures](references/procedures.md).
 
-**Scenario for Photoshop.** When the plugin answers `scenario_status`, run every Scenario step below
-through its tools, as the lead's Live channel maps them. The user approves in the panel; the craft
-and the gates stay as written.
+**Scenario for Photoshop.** When the `scenario-photoshop` tools return `connected: true`, run this
+skill's image, edit, upscale, expand and background-removal steps through them, as the lead's Live
+channel maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user
+approves in the panel. Not tested end to end.
 
 1. **Intake.** One preset per channel: `K.PRESETS[name]` holds `size`, `unsafe`, `display` and, for
    YouTube, `max_bytes`. A channel without a preset is a dict with the same keys. Presets are
@@ -124,9 +125,9 @@ and the gates stay as written.
 9. **More channels and variants.** Stages 3 to 8 per channel, from the same plate with its own focus
    and copy boxes. A variant changes one thing: the copy (remove the type layers, run `type_layers`
    again), the plate (`IO.replace` keeps the box only for a plate of the same pixel size), or one
-   layer's visibility. Quote all plate jobs of the set once. GATE: each variant passes stages 6 to 8
-   and differs from the master in the intended layer only. CSV data sets run through Photoshop's
-   Variables ([gui-paths](references/gui-paths.md)).
+   layer's visibility. Price all plate jobs of the set; get one yes. GATE: each variant passes
+   stages 6 to 8 and differs from the master in the intended layer only. CSV data sets run through
+   Photoshop's Variables ([gui-paths](references/gui-paths.md)).
 
 ## Numbers
 
