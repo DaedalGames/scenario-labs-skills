@@ -60,7 +60,7 @@ each wrapped in one named History state, with Photoshop left in the background.
 npx skills add scenario-labs/skills --skill scenario-photoshop-expert scenario-photoshop-compositing scenario-photoshop-game-art scenario-photoshop-generative-edit scenario-photoshop-key-art scenario-photoshop-mockups scenario-photoshop-upscale-restore
 ```
 
-With the Scenario for Photoshop plugin, add its core skill: `--skill scenario-photoshop`. The
+With the Scenario for Photoshop plugin, add its core skill, `scenario-photoshop`, to that list. The
 installer puts the skills side by side, which the specialists need: they import the lead skill's
 `scripts/`. In the installer picker (`npx skills add scenario-labs/skills`), the family is the
 "Expert tools: Photoshop" group. Update with `npx skills update`.
