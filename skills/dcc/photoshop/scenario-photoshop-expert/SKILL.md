@@ -70,7 +70,7 @@ screen, or open a modal dialog.
 
 **Live channel: Scenario for Photoshop.** When the `scenario-photoshop` tools return
 `connected: true`, stages 3 to 5 go through them, as the `scenario-photoshop` skill teaches; never
-mix the two routes inside one stage.
+mix the two routes' Scenario calls inside one stage.
 
 - Stage 3: `capture_reference` with the `model_id` replaces `IO.export_region` and `IO.export_mask`.
 - Stage 4: `list_models` and `model_schema` replace `recommend`; then `upload_reference`,
