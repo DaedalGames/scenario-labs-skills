@@ -29,11 +29,12 @@ lead skill, `scenario-photoshop-expert`.
 - The Scenario for Photoshop route: the core skill `scenario-photoshop` teaches the plugin's local
   Scenario MCP tools, the lead's Live channel maps the toolkit calls to them, and each specialist
   points there. Verified live through the plugin: a paid selection edit in a Claude Code session
-  (2026-10-20: one take, Agents may modify the document on, the approval card answered through the
-  plugin's development tools, masked landing, nothing changed outside), and the free steps on
-  2026-10-23 (status, document read, model list, ranking and schema, an upscale capture and its
-  price check, a script-made document seen at once). Not run live yet: `inspect_result_previews`,
-  the upload card on screen, a landing with the switch off. Not tested through the plugin: each
+  (2026-10-20, plugin 0.6.1 with its server 0.6.0: one take, Agents may modify the document on, the
+  approval card answered through the plugin's development tools, masked landing, nothing changed
+  outside), and the free steps on 2026-10-23 (status, document read, model list, ranking and schema,
+  an upscale capture and its price check, a script-made document seen at once). Not run live yet:
+  `inspect_result_previews` on an edit, the upload card on screen, a masked edit landed through the
+  proposal card with the agent polling `job_status`. Not tested through the plugin: each
   specialist's pipeline end to end.
 - Blind grading on seven briefs, one per skill: the same model answered with the skills and from
   memory alone, and a separate grader scored the shuffled pairs without knowing which was which. On

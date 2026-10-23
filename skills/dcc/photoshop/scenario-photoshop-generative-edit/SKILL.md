@@ -85,13 +85,13 @@ trained-model alignment, annotation edits, gray (partial) selections, Windows.
 call is one `ps_run` job; after one raises or times out, recover as the lead's Quality gates say.
 Code: [procedures](references/procedures.md).
 
-**Scenario for Photoshop.** When the `scenario-photoshop` tools return `connected: true`, run this
-skill's image, edit, upscale, expand and background-removal steps through them, as the lead's Live
-channel maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user
-approves in the panel. Not tested end to end. There, `capture_reference` (`purpose: "edit"`)
-replaces `GE.capture`; `inspect_result_previews` returns stage 5's `aspect_ok`, `edited`, `seam_ok`
-and `polarity_suspect` with the same thresholds (the width gate stays yours); `edit_selection` with
-the kept `takes` replaces `GE.place_edit`; the Live channel's outside gate is stage 7's
+**Scenario for Photoshop.** When the plugin's tools return `connected: true`, run this skill's
+image, edit, upscale, expand and background-removal steps through them, as the lead's Live channel
+maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user approves in
+the panel. Not tested end to end. There, `capture_reference` (`purpose: "edit"`) replaces
+`GE.capture`; `inspect_result_previews` returns stage 5's `aspect_ok`, `edited`, `seam_ok` and
+`polarity_suspect` with the same thresholds (the width gate stays yours); `edit_selection` with the
+kept `takes` replaces `GE.place_edit`; the Live channel's outside gate is stage 7's
 `v["untouched"]`. `GE.check` and `GE.verify` need a toolkit capture.
 
 1. **Intake.** `A.doc_state()`: name, size, mode, bits, profile, active layer, selection bounds.

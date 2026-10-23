@@ -86,10 +86,10 @@ Photoshop's Generative Upscale and Neural Filters, Windows.
 call is one `ps_run` job; after one raises or times out, recover as the lead's Quality gates say.
 Code: [procedures](references/procedures.md).
 
-**Scenario for Photoshop.** When the `scenario-photoshop` tools return `connected: true`, run this
-skill's image, edit, upscale, expand and background-removal steps through them, as the lead's Live
-channel maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user
-approves in the panel. Not tested end to end. There, an upscale lands only as a new document,
+**Scenario for Photoshop.** When the plugin's tools return `connected: true`, run this skill's
+image, edit, upscale, expand and background-removal steps through them, as the lead's Live channel
+maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user approves in
+the panel. Not tested end to end. There, an upscale lands as a new document (`new_document`),
 outside this skill's stack (sRGB 8-bit from an Adobe RGB 16-bit source, measured through the panel):
 use it for a single upscale, converted to the source's profile and depth. A stack (stages 2 to 5)
 stays on hosted Scenario MCP.

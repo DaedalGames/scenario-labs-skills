@@ -14,9 +14,10 @@ ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`
 proceed from tool schemas and flag the gap.
 
 **Status (2026-10-23):** every toolkit call in Workflow is verified live on Photoshop 27.11 (macOS)
-by the family's live suites. The Live channel is verified live through the plugin (a paid selection
-edit on 2026-10-20, free steps on 2026-10-23). Not tested: a switch-off landing and a specialist's
-pipeline through the plugin, the `social` profile, `app.doAction`, the batch loop, and Windows.
+by the family's live suites. The Live channel is verified live in part (a paid selection edit on
+2026-10-20, free steps on 2026-10-23). Not tested: toolkit gates after a plugin landing,
+`inspect_result_previews` on an edit, the `social` profile, `app.doAction`, the batch loop, and
+Windows.
 
 ## Stance (the expert delta)
 

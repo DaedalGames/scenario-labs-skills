@@ -84,10 +84,10 @@ Variables and Data Sets, the `social` profile, a paid plate, Windows.
 `ps_run` job and acts on the active document; after one raises or times out, recover as the lead's
 Quality gates say. Code: [procedures](references/procedures.md).
 
-**Scenario for Photoshop.** When the `scenario-photoshop` tools return `connected: true`, run this
-skill's image, edit, upscale, expand and background-removal steps through them, as the lead's Live
-channel maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user
-approves in the panel. Not tested end to end.
+**Scenario for Photoshop.** When the plugin's tools return `connected: true`, run this skill's
+image, edit, upscale, expand and background-removal steps through them, as the lead's Live channel
+maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user approves in
+the panel. Not tested end to end.
 
 1. **Intake.** One preset per channel: `K.PRESETS[name]` holds `size`, `unsafe`, `display` and, for
    YouTube, `max_bytes`. A channel without a preset is a dict with the same keys. Presets are

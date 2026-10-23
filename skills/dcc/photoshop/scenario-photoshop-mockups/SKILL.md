@@ -82,10 +82,10 @@ Scenario jobs and the GUI paths.
 call is one ExtendScript job through `ps_run`, with one named History state; after one raises or
 times out, recover as the lead's Quality gates say. Code: [procedures](references/procedures.md).
 
-**Scenario for Photoshop.** When the `scenario-photoshop` tools return `connected: true`, run this
-skill's image, edit, upscale, expand and background-removal steps through them, as the lead's Live
-channel maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user
-approves in the panel. Not tested end to end.
+**Scenario for Photoshop.** When the plugin's tools return `connected: true`, run this skill's
+image, edit, upscale, expand and background-removal steps through them, as the lead's Live channel
+maps them, gates included; other Scenario steps stay on hosted Scenario MCP. The user approves in
+the panel. Not tested end to end.
 
 1. **Intake.** `A.doc_state()`: name, size, mode, profile, layers. Name the product layer, each
    printable face, the designs and the colorways. A soft or small plate goes to
