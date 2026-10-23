@@ -84,6 +84,10 @@ Variables and Data Sets, the `social` profile, a paid plate, Windows.
 `ps_run` job and acts on the active document; after one raises or times out, recover as the lead's
 Quality gates say. Code: [procedures](references/procedures.md).
 
+**Scenario for Photoshop.** When the plugin answers `scenario_status`, run every Scenario step below
+through its tools, as the lead's Live channel maps them. The user approves in the panel; the craft
+and the gates stay as written.
+
 1. **Intake.** One preset per channel: `K.PRESETS[name]` holds `size`, `unsafe`, `display` and, for
    YouTube, `max_bytes`. A channel without a preset is a dict with the same keys. Presets are
    authoring-time specs: check each channel's own documentation before a campaign. GATE: every

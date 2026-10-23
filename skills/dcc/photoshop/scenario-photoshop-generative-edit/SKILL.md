@@ -85,6 +85,12 @@ trained-model alignment, annotation edits, gray (partial) selections, Windows.
 call is one `ps_run` job; after one raises or times out, recover as the lead's Quality gates say.
 Code: [procedures](references/procedures.md).
 
+**Scenario for Photoshop.** When the plugin answers `scenario_status`, run every Scenario step below
+through its tools, as the lead's Live channel maps them. The user approves in the panel; the craft
+and the gates stay as written. There, `inspect_result_previews` returns stage 5's `aspect_ok`,
+`edited`, `seam_ok` and `polarity_suspect` with the same thresholds, and `edit_selection` replaces
+stage 6's `GE.place_edit`.
+
 1. **Intake.** `A.doc_state()`: name, size, mode, bits, profile, active layer, selection bounds.
    Write the brief as one line to change and one line to keep, then route (last Stance bullet).
    GATE: document read by name; change and keep written.

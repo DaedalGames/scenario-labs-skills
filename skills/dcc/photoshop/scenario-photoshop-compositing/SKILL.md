@@ -92,6 +92,10 @@ placement, Windows.
 after one raises or times out, recover as the lead's Quality gates say. Code:
 [procedures](references/procedures.md).
 
+**Scenario for Photoshop.** When the plugin answers `scenario_status`, run every Scenario step below
+through its tools, as the lead's Live channel maps them. The user approves in the panel; the craft
+and the gates stay as written.
+
 1. **Intake.** `A.doc_state()`; name the element layer and the plate; write the key light, the
    must-not-change list and the look in one line each. GATE: document read by name; three lines
    written.

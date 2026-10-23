@@ -1,6 +1,6 @@
 ---
 name: scenario-photoshop-expert
-description: 'Use when an agent drives Adobe Photoshop on macOS for any task: running ExtendScript or Action Manager code in a live Photoshop 2026 (27.x), sending a selection, layer or canvas from an open PSD to a Scenario model and bringing the result back as a layer, checking a generated edit with numbers (pixels changed outside the mask, texture loss, edge halo, skin tone) or 100% crops, auditing a PSD before delivery (web, print, social, game texture, layered handoff), running one edit or a recorded Action over many files, turning a Photoshop frame into a video, or routing a Photoshop brief to a specialist. Also when a Photoshop script fails silently or oddly: a transform that does nothing, an interpolation name accepted but ignored, a reserved word, a layer kind that throws, error 8800, or an agent that saved or closed the user''s file.'
+description: 'Use when an agent drives Adobe Photoshop on macOS for any task: running ExtendScript or Action Manager code in a live Photoshop 2026 (27.x), sending a selection, layer or canvas from an open PSD to a Scenario model (by script or through the Scenario for Photoshop plugin) and bringing the result back as a layer, checking a generated edit with numbers (pixels changed outside the mask, texture loss, edge halo, skin tone) or 100% crops, auditing a PSD before delivery (web, print, social, game texture, layered handoff), running one edit or a recorded Action over many files, turning a Photoshop frame into a video, or routing a Photoshop brief to a specialist. Also when a Photoshop script fails silently or oddly: a transform that does nothing, an interpolation name accepted but ignored, a reserved word, a layer kind that throws, error 8800, or an agent that saved or closed the user''s file.'
 license: MIT
 ---
 
@@ -13,10 +13,11 @@ import, and the map to them. If a sibling skill named here is missing from your 
 ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended,
 proceed from tool schemas and flag the gap.
 
-**Status (2026-10-19):** every toolkit call in Workflow is verified live on Photoshop 27.11 (macOS)
+**Status (2026-10-23):** every toolkit call in Workflow is verified live on Photoshop 27.11 (macOS)
 by the io, gates, audit, history and restore suites and the specialists' suites. `test_io_live.py`
-runs stage 5 as written (a masked placement with provenance, then the outside gate);
-`test_history_live.py` runs the History gate and `step_back` at the History limit. Not tested: the
+runs stage 5 as written; `test_history_live.py` runs the History gate and `step_back` at the History
+limit. The Live channel's tools are verified live through the plugin (a paid selection edit on
+2026-10-20, the free steps on 2026-10-23). Not tested: the toolkit gates after a plugin landing, the
 `social` profile, `app.doAction`, the batch loop, and Windows.
 
 ## Stance (the expert delta)
@@ -45,7 +46,7 @@ runs stage 5 as written (a masked placement with provenance, then the outside ga
 - **Judge at 100%, then at viewing size.** Ramirez: "Any other zoom level can be misleading"
   [a7E4HlrAc3w 01:05]. Jared Verdi's agent renders the canvas and reads it before finishing
   [ojOTkInaZIk 11:08].
-- **Quote before every paid run; one quote for a batch.** A bad take still "counts against your
+- **Quote before every paid run; one yes for a batch.** A bad take still "counts against your
   limits": Dinda [mSgSaisb6Kg 08:44]. [added] The user owns the spend, so the agent asks first.
 
 ## Establish first
@@ -69,6 +70,14 @@ on failure (`ValueError` for a bad argument, before any job); a raw `ps_run.run`
 `error` and `exit`. The user keeps working meanwhile: never bring Photoshop to the front, click the
 screen, or open a modal dialog.
 
+**Live channel: Scenario for Photoshop.** When the plugin's local server `scenario-photoshop`
+answers `scenario_status`, stages 3 to 5 go through it, as the `scenario-photoshop` skill teaches:
+`capture_reference` replaces `IO.export_region` and `IO.export_mask`; `upload_reference`,
+`estimate_cost`, `generate` and `wait_for_job` replace the hosted calls;
+`prepare_result_application` then `apply_result_application` replace `IO.place`. Gate stage 5 on the
+returned `history_state` ("Scenario agent: <action>") and `outside_check`; stages 6 to 8 run as
+written. Without the plugin, use the stages below; never mix the two routes inside one stage.
+
 1. **Connect and read.** `ps_run.find_photoshop()`, `ps_run.run("return app.version;")` (exit 3:
    `ps_run.py --launch`; exit 6: the user allows automation), then `A.doc_state()`. GATE: exit 0;
    the document name matches the brief; `saved`, bits and profile recorded.
@@ -77,10 +86,10 @@ screen, or open a modal dialog.
 3. **Capture.** `sel = IO.selection()["bounds"]`, `cap = IO.export_region(out, pad=32)`,
    `IO.export_mask(out_mask, bounds=cap["bounds"])`. Whole-image edits capture the canvas with no
    mask. GATE: both files share `cap["bounds"]`; the selection covers only what should change.
-4. **Quote and generate** through the Scenario MCP with the `scenario` skill: `recommend` for the
-   capability, upload, price the exact payload, get the user's yes, run, wait, download. A saved
-   Scenario workflow runs through `scenario-workflows`. GATE: the user approved this payload's
-   price; the result has the capture's aspect.
+4. **Quote and generate** through the Scenario MCP with the `scenario` skill (or the Live channel):
+   `recommend` for the capability, upload, price the exact payload, get the user's yes, run, wait,
+   download. A saved Scenario workflow runs through `scenario-workflows`. GATE: the user approved
+   this payload's price; the result has the capture's aspect.
 5. **Land.** `h0 = A.history()` right before, then
    `IO.place(result, name, bounds=cap["bounds"], mask_selection=True, xmp={...}, undo="Scenario: <action>")`:
    an embedded smart object, fitted, masked, with provenance; the selection stays active for
@@ -185,9 +194,9 @@ Receives any Photoshop brief. Routes it:
 | One character across a series of frames (animation, learning)                 | `scenario-consistency`, outside Photoshop                 |
 | Image to video                                                                | `scenario-video`, outside Photoshop                       |
 
-Connection, model choice and quoting go to `scenario`. A brief can chain: a packshot campaign is
-compositing (product into a generated scene), then mockups (label per variant), then key-art (sizes
-and type), then the audit per channel.
+Connection, model choice and quoting go to `scenario`, or to `scenario-photoshop` on the Live
+channel. A brief can chain: a packshot campaign is compositing (product into a generated scene),
+then mockups (label per variant), then key-art (sizes and type), then the audit per channel.
 
 **Handoff contract:** the receiving skill gets the document name, the layers made and their History
 state names, the gate numbers, the crops looked at, and the list of what was not verified.
@@ -195,8 +204,6 @@ state names, the gate numbers, the crops looked at, and the list of what was not
 ## Photoshop 2026 notes
 
 - Measured on 27.11. Read `app.version` every session: descriptors are undocumented and move.
-- 27.6 redesigned Actions and added Layer Cleanup; 27.9 changed the UI backend (re-test older code);
-  27.10 added Prompt to edit; 27.11 Enhance Edge.
 - Photoshop's generative tools have no toolkit call and no documented script call (traps, section
   1). Offer them to the user as manual steps, and play no Action that holds one.
 - AppleScript given a file alias fails with error 8800; `ps_run` inlines `$.evalFile`.

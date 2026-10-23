@@ -82,6 +82,10 @@ Scenario jobs and the GUI paths.
 call is one ExtendScript job through `ps_run`, with one named History state; after one raises or
 times out, recover as the lead's Quality gates say. Code: [procedures](references/procedures.md).
 
+**Scenario for Photoshop.** When the plugin answers `scenario_status`, run every Scenario step below
+through its tools, as the lead's Live channel maps them. The user approves in the panel; the craft
+and the gates stay as written.
+
 1. **Intake.** `A.doc_state()`: name, size, mode, profile, layers. Name the product layer, each
    printable face, the designs and the colorways. A soft or small plate goes to
    scenario-photoshop-upscale-restore first. Light colorways from a dark plate: get a light blank

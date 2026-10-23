@@ -86,6 +86,11 @@ Photoshop's Generative Upscale and Neural Filters, Windows.
 call is one `ps_run` job; after one raises or times out, recover as the lead's Quality gates say.
 Code: [procedures](references/procedures.md).
 
+**Scenario for Photoshop.** When the plugin answers `scenario_status`, run every Scenario step below
+through its tools, as the lead's Live channel maps them. The user approves in the panel; the craft
+and the gates stay as written. There, an upscale opens as a new sRGB 8-bit document (measured on an
+Adobe RGB 16-bit source): convert it before stacking.
+
 1. **Intake.** `A.doc_state()`: name, size, mode, bits, profile, layers. Note faces, text, gradients
    and damage. For a colorize on a Grayscale master, ask before switching it to RGB (Dinda
    [G5yuLhm0SdM 12:32]). GATE: document read by name; job, fidelity and factor written.
