@@ -81,7 +81,7 @@ In call order:
 | Quote        | `estimate_cost`                                                           | Free dry run; the quote lasts 120 s and is used once         |
 | Run          | `generate`                                                                | The only paid tool                                           |
 | Wait         | `wait_for_job(local_id)`                                                  | 45 s by default, 170 at most; again while `still_running`    |
-| Check takes  | `inspect_result_previews(local_id)`                                       | Edit lane: flags, `shift_px` and the panel's `badges`        |
+| Check takes  | `inspect_result_previews(local_id)`                                       | Edit lane: flags, `shift_px` and `badges`                    |
 | Land         | `prepare_result_application`, then `apply_result_application`             | `takes` picks the takes; one History state per landing       |
 | Recover      | `job_status`, `list_local_jobs`, `recover_local_job`, `recover_cloud_job` | `cancel_prepared_job` withdraws a request awaiting its card  |
 | Library      | `list_assets`, `search_assets`, `list_collections`, `list_generations`    | Land a Library image with `library_asset_id`                 |
@@ -97,7 +97,8 @@ Lanes, with the capture and landing each one takes:
 | `remove_background` | `remove_background`                                               | `cutout_mask`                          |
 
 Expand by sides (`expand` {left, top, right, bottom}) only with a model whose `model_schema` reads
-`expand_route: "mask"`; `position` and `exact_size` models take {aspect, anchor}.
+`expand_route: "mask"`; `position` and `exact_size` models take {aspect, anchor}. `anchor` is where
+the original sits (`left` grows the canvas to the right); `exact_size` models keep it centered.
 
 A landing is named "Scenario agent: <action>" in History. A trained model is never the model called.
 `list_models(source: "trained")` gives its `base_model_ids`: call a base with the trained model in
@@ -171,7 +172,8 @@ Errors that set the next step:
    which the selection mask hides. Any other badge but "Seam ok" (edge tone, a patch at the
    selection edge, part of it unchanged): keep the take, look at it at 100% after landing, and tell
    the user. A null flag means the check did not run (a JPEG result, or a job from before a panel
-   reload): judge that take from its preview and say so.
+   reload): judge that take from its preview and say so. A server that returns no `badges` predates
+   this skill: treat `seam_ok: false` as a fail there.
 8. `prepare_result_application` with
    `{"local_id": "<local_id>", "expected_revision": <revision>, "purpose": "edit_selection", "takes": [<kept take numbers>]}`
    (`revision` from the last `wait_for_job` or `job_status`, takes counted from 1). Read `review`
@@ -180,11 +182,12 @@ Errors that set the next step:
    so before any Apply, and offer a new capture and run, `new_document`, or landing it to mask by
    hand.
 9. `apply_result_application` with the `application_id`. Switch on: `committed`, the kept takes
-   masked by the selection (a group when there are two), and `outside_check.untouched` true. Switch
-   off: `pending_approval`; the user clicks **Apply**; poll `job_status` until `application.state`
-   is `committed`, and stop on `dismissed`, `expired` or `rolled_back` (nothing landed; tell the
-   user, and after `rolled_back` prepare again). No `outside_check` comes back then: check outside
-   the selection yourself (`preview_document`, or the expert toolkit's diff).
+   masked by the selection (a group when there are two), and `outside_check.untouched` true;
+   `rolled_back` means nothing landed: prepare again. Read `notes` back to the user. Switch off:
+   `pending_approval`; the user clicks **Apply**; poll `job_status` until `application.state` is
+   `committed`, and stop on `dismissed`, `expired` or `rolled_back` (nothing landed; tell the user,
+   and after `rolled_back` prepare again). No `outside_check` comes back then: check outside the
+   selection yourself (`preview_document`, or the expert toolkit's diff).
 
 ## Common mistakes
 
@@ -206,7 +209,8 @@ Errors that set the next step:
   before preparing again.
 - Trusting an `expand` result unseen: `inspect_result_previews` only notes that its seam check runs
   at landing. Look at both old edges at 100% after landing; the model can draw a feature twice,
-  which the check flags but does not remove.
+  which the check flags but does not remove. A take that did not line up lands unmasked for manual
+  alignment, and apply's `notes` says so: tell the user.
 - Asking the user to Apply blind. The proposal card shows no picture of the result: show the takes
   from `inspect_result_previews` in your reply first.
 - An `image` result on a canvas larger than the model's output: landing scales it up to the box.
