@@ -67,9 +67,9 @@ publicly shareable language only.
   internal project or team names, customer names, real team/project/API identifiers, credentials,
   pricing internals, or unreleased features.
 - Every fact must be verifiable from public surfaces: the tool reference at
-  mcp.scenario.com/docs/tools, the Blender and Photoshop plugins' `docs/MCP.md` (and Photoshop's
-  `docs/spec/MCP.md`) for their local tools, live public catalog searches. A fact knowable only from
-  internal sources stays out.
+  mcp.scenario.com/docs/tools, the Blender extension's and the Photoshop plugin's `docs/MCP.md` (and
+  the plugin's `docs/spec/MCP.md`) for their local tools, live public catalog searches. A fact
+  knowable only from internal sources stays out.
 - In doubt, treat it as internal: ask, or drop it. Example: no internal repository naming.
 
 ## Authoring contract
