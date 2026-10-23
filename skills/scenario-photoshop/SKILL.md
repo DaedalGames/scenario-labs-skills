@@ -90,7 +90,7 @@ Lanes, with the capture and landing each one takes:
 | Lane                | `capture_reference` `purpose`                                     | `prepare_result_application` `purpose` |
 | ------------------- | ----------------------------------------------------------------- | -------------------------------------- |
 | `image`             | none; quote with `canvas` {box} or `new_document` {width, height} | `new_layer` or `new_document`          |
-| `edit`              | `edit`, from a `selection`                                        | `edit_selection`, or `new_layer`       |
+| `edit`              | `edit`, from a `selection`                                        | `edit_selection`                       |
 | `upscale`           | `upscale`                                                         | `new_document`                         |
 | `expand`            | `expand`, with `expand` {left, top, right, bottom}                | `expand`                               |
 | `remove_background` | `remove_background`                                               | `cutout_mask`                          |
@@ -125,9 +125,12 @@ Errors that set the next step:
 
 - `QuoteExpired`, `QuoteUsed`, `QuoteMismatch`, `CostMismatch`: nothing was spent; quote again.
 - `PlanLimit`, `InsufficientCredits`, `Blocked`: tell the user; never retry.
-- `RateLimited`, `PhotoshopBusy`: wait, then call again with the same arguments.
-- `RequestInFlight`: the same request is running (find it with `list_local_jobs`) or Unknown (the
-  user resolves it in **Jobs**).
+- `RateLimited`, `PhotoshopBusy`: wait, then call again with the same arguments; past 120 s, quote
+  again.
+- A job that ends `not_sent` (declined, card expired, rate limited after Approve) spent nothing; a
+  new run needs a new quote, a new key and the user's yes.
+- `RequestInFlight`: the same request is running (find it with `list_local_jobs`) or `uncertain`
+  (shown as Unknown; the user resolves it in **Jobs**).
 - `ApplicationExpired`, `ApplicationUsed`: call `prepare_result_application` again.
 - `UploadDeclined`: nothing was sent; ask the user before trying again.
 
@@ -156,7 +159,8 @@ Errors that set the next step:
    the user clicks **Approve**.
 7. `wait_for_job` with `{"local_id": "<local_id>"}` until `ready`. `inspect_result_previews`: keep
    the takes with `aspect_ok`, `edited` and `seam_ok` true and `polarity_suspect` false, and show
-   them to the user. A take that fails is never landed.
+   them to the user. A take that fails is never landed. A null flag means the check did not run (a
+   JPEG result, or a job from before a panel reload): judge that take from its preview and say so.
 8. `prepare_result_application` with
    `{"local_id": "<local_id>", "expected_revision": <revision>, "purpose": "edit_selection", "takes": [<kept take numbers>]}`
    (`revision` from the last `wait_for_job`, takes counted from 1). Read `review` and `warnings`
@@ -164,8 +168,9 @@ Errors that set the next step:
 9. `apply_result_application` with the `application_id`. Switch on: `committed`, the kept takes
    masked by the selection (a group when there are two), and `outside_check.untouched` true. Switch
    off: `pending_approval`; the user clicks **Apply**; poll `job_status` until `application.state`
-   is `committed`. No `outside_check` comes back then: check outside the selection yourself
-   (`preview_document`, or the expert toolkit's diff).
+   is `committed`, and stop on `dismissed` or `expired` (nothing landed; tell the user). No
+   `outside_check` comes back then: check outside the selection yourself (`preview_document`, or the
+   expert toolkit's diff).
 
 ## Common mistakes
 
@@ -181,7 +186,11 @@ Errors that set the next step:
   document forward; ask the user to.
 - Changing the canvas size (crop, canvas size, rotate) between capture and landing:
   `edit_selection`, `expand` and `cutout_mask` return `DocumentChanged`. The paid result still lands
-  free with `purpose: "new_layer"` (unmasked); a masked landing needs a new capture and a new quote.
+  free with `purpose: "new_document"` (a new document at the result's size); a masked landing needs
+  a new capture and a new quote.
+- Trusting an `expand` result unseen: `inspect_result_previews` only notes that its seam check runs
+  at landing. Look at both old edges at 100% after landing; the model can draw a feature twice,
+  which the check flags but does not remove.
 - Asking the user to Apply blind. The proposal card shows no picture of the result: show the takes
   from `inspect_result_previews` in your reply first.
 - An `image` result on a canvas larger than the model's output: landing scales it up to the box.
