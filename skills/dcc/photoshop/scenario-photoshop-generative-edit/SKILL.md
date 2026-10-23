@@ -88,11 +88,11 @@ Code: [procedures](references/procedures.md).
 **Scenario for Photoshop.** When the plugin's tools are connected and signed in, run this skill's
 image, edit, upscale, expand and background-removal steps through them, as the lead's Live channel
 maps them, gates included; other Scenario steps stay on hosted Scenario MCP. Not tested end to end.
-There, `capture_reference` (`purpose: "edit"`) replaces `GE.capture`, and `edit_selection` with the
-kept `takes` replaces `GE.place_edit`. `inspect_result_previews` replaces stage 5's code gates: keep
-a take when `aspect_ok` and `edited` are true and no badge reads "May be misaligned" (width gate:
-`resolution_ratio` at least 1). The Live channel's outside gate is stage 7's `v["untouched"]`.
-`GE.check` and `GE.verify` need a toolkit capture.
+There, `capture_reference` (`purpose: "edit"`) replaces `GE.capture`, and `edit_selection` with kept
+`takes` replaces `GE.place_edit`. `inspect_result_previews` replaces stage 5's code gates,
+`polarity_suspect` included: keep a take when `aspect_ok` and `edited` are true and no badge reads
+"May be misaligned" (width gate: `resolution_ratio` at least 1). The Live channel's outside gate is
+stage 7's `v["untouched"]`. `GE.check` and `GE.verify` need a toolkit capture.
 
 1. **Intake.** `A.doc_state()`: name, size, mode, bits, profile, active layer, selection bounds.
    Write the brief as one line to change and one line to keep, then route (last Stance bullet).
