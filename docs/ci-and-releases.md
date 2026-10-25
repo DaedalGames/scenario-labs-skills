@@ -70,8 +70,10 @@ which commit types release and which files release-please owns.
   - Publishing rejects a workflow-level `env` or `defaults`, write permissions above the job, and
     actions outside upstream's approved list in the job.
 - `links.yml` runs lychee over tracked Markdown, without the vendored dev skills and `CHANGELOG.md`:
-  - on a pull request that changes Markdown, the relative links and anchors of every file offline,
-    then every link of the changed files, so a dead external link elsewhere never blocks it;
+  - on every pull request, the relative links and anchors of every file offline, since moving any
+    file, Markdown or not, can break a link to it;
+  - on a pull request that changes Markdown, then every link of the changed files, so a dead
+    external link elsewhere never blocks it;
   - weekly, and on dispatch, every link.
   - `lychee.toml` lists the hosts and patterns it skips, each with its reason.
   - GitHub notifies a failed scheduled run only to whoever last changed its `cron` line.

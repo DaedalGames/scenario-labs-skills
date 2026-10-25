@@ -1,16 +1,13 @@
 name: Links
 
 # Checks the links in tracked Markdown with lychee (lychee.toml holds the exclusions).
-# A pull request that changes Markdown gets every file's relative links and anchors checked
-# offline, and every link of the files it changes checked online, so a dead external link
-# elsewhere never blocks it. The weekly run checks every link, against link rot.
+# Every pull request gets every file's relative links and anchors checked offline, since moving
+# any file, Markdown or not, can break a link to it. Every link of the Markdown files it changes
+# is checked online, so a dead external link elsewhere never blocks it. The weekly run checks
+# every link, against link rot.
 
 on:
   pull_request:
-    paths:
-      - "**/*.md"
-      - "lychee.toml"
-      - ".github/workflows/links.yml"
   schedule:
     - cron: "0 7 * * 1"
   workflow_dispatch:
@@ -43,7 +40,7 @@ jobs:
         run: |
           dir="$RUNNER_TEMP/links"
           mkdir -p "$dir"
-          git ls-files '*.md' | grep -v -E '^(\.agents/skills/|\.claude/skills/|CHANGELOG\.md$)' >"$dir/all.txt"
+          git ls-files '*.md' | grep -v -E '^(\.agents/skills/(skill-creator|skill-development|pr-summary|pr-squash-message|pr-handle-comments)/|CHANGELOG\.md$)' >"$dir/all.txt"
           if [ "$EVENT" = pull_request ]; then
             git diff --name-only --diff-filter=d HEAD^1 HEAD -- '*.md' | grep -F -x -f "$dir/all.txt" >"$dir/online.txt" || true
           else
