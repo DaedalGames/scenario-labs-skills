@@ -10,7 +10,6 @@ metadata:
 
 ## Overview
 
-Scenario runs text-to-3D, image-to-3D, and 3D-to-3D models through the same MCP loop as images.
 Generate a concept image first, then run image-to-3D: it has a larger catalog and more art direction
 than text-to-3D (`txt23d`). Per-family contracts: `scenario-meshy`, `scenario-rodin`,
 `scenario-sparc3d`. Walkable scenes and Gaussian splats: `scenario-3d-worlds`. PBR retexture of a
@@ -31,9 +30,7 @@ flag the gap.
 | Preview        | `asset_display`                                                                | Interactive GLB/FBX/VOX/OBJ viewer on MCP App hosts                                    |
 | Download       | `asset_download`                                                               | Returns a URL; save with `curl -L`                                                     |
 
-## Worked example: concept image to game-ready mesh
-
-Sequence for "make a 3D treasure chest prop".
+## Worked example: game-ready treasure chest
 
 - **Plan check.** Before step 1, run `recommend` for every later step (step 2, plus any rig or
   retexture). An entry marked `requires_plan_upgrade` fails with a 403
@@ -57,14 +54,26 @@ Sequence for "make a 3D treasure chest prop".
    `dry_run`). Those two LLM-based members alone:
    - reconstruct one object from 1 to 8 photos or renders into an editable mesh with named parts and
      per-part PBR materials;
-   - suit props and hard-surface subjects, not characters or creatures, and need those images (a
-     prompt alone returned 400 at authoring time);
+   - suit props and hard-surface subjects, not characters or creatures;
    - price by `buildEffort`: `standard`, `high` (the default), `maximum`;
-   - cap the exported triangle count with `faceBudget` (10k to 50k for a game-ready asset; the
-     default is not game-ready);
+   - cap the exported triangle count with `faceBudget` (the game range in step 3);
    - change a result by editing it (see Refining meshes).
-3. `model_schema_get` on the chosen model: 3D schemas vary widely (single image or multi-view
-   arrays, polycount targets, PBR toggles, topology).
+3. `model_schema_get`: inspect image inputs, polycount, PBR, and topology controls. Target 10k to
+   50k triangles for this prop; never assume defaults meet that budget. Use only exposed controls:
+   - **Numeric field:** read `min` and `max`, or the description when they are absent.
+   - **Enum:** read `allowed_values` and their topology and count meanings (`scenario-rodin` covers
+     `qualityMeshOption`). A quad count is not a triangle count.
+   - **No face control, or the target is below its range:** generate, then remesh down if needed
+     (Refining meshes). Never invent a face field; `scenario-sparc3d` covers members without one.
+
+   Check the output's triangle count against the budget. At authoring time:
+   - Tripo (`faceLimit`) and Meshy (`targetPolycount`, set where `scenario-meshy` says) reached both
+     ends. At 10k, an eight-legged creature kept every leg and claw, and a chest its padlock and
+     handles. Meshy's Smart Topology members capped lower, at 15k or 30k.
+   - Hunyuan 3D (`faceCount`, from 40k) covers only the top of the range, and Trellis
+     (`decimationTarget`, from 100k) starts above it. Remesh only for a target under the member's
+     floor.
+
 4. `model_run` with `parameters={"image": "asset_xxx", ...}` and `dry_run=true` to price it. Then
    run it for real with `wait=false` and pass its `job_id` to `jobs_wait` (`job_ids=["<job_id>"]`);
    a dry run creates no job. Re-call `jobs_wait` with the returned `pending_job_ids` if it times
@@ -72,11 +81,18 @@ Sequence for "make a 3D treasure chest prop".
    quote it from `recommend`, then re-price with `dry_run` on the real asset before launching. Never
    `dry_run` it with a placeholder id: file ids resolve before plan access is checked, so it returns
    404 and proves nothing.
-5. `asset_display` the output `asset_id`, then `asset_download` with `format: "glb"` and
-   `curl -L -o chest.glb "<url>"`. `format` converts to `glb`, `fbx`, or `obj`; omitted, it returns
-   the stored original, a Blender file for the LLM-based members. Ask for `fbx` for a Unity project
+5. `asset_display` the output `asset_id`, then `asset_download` and `curl -L -o chest.glb "<url>"`.
+   Omit `format` when `asset_get` shows `properties.format` `glb`: it returns the stored original
+   byte for byte. `format` converts to `glb`, `fbx`, or `obj`; pass `glb` for the LLM-based members,
+   which store a Blender file. On a stored GLB, `format: "glb"` re-exports it: at authoring time the
+   same textures and triangles, smaller indices, a different file. Ask for `fbx` for a Unity project
    without a glTF importer, and keep the GLB too: at authoring time the FBX embedded only two
    images, so it may miss PBR maps.
+
+**Prompt-only build.** Both LLM-based members support `txt23d`. When the user wants no concept to
+approve, skip step 1. In step 2, `recommend` with `capability="txt23d"` and the user's words as
+`prompt`. Follow steps 3 to 5 with `images: []`; describe the object and name required parts in
+`prompt`. A chest's `lid`, `body`, and `padlock` returned as those node names.
 
 Multi-view models take several images of one subject; read the count and fields off
 `model_schema_get`. Side fields follow the subject: on the Tripo multi-view members at authoring

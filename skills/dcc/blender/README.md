@@ -92,5 +92,24 @@ character with every preset and re-imports each file in Blender 5.2.1. The same 
 into Unity 6000.3.21f1 (batch mode) and Godot 4.7.2 (headless); the results are in the skill's
 `references/engines.md`. The `unreal` and `roblox` presets were not imported into those engines.
 
+On 2026-10-20 the application test (`/skills:validate`) had a fresh agent take a generated chest to
+Unity, Godot and Roblox with `scenario-blender-export`. Its five findings were fixed:
+
+- `round_trip()` compares the image maps on each material; `extra_maps()` writes the metallic and
+  roughness maps an FBX drops after a glTF import;
+- `ground()` sets a generated mesh's real size and puts its pivot at the center of its base;
+- the gate step names the route for open borders and edges shared by three or more faces;
+- a headless Godot check sits in `references/engines.md`;
+- `bx_review.review()` takes `culling=True` (`scenario-blender-expert`).
+
+On 2026-10-26 a third run took a generated side table to Unity with LODs, Unreal with a convex
+collision mesh, and three.js. Its findings were fixed:
+
+- `lods()` welds the seams a glTF import splits before decimating; unwelded, LOD1 and LOD2 cracked
+  and the gate only warned about loose vertices;
+- `collision()` caps a convex hull at `max_verts=64`; the full hull of the table had 12,270 faces;
+- `references/engines.md` quotes Epic on Auto Generate Collision with a UCX mesh and on sRGB for
+  masks.
+
 Paths such as `tests/...` inside the references point to the test evidence on the build machine.
 They are provenance only; the skills do not need them to run.

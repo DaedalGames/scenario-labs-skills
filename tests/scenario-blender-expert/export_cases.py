@@ -279,6 +279,152 @@ cases["skeletal_active_only"] = {"pass": rt["pass"], "diffs": rt["diffs"]}
 
 cases["spine_angle_deg"] = round(math.degrees(0.6), 1)
 
+
+# Maps: a generated GLB packs metallic (B) and roughness (G) in one image, which the glTF
+# importer routes through Separate Color. The FBX exporter drops both; extra_maps() writes them.
+def image(name, rgba):
+    img = bpy.data.images.new(name, 8, 8, alpha=True)
+    img.pixels.foreach_set(list(rgba) * 64)
+    img.filepath_raw, img.file_format = os.path.join(TMP, name + ".png"), "PNG"
+    img.save()
+    bpy.data.images.remove(img)
+    out = bpy.data.images.load(os.path.join(TMP, name + ".png"))
+    out.colorspace_settings.name = "Non-Color"
+    return out
+
+
+def link_image(nt, img, socket, through=None):
+    tex = nt.nodes.new("ShaderNodeTexImage")
+    tex.image = img
+    bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    if through is None:
+        nt.links.new(tex.outputs["Color"], bsdf.inputs[socket])
+    else:
+        nt.links.new(tex.outputs["Color"], through.inputs[0])
+        nt.links.new(through.outputs[socket[1]], bsdf.inputs[socket[0]])
+
+
+def first_pixel(path):
+    img = bpy.data.images.load(path)
+    img.colorspace_settings.name = "Non-Color"
+    px = [round(v, 3) for v in img.pixels[:4]]
+    bpy.data.images.remove(img)
+    return px
+
+
+bpy.ops.wm.read_factory_settings(use_empty=True)
+nt = crate().data.materials[0]
+if nt.node_tree is None:
+    nt.use_nodes = True
+nt = nt.node_tree
+link_image(nt, image("albedo", (0.8, 0.4, 0.2, 1.0)), "Base Color")
+sep = nt.nodes.new("ShaderNodeSeparateColor")
+mr = image("metal_rough", (1.0, 0.25, 0.75, 1.0))
+link_image(nt, mr, ("Roughness", "Green"), through=sep)
+nt.links.new(sep.outputs["Blue"], next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED").inputs["Metallic"])
+src_glb = os.path.join(TMP, "maps_src.glb")
+bxe.export(src_glb, "gltf", ["Crate"])
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.import_scene.gltf(filepath=src_glb)
+cases["maps_gltf_import"] = bxe.inspect_scene(["Crate"])["objects"]["Crate"]["maps"]
+fbx = os.path.join(TMP, "maps.fbx")
+bxe.export(fbx, "unity", ["Crate"])
+cases["maps_fbx"] = bxe.round_trip(fbx, ["Crate"], preset="unity")["diffs"]
+bxe.export(os.path.join(TMP, "maps.glb"), "godot", ["Crate"])
+cases["maps_glb"] = bxe.round_trip(os.path.join(TMP, "maps.glb"), ["Crate"], preset="godot")["diffs"]
+unity = bxe.extra_maps(["Crate"], os.path.join(TMP, "maps_unity"), "unity")
+roblox = bxe.extra_maps(["Crate"], os.path.join(TMP, "maps_roblox"), "roblox")
+cases["extra_maps"] = {os.path.basename(p): first_pixel(p)
+                       for r in (unity, roblox) for ps in r["written"].values() for p in ps}
+def png_type(path):
+    """PNG color type: 0 grayscale (Roblox asks for single-channel maps), 6 RGBA."""
+    with open(path, "rb") as f:
+        return f.read(26)[25]
+
+
+cases["extra_maps_png_type"] = {os.path.basename(p): png_type(p)
+                                for r in (unity, roblox) for ps in r["written"].values() for p in ps}
+# The same maps linked straight to their inputs travel in the FBX.
+nt = bpy.data.objects["Crate"].active_material.node_tree
+for socket, path in zip(("Metallic", "Roughness"), roblox["written"]["M_Crate"]):
+    link_image(nt, bpy.data.images.load(path), socket)
+bxe.export(fbx, "unity", ["Crate"])
+cases["maps_fbx_direct"] = bxe.round_trip(fbx, ["Crate"], preset="unity")["diffs"]
+
+# ground(): a mirrored, turned, scaled mesh under a moved parent.
+bpy.ops.wm.read_factory_settings(use_empty=True)
+c = crate()
+root = bpy.data.objects.new("Root", None)
+bpy.context.scene.collection.objects.link(root)
+root.location = (5, 0, 1)
+c.parent = root
+c.location, c.rotation_euler, c.scale = (1, 2, 3), (0, 0, 0.7), (2, -1, 0.5)
+g = bxe.ground(["Crate"], width=0.5)
+bpy.context.view_layer.update()
+pts = [c.matrix_world @ v.co for v in c.data.vertices]
+mid = sum((v.co for v in c.data.vertices), Vector()) / len(c.data.vertices)
+cases["ground"] = {
+    "result": g, "parent": c.parent.name if c.parent else None,
+    "identity": c.matrix_world == c.matrix_world.Identity(4),
+    "min_z": round(min(p.z for p in pts), 5),
+    "center_xy": [round((min(p[k] for p in pts) + max(p[k] for p in pts)) / 2, 5) for k in (0, 1)],
+    "outward": all((f.center - mid).dot(f.normal) > 0 for f in c.data.polygons),
+}
+scene()
+try:
+    bxe.ground(["Body"])
+    cases["ground_skinned"] = "moved"
+except ValueError as exc:
+    cases["ground_skinned"] = str(exc)
+
+
+# A sphere through GLB, split at its UV seams as every glTF import is: its LODs must stay
+# closed once welded, and its convex hull must keep to the vertex budget and stay closed.
+def open_edges(ob):
+    bm = bmesh.new()
+    bm.from_mesh(ob.data)
+    bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=1e-5)
+    n = sum(1 for e in bm.edges if len(e.link_faces) == 1)
+    bm.free()
+    return n
+
+
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.mesh.primitive_uv_sphere_add(segments=64, ring_count=32)
+sphere_glb = os.path.join(TMP, "sphere.glb")
+bpy.ops.export_scene.gltf(filepath=sphere_glb)
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.ops.import_scene.gltf(filepath=sphere_glb)
+s = next(o for o in bpy.data.objects if o.type == "MESH")
+cases["seam_split_verts"] = len(s.data.vertices)
+r = bxe.lods(s.name, ratios=(0.5, 0.25))
+cases["seam_lods"] = {n: open_edges(bpy.data.objects[n]) for n in r["tris"]}
+cases["seam_meshes"] = len(bpy.data.meshes)
+hull = bxe.collision(s, "unreal")
+cases["seam_hull"] = dict(hull, open=open_edges(bpy.data.objects[hull["object"]]))
+cases["hull_too_small"] = []
+for n in (3, 0):
+    try:
+        bxe.collision(s, "unreal", max_verts=n)
+        cases["hull_too_small"].append("made")
+    except ValueError as exc:
+        cases["hull_too_small"].append(str(exc))
+
+
+# A double-sided card (a grid and its reversed copy on the same points): the weld must not fuse
+# the two sides, or every LOD loses its back.
+def card(bm):
+    bmesh.ops.create_grid(bm, x_segments=20, y_segments=20, size=1.0)
+    back = bmesh.ops.duplicate(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:])
+    bmesh.ops.reverse_faces(bm, faces=[g for g in back["geom"] if isinstance(g, bmesh.types.BMFace)])
+
+
+bpy.ops.wm.read_factory_settings(use_empty=True)
+mesh("Card", card)
+r = bxe.lods("Card", ratios=(0.5,))
+cases["card_sides"] = {n: [sum(1 for p in bpy.data.objects[n].data.polygons if (p.normal.z > 0) == up)
+                           for up in (True, False)] for n in r["tris"]}
+
 with open(OUT, "w") as f:
     json.dump(cases, f, indent=1)
 print("EXPORT CASES", len(cases))

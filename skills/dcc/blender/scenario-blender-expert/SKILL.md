@@ -131,8 +131,8 @@ textures).
   `blender -b f.blend --python bx_audit.py -- --object Name [--high Sculpt] [--json out.json]`.
 - `bx_audit.deliverable(objs, profile="game")`: the delivery gate. `audit` grades topology; this
   grades what an engine, renderer or slicer receives, across the parts of ONE asset:
-  - errors in every profile: floating parts and fragments, closed parts inside out, negative scale;
-    z-fighting between parts everywhere but `print`;
+  - errors in every profile: a mesh with no faces after modifiers, floating parts and fragments,
+    closed parts inside out, negative scale; z-fighting between parts everywhere but `print`;
   - by profile (`game`, `render`, `print`, `roblox`): unapplied scale, faces pointing into a part
     (an error from 0.1% of its surface, a warning below except for `print`), duplicate faces, no UV
     map under an image texture, open borders for `print` and `roblox`, any gap between parts for
@@ -148,12 +148,13 @@ textures).
     inside-out parts, `bmesh.ops.reverse_faces` for faces pointing inward
     (`per_object[name]["inward_faces_at"]`), delete or offset the hidden face of a z-fighting pair,
     join or move floating parts, delete fragments.
-  - Engines cull back faces: to see what they draw, render Workbench with
-    `scene.display.shading.show_backface_culling = True` and compare with it off.
-- `bx_review.py`: `review(objs, out_dir, views, modes)` writes one contact sheet (rows = modes, cols
-  = views) in a temporary scene, user settings untouched; `playblast(out_path, res_pct=50)`;
-  `turntable(obj, out_path, frames=72, res=720)`. Only `review` has a command line: call the others
-  from a short wrapper script.
+  - Engines cull back faces: to see what they draw, render
+    `bx_review.review(parts, out, culling=True)` (magenta shows through a face pointing inward) and
+    compare with a sheet without.
+- `bx_review.py`: `review(objs, out_dir, views, modes, culling=False)` takes objects or names and
+  writes one contact sheet (rows = modes, cols = views) in a temporary scene, user settings
+  untouched; `playblast(out_path, res_pct=50)`; `turntable(obj, out_path, frames=72, res=720)`. Only
+  `review` has a command line: call the others from a short wrapper script.
 - `bx_gui.py`: real brushes in a live session: `set_view`, `activate_brush(mode, name)`,
   `stroke(mode, world_points, size, strength)`, `run(op, **kw)`, `set_paint_color`, `screenshot`.
 
