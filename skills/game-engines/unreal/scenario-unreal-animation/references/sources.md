@@ -65,5 +65,6 @@ Ran live: Epic's skeletal mesh, physics asset, Control Rig and Sequencer Control
 of `scripts/ue_anim.py` (imports, IK Rigs, retargeter, batch retarget, keyed clips, montages, root
 motion, AnimBP settings, Pose Search tags) and the five `job_*.py` jobs; a Control Rig bake (it held
 one pose); offline tests pass (`run_all.py --offline`). Not run: Motion Matching databases, schemas,
-Choosers (no Game Animation Sample), MetaHuman, ML Deformer, cloth, foot IK on slopes, Insights;
-remaining `[verify]` marks are those.
+Choosers (no Game Animation Sample), MetaHuman, ML Deformer, cloth, foot IK on slopes, Insights, and
+two calls added after the run (the retargeter's `snap_bone_to_ground` step, the base cost bias Pose
+Search tag); remaining `[verify]` marks are those.

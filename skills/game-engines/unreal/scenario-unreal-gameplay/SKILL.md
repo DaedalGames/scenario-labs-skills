@@ -224,7 +224,7 @@ in-editor BlueprintBasics skill (through `ToolsetRegistry.AgentSkillToolset`) be
 - Replicated properties auto-register (5.6); Iris Production Ready for licensees, generic
   replication still default; Mover still Experimental.
 - Enhanced Input unified with Common UI; Combo trigger deprecated; `UPlayerMappableInputConfig`
-  deprecated (5.4).
+  deprecated (5.3).
 - GAS: NonInstanced abilities deprecated (5.5); cooldown GE validation (5.7,
   `AbilitySystem.WarnCooldownEffectWithoutTags` default 1); debug commands under
   `AbilitySystem.Ability` and `AbilitySystem.Effect`.

@@ -477,9 +477,9 @@ Source on, Enable World Partition Generation Sources on, landscape cache on. Bud
 as the concurrency cap. FastGeo option: PCG FastGeo Interop plugin plus
 `pcg.RuntimeGeneration.ISM.ComponentlessPrimitives 1` (Experimental). **Teleports:** latency is
 worse after a teleport than along a continuous path (icIFFlOyob4 [00:36:44]). Place a PCG Generation
-Source component (no `unreal.PCGGenerationSourceComponent` on 5.8.3; class name [not yet run], rn54)
-at the target before the teleport, alongside the World Partition Streaming Source (P6), wait for
-both, and cap concurrent generation with `pcg.RuntimeGeneration.NumGeneratingComponents`.
+Source component (`unreal.PCGGenSourceComponent`: 5.8 Python reference, present on 5.8.3; rn54) at
+the target before the teleport [not yet run], alongside the World Partition Streaming Source (P6),
+wait for both, and cap concurrent generation with `pcg.RuntimeGeneration.NumGeneratingComponents`.
 `W.pcg_component_check(..., teleports=True)` warns while no generation source is planned; CDPR had
 not used generation sources much in production yet, so measure the result. Transfers: dump nodes as
 `{id: {"title", "gpu", "grid", "skip_readback"}}` and edges (graph nodes read from Python on 5.8.3

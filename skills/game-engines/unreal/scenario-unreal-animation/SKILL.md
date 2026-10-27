@@ -233,7 +233,8 @@ scenario-unreal-performance.
   tried): use a copy, else templates.
 - Interchange imports skeletal FBX from Python on 5.8.3 (`import_character`); pass options
   explicitly.
-- Control Rig: Construction Event; Physics Beta; `FSmartName` and 5.0 to 5.6 anim APIs removed.
+- Control Rig: Construction Event; Physics Beta; 5.0 to 5.6 anim APIs removed; `FSmartName`
+  deprecated, still in the 5.8 API.
 - MetaHuman: `ConvertLegacyDNAAssets -DryRun` first; face MetaHuman Animator on macOS, body Windows
   only.
 - Experimental (keep a fallback): Animation Mixer, Direct Mesh Controls, uFBX, MetaHuman Crowd,

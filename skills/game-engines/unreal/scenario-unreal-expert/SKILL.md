@@ -22,13 +22,13 @@ that did not run is marked **[not yet run]**.
 
 ## 1. Pick the channel (details: [`references/channels.md`](references/channels.md))
 
-| You need                                                                                                                                                    | Use                                                                                                                                                                                                                                                                                                                    |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| structured edits an Epic toolset covers (actors, assets, material graphs and instances, Blueprints, UMG, Sequencer, PCG, Niagara, tests, logs, screenshots) | **Epic Unreal MCP**, section 2                                                                                                                                                                                                                                                                                         |
-| loops, audits, anything toolsets lack, with an editor open                                                                                                  | **Python in the running editor**: [`ue_remote.PythonRemote`](scripts/ue_remote.py) after [`ue_env.enable_remote_execution(project)`](scripts/ue_env.py) (macOS needs bind address 0.0.0.0, the helper sets it), or `ue_env.install_python_toolset(project)` for a `run_python` tool on the MCP server (opt-in, unsafe) |
-| audits, imports, batch edits, validation, no editor open                                                                                                    | **headless commandlet**: [`ue_run.run_python(uproject, script)`](scripts/ue_run.py)                                                                                                                                                                                                                                    |
-| a rendered frame without a window                                                                                                                           | an editor you own: `ue_run.launch_editor(uproject, mcp_port=N, mode="offscreen")`, or `ue_run.run_python(..., mode="latent")`                                                                                                                                                                                          |
-| property batches on known objects, presets                                                                                                                  | Remote Control (calls refused by default in 5.8)                                                                                                                                                                                                                                                                       |
+| You need                                                                                                                                                    | Use                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| structured edits an Epic toolset covers (actors, assets, material graphs and instances, Blueprints, UMG, Sequencer, PCG, Niagara, tests, logs, screenshots) | **Epic Unreal MCP**, section 2                                                                                                                                                                                                                                                                                                                                         |
+| loops, audits, anything toolsets lack, with an editor open                                                                                                  | **Python in the running editor**: [`ue_remote.PythonRemote`](scripts/ue_remote.py) after [`ue_env.enable_remote_execution(project)`](scripts/ue_env.py) (on macOS and Linux it binds 0.0.0.0, which lets any host on the local network run code: say so first), or `ue_env.install_python_toolset(project)` for a `run_python` tool on the MCP server (opt-in, unsafe) |
+| audits, imports, batch edits, validation, no editor open                                                                                                    | **headless commandlet**: [`ue_run.run_python(uproject, script)`](scripts/ue_run.py)                                                                                                                                                                                                                                                                                    |
+| a rendered frame without a window                                                                                                                           | an editor you own: `ue_run.launch_editor(uproject, mcp_port=N, mode="offscreen")`, or `ue_run.run_python(..., mode="latent")`                                                                                                                                                                                                                                          |
+| property batches on known objects, presets                                                                                                                  | Remote Control (calls refused by default in 5.8)                                                                                                                                                                                                                                                                                                                       |
 
 Rules that hold for every channel: check `ue_run.editor_processes()` first and never start a second
 editor on a project that is open; never kill or relaunch an editor you did not start; no windows and
@@ -63,8 +63,8 @@ the truth, so save before stopping an editor.
    call `get_execution_environment` once, then `execute_tool_script`. The sandbox script defines
    `run()` returning a dict and calls `execute_tool(fully_qualified_tool_name, json_string)`; it
    imports only `json, math, re, time, datetime, copy`, so there is no `unreal` module and no file
-   access. Use it for N similar calls in one round trip; use Python (section 1) for logic that needs
-   the engine API.
+   writing (`get_execution_environment` says what else it allows). Use it for N similar calls in one
+   round trip; use Python (section 1) for logic that needs the engine API.
 5. **Save and verify from disk.** `AssetTools.save_assets` (and the level) before any stop; read the
    result back with `ObjectTools`, `SceneTools` or `ActorTools`; check logs; capture a frame
    (`EditorAppToolset.CaptureViewport` or [`ue_review.screenshot`](scripts/ue_review.py)) and run
@@ -122,9 +122,11 @@ folders. Route them to `scenario-unreal-pipeline-automation` (import and validat
 `scenario-unreal-materials` (PBR hookup, masked or packed maps),
 `scenario-unreal-lighting-rendering` (skies, HDRIs) or `scenario-unreal-world-building` (placement).
 With the plugin installed, the `scenario-unreal` skill covers its local MCP server (price, generate,
-import, place, save); generation spends credits, so the plugin asks for approval in the editor. Read
-its tool results before polishing: they say what was imported and where. Intake rules and what a
-commandlet can and cannot import:
+import, place, save). Generation spends credits: quote first (`estimate_cost`), tell the user the
+price, and ask before `generate`. The plugin asks for approval in the editor only when 'Approve each
+spend here' is on (off by default), or when the call comes through Epic's Unreal MCP (toolset
+`ScenarioToolsets.ScenarioToolset` on 5.8). Read its tool results before polishing: they say what
+was imported and where. Intake rules and what a commandlet can and cannot import:
 `scenario-unreal-pipeline-automation/references/generated-assets.md`; generated skies:
 `scenario-unreal-lighting-rendering/references/generated-skies.md`.
 
@@ -209,8 +211,11 @@ function: `references/toolkit-map.md`.
 - **MRG renames**: Movie Render Graph Production Ready, new features graph-only, MRQ presets legacy,
   queue default "Basic"; `set_graph_preset()` for graph jobs; end frames exclusive; H.264 node
   Windows only.
-- **Remote Control defaults**: server off until started, remote function calls refused, 127.0.0.1
-  only; opening `DefaultBindAddress` to the LAN likely exposes the unauthenticated MCP server too.
+- **Remote Control defaults**: the server may start with the editor ('Auto Start Web Server'), so
+  probe 30010 before `WebControl.StartServer`; a `-nullrhi` editor may not run it. Remote function
+  calls and console commands are refused until allowed. HTTP binds 127.0.0.1; the WebSocket bind
+  address is its own setting. Opening `DefaultBindAddress` to the LAN likely exposes the
+  unauthenticated MCP server too.
 
 ## 8. macOS specifics
 

@@ -123,9 +123,13 @@ print(G.lint_verdict(G.cpp_lint("/abs/MyGame/Source")))       # GATE: ok and no 
 - A Blueprint-only project first needs one C++ class to become a code project (Tools > New C++
   Class, or add a `Source/` module and a `Modules` entry in the `.uproject`), then project files
   regenerate.
-- Close the editor for new classes, new `UPROPERTY`/`UFUNCTION`, and header changes. Live Coding on
-  Mac was not tried here (not yet run: the test builds with UBT and the editor closed); the MCP doc
-  notes Live Coding does not propagate new `UFUNCTION` declarations even where it works.
+- Close the editor for new classes, new `UPROPERTY`/`UFUNCTION`, and header changes, on every OS.
+- Live Coding (Ctrl+Alt+F11) depends on the OS:
+  - Windows: it patches C++ while the editor runs. The MCP doc notes it does not propagate new
+    `UFUNCTION` declarations. Not yet run here.
+  - macOS and Linux: it is not available (JetBrains Rider's Unreal help; Epic's Live Coding doc
+    builds it on Live++, whose vendor lists Windows and consoles only). Close the editor and build
+    with UBT (`build_command` above defaults to macOS).
 - ASC initialization is the first thing that breaks: `InitAbilityActorInfo` must run on the server
   AND on the owning client after possession. ASC on the pawn: server `PossessedBy`, client
   `AcknowledgePossession` on the PlayerController; ASC on the PlayerState: server `PossessedBy`,
@@ -228,7 +232,7 @@ print(rep["failed"])                    # empty on 5.8.3
 - Fallback when `rep["failed"]` lists instanced modifiers: duplicate the template project's
   `IMC_Default` (`unreal.EditorAssetLibrary.duplicate_asset`) and only add or change keys with
   `map_key`.
-- 5.8: no Combo trigger (deprecated), no `UPlayerMappableInputConfig` (deprecated 5.4); Enhanced
+- 5.8: no Combo trigger (deprecated), no `UPlayerMappableInputConfig` (deprecated 5.3); Enhanced
   Input and Common UI share input data.
 - Verify at runtime: `showdebug enhancedinput` in PIE (screenshot) lists IMC_Default and the
   actions.

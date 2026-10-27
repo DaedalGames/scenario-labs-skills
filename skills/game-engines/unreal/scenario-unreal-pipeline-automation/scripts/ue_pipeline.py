@@ -43,11 +43,12 @@ PURE (python3 anywhere, and inside Unreal)
               validation_messages(), job_verdict()
   config      ini_set(), zen_ci_patch()
   (also pure) normalize_role(), texture_params(), role_settings(), prefix_for()
-IN-EDITOR (need the `unreal` module; run on 5.8.3 except validate_paths and interchange_fbx_flags)
-  api_presence(), ensure_pipeline_preset(), describe_pipeline(), interchange_fbx_flags(),
-  import_source(), apply_texture_role(), create_material_instance(), assign_materials(),
-  apply_mesh_rules(), mesh_facts(), texture_facts(), register_validators(), engine_validate(),
-  validate_paths(), redirectors_under(), run_import_plan()
+IN-EDITOR (need the `unreal` module; run on 5.8.3 except validate_paths, interchange_fbx_flags,
+  default_stack and pipeline_builds_hull)
+  api_presence(), ensure_pipeline_preset(), describe_pipeline(), default_stack(),
+  pipeline_builds_hull(), interchange_fbx_flags(), import_source(), apply_texture_role(),
+  create_material_instance(), assign_materials(), apply_mesh_rules(), mesh_facts(), texture_facts(),
+  register_validators(), engine_validate(), validate_paths(), redirectors_under(), run_import_plan()
 CLI (python3): plan | diff | package | problems | compare-launcher | parse-uat |
                automation-report | verdict
 Jobs inside Unreal: scripts/ue_pipeline_job.py (through ue_run.run_python) and
@@ -627,11 +628,18 @@ def nanite_decision(info, target=None, min_tris=None):
     return {"nanite": True, "reasons": reasons, "warnings": warnings, "set_fallback": True}
 
 
-def collision_decision(asset_class, custom_collision_count=0, extent_cm=None):
+def collision_decision(asset_class, custom_collision_count=0, extent_cm=None, fallback_hull=False):
     """Which simple collision to keep or create. DCC collision (UCX_/UBX_/UCP_/USP_ named meshes,
     Interchange "Import Collision According to Mesh Name") always wins. Pure.
+    fallback_hull: the import pipeline builds a hull when the file has no UCX_ meshes
+    (pipeline_builds_hull; None = unknown). Then a count above 0 cannot tell DCC collision from
+    that hull: the shapes are kept and flagged "unsure" (C02), never replaced.
     Returns {"action": keep|box|kdop26|decomposition|none, "reason"}."""
     if custom_collision_count and custom_collision_count > 0:
+        if fallback_hull is not False:
+            return {"action": "keep", "unsure": True,
+                    "reason": "%d primitive(s): DCC collision or the importer's fallback hull; import with "
+                              "fallback_collision_type NONE to apply the %s rule" % (custom_collision_count, asset_class)}
         return {"action": "keep", "reason": "%d DCC collision primitive(s) from UCX_/UBX_/UCP_/USP_ meshes"
                 % custom_collision_count}
     kind = ASSET_CLASSES.get(asset_class, ASSET_CLASSES["prop_small"])["collision"]
@@ -661,7 +669,7 @@ def mesh_rules(facts, plan_meta=None, asset_class=None):
                           "has_morph_targets": facts.get("has_morph_targets"), "uses_wpo": facts.get("uses_wpo"),
                           "tris": facts.get("tris")}, meta.get("target"), meta.get("nanite_min_tris"))
     return {"asset_class": cls, "nanite": nd,
-            "collision": collision_decision(cls, facts.get("simple_collision_count", 0), ext),
+            "collision": collision_decision(cls, facts.get("simple_collision_count", 0), ext, facts.get("fallback_hull")),
             "lods": lod_decision(cls, nd["nanite"], meta.get("lod_reduction"))}
 
 
@@ -718,6 +726,7 @@ ISSUES = {
     "P04": "no default assets pipeline", "E01": "exception during import",
     "I03": "planned name already held by another asset (duplicate left)",
     "SC01": "files not checked out: run stopped before saving",
+    "C02": "collision may be the importer's fallback hull, not DCC collision",
 }
 
 DEFAULT_RULES = {
@@ -1272,9 +1281,11 @@ UNREAL_API = [
     "uclass", "ufunction", "load_asset", "log", "log_warning", "log_error",
     "InterchangeVertexColorImportOption", "InterchangeMaterialImportOption", "ValidateAssetsSettings",
     "AutomationLibrary", "AutomationScheduler", "LevelEditorSubsystem", "UnrealEditorSubsystem",
-    "EditorActorSubsystem",
+    "EditorActorSubsystem", "InterchangeMeshCollision", "InterchangeProjectSettingsScript",
 ]
-DEFAULT_PIPELINE = "/Interchange/Pipelines/DefaultAssetsPipeline"  # engine plugin content (run on 5.8.3)
+# The generic assets pipeline (run on 5.8.3), not every format's default stack: the default stack
+# can differ per translator, and override_pipelines replaces all of it (default_stack() reads it).
+DEFAULT_PIPELINE = "/Interchange/Pipelines/DefaultAssetsPipeline"
 GLTF_PIPELINE = "/Interchange/Pipelines/DefaultGLTFAssetsPipeline"  # keeps glTF material instances (run on 5.8.3)
 DEFAULT_MATERIAL_HINTS = ("WorldGridMaterial", "DefaultMaterial")
 
@@ -1303,7 +1314,11 @@ PROP_PIPELINE_SETTINGS = [
       "mesh_pipeline.combine_static_meshes"], True,
      "one static mesh per file; 5.8.3 deprecates the bool (DeprecationWarning) for the enum"),
     (["mesh_pipeline.import_collision_according_to_mesh_name"], True, "UCX_/UBX_/UCP_/USP_ from the DCC"),
-    (["mesh_pipeline.import_collision"], False, "class rule adds collision after import [added]"),
+    # 5.8 Python reference: import_collision is deprecated for collision, and collision False drops
+    # UCX_ meshes too; fallback_collision_type NONE builds no hull but keeps them.
+    ([("mesh_pipeline.fallback_collision_type", EnumRef("InterchangeMeshCollision", ("NONE",))),
+      ("mesh_pipeline.import_collision", False)], None,
+     "no generated hull, UCX_ kept; the class rule adds collision after import [not yet run]"),
     (["mesh_pipeline.build_nanite"], False, "decided per mesh after import (nanite_decision)"),
     (["mesh_pipeline.generate_lightmap_u_vs", "mesh_pipeline.generate_lightmap_uvs"], False,
      "Nanite doc: off unless Lightmass bakes"),
@@ -1464,7 +1479,9 @@ def ensure_pipeline_preset(dest_path, settings=None, source=DEFAULT_PIPELINE, ov
     AssetTools.duplicate_asset on the object from unreal.load_asset works in both channels.
     For glTF sources pass source="/Interchange/Pipelines/DefaultGLTFAssetsPipeline": a preset
     duplicated from the generic DefaultAssetsPipeline imports glTF materials as Material assets
-    in a flat folder, the glTF one keeps material instances (run on 5.8.3)."""
+    in a flat folder, the glTF one keeps material instances (run on 5.8.3). Their parent was
+    PBRSurfaceMaterial_MR, not the default stack's MI_Default_Opaque (run on 5.8.3). The override
+    replaces the whole default stack (5.8 Python reference): compare it with default_stack(path)."""
     u = _u()
     eas = _eas()
     rec = {"path": dest_path, "created": False, "set": [], "failed": []}
@@ -1514,6 +1531,40 @@ def describe_pipeline(path=DEFAULT_PIPELINE, depth=1):
     return out
 
 
+def default_stack(path):
+    """IN-EDITOR, NOT YET RUN. Class names of the default pipeline stack Interchange picks for one
+    source file (InterchangeProjectSettingsScript.get_pipeline_stack_from_source_data, 5.8 Python
+    reference). A stack can list per_translator_pipelines, so glTF, FBX and OBJ may each get
+    another stack; override_pipelines replaces all of it. Asset paths: Project Settings > Engine >
+    Interchange > Pipeline Stacks."""
+    u = _u()
+    src = u.InterchangeManager.create_source_data(path)
+    stack = u.InterchangeProjectSettingsScript.get_pipeline_stack_from_source_data(False, src)
+    return [type(p).__name__ for p in (stack or [])]
+
+
+def pipeline_builds_hull(pipeline=None):
+    """IN-EDITOR, NOT YET RUN. Whether an import builds a collision hull for a file without UCX_
+    meshes: True, False, or None when unreadable. 5.8 Python reference: collision False creates
+    nothing; fallback_collision_type NONE "generates no collisions" but keeps custom ones. No
+    pipeline (the default stack): True, one convex hull for glTF, FBX and OBJ (run on 5.8.3)."""
+    if not pipeline:
+        return True
+    u = _u()
+    for p in ([pipeline] if isinstance(pipeline, str) else pipeline):
+        try:
+            mp = _get(u.load_asset(str(p)), "mesh_pipeline")
+        except Exception:
+            continue
+        try:
+            if not _get(mp, "collision"):
+                return False
+            return _get(mp, "fallback_collision_type") != _enum("InterchangeMeshCollision", "NONE")
+        except Exception:
+            return None
+    return None
+
+
 def interchange_fbx_flags():
     """IN-EDITOR, NOT YET RUN. Values of the FBX feature-flag cvars the 5.8 doc still lists
     (Interchange.FeatureFlags.Import.FBX, .FBX.ToLevel) to know which importer handles FBX."""
@@ -1533,6 +1584,8 @@ def import_source(path, folder, pipeline=None, reimport_of=None, use_interchange
     with ImportAssetParameters: is_automated, override_pipelines; run on 5.8.3); legacy
     AssetImportTask as fallback (automated, replace_existing; destination_name is ignored by
     Interchange). Imports are not undoable: the caller snapshots first. Returns [objects].
+    pipeline: one asset path, or a list run in order (the preset, then pipelines of the default
+    stack it should keep, read in Project Settings).
 
     The saved 5.8 API page gives import_asset and reimport_asset as "Array[Object] or None"
     (None when the import fails). Reimport reuses the stack stored on the asset unless
@@ -1552,7 +1605,7 @@ def import_source(path, folder, pipeline=None, reimport_of=None, use_interchange
                 pass
         if pipeline:
             pipes = list(_get(params, "override_pipelines") or [])
-            pipes.append(u.SoftObjectPath(pipeline))
+            pipes += [u.SoftObjectPath(str(p)) for p in ([pipeline] if isinstance(pipeline, str) else pipeline)]
             params.set_editor_property("override_pipelines", pipes)
         if reimport_of is not None:
             objs = mgr.reimport_asset(reimport_of, params)
@@ -2119,8 +2172,11 @@ def _import_item(it, meta, rules, pipeline, dirty, touched):
                 dirty.append(mi)
         rec["materials"] = assign_materials(mesh, mis) if mis else []
         facts = mesh_facts(mesh, it.get("category"), it.get("asset_class"))
+        facts["fallback_hull"] = pipeline_builds_hull(pipeline)
         decision = mesh_rules(facts, meta, it.get("asset_class"))
         rec["decision"] = decision
+        if decision["collision"].get("unsure"):
+            rec["issues"].append(_issue("C02", "warning", decision["collision"]["reason"]))
         rec["applied"] = apply_mesh_rules(mesh, decision)
         dirty.append(mesh)
         facts = mesh_facts(mesh, it.get("category"), decision["asset_class"])

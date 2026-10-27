@@ -210,11 +210,11 @@ code: [`references/procedures.md`](references/procedures.md).
 - In MRG, Game Overrides act only while connected; tone curve on the renderer node, OCIO on the
   output node; the Execute Script node needs Editor Only mode for Python (transition doc; 5.8
   notes).
-- Spawnables are custom bindings; in a commandlet create them with
-  `MovieSceneSequence.add_spawnable_from_class` (the `LevelSequenceEditorSubsystem` version returns
-  an empty binding there; run on 5.8.3); no `add_master_track`; transform channels are named
-  `Location.X_0` from Python, `Location.X` over MCP; compare binding ids with `guid.to_string()`
-  (run on 5.8.3).
+- Spawnables are custom bindings. In a commandlet create them with
+  `MovieSceneSequence.add_spawnable_from_class` (deprecated for the `LevelSequenceEditorSubsystem`
+  version, which returns an empty binding there; run on 5.8.3). No `add_master_track`; transform
+  channels are named `Location.X_0` from Python, `Location.X` over MCP; compare binding ids with
+  `guid.to_string()` (run on 5.8.3).
 - Playback honors the selection range; Sensor Aspect Ratio is not animatable.
 - OpenColorIO 2.5.1 with ACES 2.0: view names may differ from "ACES 1.0 SDR Video" (not yet run).
 - Mac: the MRG H.264 node is Windows only (encode with ffmpeg); ProRes on Mac is conflicting (not

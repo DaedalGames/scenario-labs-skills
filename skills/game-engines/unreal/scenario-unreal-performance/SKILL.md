@@ -130,7 +130,7 @@ source.
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | Stage budget             | 16.67 ms each (33.3 at 30)                                                                                        | game, render, GPU, W4R [00:05:17]               |
 | Lumen GI and reflections | about 4 ms at 60, 8 at 30                                                                                         | frame delta, console High, OZ24 [00:37:55]; LVP |
-| Roughness threshold      | 0.4 default (5.8.3 foliage value 0.4); 0.4 vs none 3x faster                                                      | OZ26 [00:41:56]; W4R [00:33:42]                 |
+| Roughness threshold      | 0.4 default; 0.4 vs none 3x faster; foliage has its own cvar: read it at the target scalability level             | OZ26 [00:41:56]; W4R [00:33:42]; LVP            |
 | HWRT scene               | under about 100,000 active instances; near field about 150 m (5.8.3 cull radius default 300 m, behind the camera) | consoles, LVP; W4R [00:29:30]                   |
 | Async compute            | about 1.5 ms saved overall                                                                                        | PS5, W4R [00:20:42]                             |
 | Resolution chain         | primary 800p to 1080p, secondary 1440p, dynres 55 to 75%                                                          | W4R [00:43:08]; OZ26 [00:15:48]                 |
@@ -193,8 +193,8 @@ settings, device profiles, validators, packaged builds, nightly perf test).
 - **snapshothitches:** needs a stat group (`stat default` or `stat game`; `stat unit` alone gave
   none); writes `Frame-<N>.utrace` and `.png` per hitch.
 - **MCP:** no console tool; `SearchCVars` lists variables only; `GetLogEntries` needs
-  `"category": ""`; `merge_actors` ignores `name`; `RunTests` blocks, and a world test crashed a
-  `-nullrhi` editor.
+  `"category": ""`; `merge_actors`: same value in `name` and at the end of `output_path`, read the
+  mesh path back; `RunTests` blocks, and a world test crashed a `-nullrhi` editor.
 - Mac: Nanite and VSM Beta, Lumen HWRT and MegaLights Experimental (M2+); Insights has no
   ContextSwitch; GPU "why" in Xcode and Instruments (MOB).
 

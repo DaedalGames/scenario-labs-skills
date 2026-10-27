@@ -513,7 +513,7 @@ def gc_verdict(f: Dict[str, Any], placements: int = 1, concave_or_modular: bool 
                             "[threshold %d added]" % (placements, root_proxy_placement_threshold), gdc + " [00:05:58]"))
     if f.get("root_proxy_count") and "RootProxy" not in str(f.get("custom_renderer_type", "")):
         out.append(_problem("note", "RENDERER", "root proxy set but custom renderer is not the root proxy "
-                            "renderer (5.5 notes; no Python class GeometryCollectionRootProxyRenderer on 5.8.3, set it in the Details panel)", gdc + " [00:07:05]"))
+                            "renderer (5.5 notes; harden_gc custom_renderer_class or the Details panel)", gdc + " [00:07:05]"))
     if not f.get("remove_on_max_sleep"):
         out.append(_problem("note", "REMOVAL", "no asset-level Remove on Sleep; confirm per-bone Remove on Break "
                             "exists (Fracture Mode or Dataflow; not readable from the Python class)",
@@ -1125,7 +1125,7 @@ def read_obj_faces(path: str) -> List[List[int]]:
     """Face index lists from an OBJ file (v, v/vt, v/vt/vn, negative indices), for mesh_watertight_check."""
     faces: List[List[int]] = []
     nverts = 0
-    with open(path) as fh:
+    with open(path, encoding="utf-8", errors="replace") as fh:
         for line in fh:
             if line.startswith("v "):
                 nverts += 1
@@ -2622,7 +2622,7 @@ def harden_gc(gc, settings: Dict[str, Any], save: bool = True) -> Dict[str, str]
     enable_nanite_fallback, strip_on_cook, damage_threshold (list), use_size_specific_damage_threshold,
     use_material_damage_modifiers, remove_on_max_sleep, maximum_sleep_time (min, max),
     removal_duration (min, max), slow_moving_as_sleeping, slow_moving_velocity_threshold,
-    physics_material (path), root_proxy_meshes (paths), custom_renderer_class (name) [verify].
+    physics_material (path), root_proxy_meshes (paths), custom_renderer_class (name, or a /Script/ path) [verify].
     Per-bone data (anchors, Remove on Break, one-way debris levels) is NOT on this class: Dataflow
     or Fracture Mode. Not yet run in Unreal."""
     u = _ue()
@@ -2653,8 +2653,15 @@ def harden_gc(gc, settings: Dict[str, Any], save: bool = True) -> Dict[str, str]
     rclass = s.pop("custom_renderer_class", None)
     if rclass:
         cls = getattr(u, rclass, None)
+        if cls is None and hasattr(u, "load_class"):
+            # GeometryCollectionRootProxyRenderer is no Python type on 5.8.3: load it by class path
+            path = rclass if rclass.startswith("/") else "/Script/GeometryCollectionEngine." + rclass
+            try:
+                cls = u.load_class(None, path)
+            except Exception:  # noqa: BLE001  # unknown path: reported below
+                cls = None
         if cls is None:
-            log["custom_renderer_type"] = "FAILED: unreal.%s not found [verify]" % rclass
+            log["custom_renderer_type"] = "FAILED: class %s not found [verify]" % rclass
         else:
             _set(gc, "custom_renderer_type", cls, log)
     for k, v in s.items():

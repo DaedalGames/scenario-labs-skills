@@ -135,9 +135,10 @@ frame. The loop: predict EV100 from the sun's lux and elevation with the transmi
 known manual EV100 with the buffer dumps on, read the ground's luminance from
 `<shot>_PreTonemapHDRColor.exr` on the host (`meter_pretonemap`, gain 0.99 calibrated with an
 emissive card on 5.8.3), and correct by the difference. The meter PPV is separate and switched off
-afterwards so the gameplay PPV keeps its own exposure. Sun color at sunset: keep the light white and
-Use Temperature off under a SkyAtmosphere: the atmosphere already reddens it (ground color at 5
-degrees measured (0.24, 0.10, 0.026) on 5.8.3); read the color back after setting it
+afterwards so the gameplay PPV keeps its own exposure. Sun color at sunset: a SkyAtmosphere already
+reddens a low sun (ground color at 5 degrees measured (0.24, 0.10, 0.026) on 5.8.3), so the light's
+own tint stays mild. When the brief asks for warm light, turn Use Temperature on at 4,500 to 5,500 K
+(never 6,500 or white, never deep orange). Read the color back after setting it
 (`set_light_physical` uses `set_light_color`, the only write that converts linear to the stored
 FColor).
 

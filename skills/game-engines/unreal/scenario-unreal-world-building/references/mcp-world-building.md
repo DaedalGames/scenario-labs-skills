@@ -9,10 +9,11 @@ passes.
 **Batch first.** Four or more toolset calls in a row go in one
 `ProgrammaticToolset.execute_tool_script` call: the script defines `run()`, calls
 `execute_tool("<toolset>.<tool>", json_string)`, returns a dict, and may import only json, math, re,
-time, datetime and copy (no `unreal`). A failing tool aborts the whole script and `try/except` did
-not catch it on 5.8.3; actors made before the failure stay, so read the level back before
-re-running. Keep calls expected to fail as single `call_tool` calls. Do not `time.sleep` inside a
-script to wait for PCG generation or a navmesh build: read the result in the next call.
+time, datetime and copy (no `unreal`). Call `get_execution_environment` once per session, before the
+first script. A failing tool aborts the whole script and `try/except` did not catch it on 5.8.3;
+actors made before the failure stay, so read the level back before re-running. Keep calls expected
+to fail as single `call_tool` calls. Do not `time.sleep` inside a script to wait for PCG generation
+or a navmesh build: read the result in the next call.
 
 Short names: ST `editor_toolset.toolsets.scene.SceneTools`, AC `...actor.ActorTools`, OT
 `...object.ObjectTools`, PR `...primitive.PrimitiveTools`, AT `...asset.AssetTools`, PCG
@@ -68,6 +69,7 @@ PCG ListNativeNodes(bCommonOnly?: bool) -> [str]
 PCG ListAvailableSubgraphs() -> [str]
 SP  RunPCGInstantGraph(graph: Ref<PCGGraph>, params: {..}) -> [{PCGNodeExecutionMessage}]
 PT  execute_tool_script(script: str) -> str
+PT  get_execution_environment() -> {ProgrammaticApiExecutionEnvironmentInfo}
 ```
 
 ## 3. Recipes (scripts run live; `ARGS` is the one line the runner replaces)

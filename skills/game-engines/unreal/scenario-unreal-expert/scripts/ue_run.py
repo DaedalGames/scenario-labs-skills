@@ -379,18 +379,25 @@ def parse_ps(text, uproject):
 
 
 def _ps_text():
-    """Process list with full command lines (macOS and Linux). Tests replace this."""
+    """Process list with full command lines (macOS and Linux), None when `ps` is missing or fails
+    (Windows has no `ps`). Tests replace this."""
     try:
         return subprocess.run(["ps", "-axo", "pid=,command="], capture_output=True, text=True,
                               timeout=10).stdout
     except (OSError, subprocess.SubprocessError):
-        return ""
+        return None
 
 
-def editor_processes(uproject):
+PS_MISSING = ("could not list processes (`ps` is missing or failed, as on Windows): the write-lock "
+              "check was skipped; make sure no editor has this project open before a job that saves")
+
+
+def editor_processes(uproject, ps_text=None):
     """Unreal Editor processes (GUI or commandlet) that have this project open, excluding
-    this Python process. A running editor holds a write lock on what it loaded."""
-    return [r for r in parse_ps(_ps_text(), uproject) if r["pid"] != os.getpid()]
+    this Python process. A running editor holds a write lock on what it loaded. Returns [] when
+    the process list cannot be read: _lock_guard says so."""
+    text = _ps_text() if ps_text is None else ps_text
+    return [r for r in parse_ps(text, uproject) if r["pid"] != os.getpid()]
 
 
 def _lock_guard(uproject, lock_check):
@@ -399,7 +406,10 @@ def _lock_guard(uproject, lock_check):
         return [], []
     if lock_check not in ("warn", "refuse"):
         raise ValueError("lock_check must be 'warn', 'refuse' or 'off': %r" % (lock_check,))
-    editors = editor_processes(uproject)
+    text = _ps_text()
+    if text is None:
+        return [], [PS_MISSING]
+    editors = editor_processes(uproject, text)
     if not editors:
         return [], []
     return editors, [LOCK_MESSAGE % ", ".join(str(e["pid"]) for e in editors)]
@@ -458,14 +468,20 @@ def _spawn(cmd, log_file, timeout, env=None, echo=False, until_file=None, grace=
 
 def _terminate_group(proc, wait=20.0):
     """SIGTERM the process group this module spawned, SIGKILL only after `wait` seconds.
-    Never used on a process we did not start."""
-    try:
-        pgid = os.getpgid(proc.pid)
-    except OSError:
-        return
-    for sig, delay in ((signal.SIGTERM, wait), (signal.SIGKILL, 5.0)):
+    Without process groups (Windows) the spawned process alone gets terminate(), an immediate
+    TerminateProcess, so its child processes survive. Never used on a process we did not start."""
+    if hasattr(os, "killpg"):
         try:
-            os.killpg(pgid, sig)
+            pgid = os.getpgid(proc.pid)
+        except OSError:
+            return
+        steps = ((lambda: os.killpg(pgid, signal.SIGTERM), wait),
+                 (lambda: os.killpg(pgid, signal.SIGKILL), 5.0))
+    else:
+        steps = ((proc.terminate, wait), (proc.kill, 5.0))
+    for send, delay in steps:
+        try:
+            send()
         except OSError:
             return
         t = time.time()
@@ -637,7 +653,8 @@ def run_uat(args, timeout=7200, engine=None, env=None, echo=False, job_dir=None)
 
 
 def launch_editor(uproject, map=None, mcp_port=None, engine=None, extra=(), log_path=None, mode="headless"):
-    """Start an editor this process owns (for MCP, Remote Control or PythonRemote).
+    """Start an editor this process owns (for MCP, Remote Control or PythonRemote). For Remote
+    Control use mode "offscreen": a -nullrhi editor may not start its server.
 
     mode "headless" (default): UnrealEditor-Cmd with -nullrhi, no window, no rendering (checked on
     5.8.3: the MCP server runs, about 30 s to listen); "offscreen": the full editor with -RenderOffscreen
@@ -669,7 +686,8 @@ def launch_editor(uproject, map=None, mcp_port=None, engine=None, extra=(), log_
 
 def stop_editor(handle, timeout=60.0):
     """Stop an editor started by launch_editor: SIGTERM to its group (UE requests a normal
-    exit on SIGTERM, run on 5.8.3), SIGKILL only after `timeout`. Prefer quitting from inside
+    exit on SIGTERM, run on 5.8.3), SIGKILL only after `timeout`; on Windows an immediate
+    terminate (_terminate_group). Prefer quitting from inside
     first (PythonRemote: unreal.SystemLibrary.quit_editor()). Unsaved work is the caller's
     responsibility: save before stopping."""
     proc = handle.get("process")

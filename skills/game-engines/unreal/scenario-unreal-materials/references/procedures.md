@@ -243,14 +243,15 @@ scenario-unreal-lighting-rendering). Keep scanline, flicker and scroll math inde
 Content sample so it runs inside the fetch latency (Tech Art Aid [y0QASid1v8w 00:46:03]); HDR screen
 content as HDR Compressed (BC6H). Scrolling text that smears under TSR: the Temporal Responsiveness
 node (5.7, experimental, costly), masked to the text region. It needs
-`r.Velocity.TemporalResponsiveness.Supported=1` (the article names BaseWindowsEngine.ini
-`[/Script/Engine.Renderer]` or ConsoleVariables.ini; it reads 0 by default on 5.8.3; the Mac ini
-location is **[not yet run]**), `recompileshaders all` before 5.7.1, and a small WPO on Nanite
-meshes; levels above 0 to 0.5 give medium history rejection, above 0.5 full; check with
-`r.TSR.Visualize 3` (mat-upd 5.7). `lint_graph(..., cvars=probe["cvars"])` flags the missing cvar
-(`tr_cvar_off`) and a Nanite material without WPO (`tr_nanite_needs_wpo`). Class:
-`MaterialExpressionTemporalResponsivenessOutput` (display name "Temporal Responsiveness",
-Experimental; 5.8.3 header).
+`r.Velocity.TemporalResponsiveness.Supported=1` in the project's `Config/DefaultEngine.ini` under
+`[/Script/Engine.RendererSettings]` or `[SystemSettings]`, then an editor restart. Epic's console
+variable documentation lists those sections, not the article's `[/Script/Engine.Renderer]`. The cvar
+reads 0 by default on 5.8.3; setting it was **[not yet run]**. It also needs `recompileshaders all`
+before 5.7.1, and a small WPO on Nanite meshes; levels above 0 to 0.5 give medium history rejection,
+above 0.5 full; check with `r.TSR.Visualize 3` (mat-upd 5.7).
+`lint_graph(..., cvars=probe["cvars"])` flags the missing cvar (`tr_cvar_off`) and a Nanite material
+without WPO (`tr_nanite_needs_wpo`). Class: `MaterialExpressionTemporalResponsivenessOutput`
+(display name "Temporal Responsiveness", Experimental; 5.8.3 header).
 
 ## P5. Approved presets, child instances, per-actor variation
 

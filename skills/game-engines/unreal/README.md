@@ -37,6 +37,13 @@ Start with the lead skill, `scenario-unreal-expert`.
 - Blind-graded written scenarios on version 0.1 (round 1): 51 % without the skills, 95 % with them
   (69/135 vs 128/135); all 9 scenarios improved. One grader per scenario: a direction, not a
   statistic. These scores were measured on version 0.1, before the live runs.
+- Review round (2026-10-27): each claim a 5.8.4 source review disputed was checked against Epic's
+  public 5.8 Python and C++ references, Epic's documentation and the Scenario for Unreal plugin's
+  public guide. Where none of them settles a claim, the skill now has the agent read the value or
+  feature-detect the call instead of asserting either version. Python Remote Execution's bind
+  address now follows the OS: `0.0.0.0` on macOS and Linux (socket tests on both), Epic's
+  `127.0.0.1` on Windows (not run there). On `0.0.0.0` any host on the local network can run code in
+  the editor (shown with a second host), and the skills say so.
 - The offline checks that came with the skills run in the build project, not in this repository:
   they use system Python and fake `unreal` modules. Treat any in-engine code path marked
   `[not yet run]` as unverified until a first live run.

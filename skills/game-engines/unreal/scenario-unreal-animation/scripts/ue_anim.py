@@ -1546,7 +1546,8 @@ def anim_ini_plan(budget_ms_by_level=None, tick_when_rendered=True, multithreade
 def import_defaults_plan(sample_rate=None, delete_existing_curves=True):
     """Project-wide import defaults for gameplay clips, so dialog imports by people get them too (Lake
     N_suMyUuork [00:06:50]: change the defaults in config, not per asset; import options doc: Do not import
-    curves with 0 values for gameplay animation; a fixed sample rate, 30 Hz default or the project rate).
+    curves with 0 values for gameplay animation). sample_rate means what it means in import_animations:
+    None keeps the source rate (custom rate 0, "find the best sample rate"), a number forces that rate.
 
     Legacy FBX importer: Lake edits the engine's BaseEditorPerProjectUserSettings.ini, FBX anim sequence
     import data section; the project-level file and the section and key spellings below are [verify].
@@ -1557,11 +1558,9 @@ def import_defaults_plan(sample_rate=None, delete_existing_curves=True):
     rows = [(sec, "bDoNotImportCurveWithZero", "True")]
     if delete_existing_curves:
         rows.append((sec, "bDeleteExistingCustomAttributeCurves", "True"))
-    if sample_rate is None:
-        rows.append((sec, "bUseDefaultSampleRate", "True"))
-    else:
-        rows.append((sec, "bUseDefaultSampleRate", "False"))
-        rows.append((sec, "CustomSampleRate", str(int(sample_rate))))
+    # bUseDefaultSampleRate=True bakes at 30 Hz, so it stays off for None as on the Python import paths.
+    rows.append((sec, "bUseDefaultSampleRate", "False"))
+    rows.append((sec, "CustomSampleRate", "0" if sample_rate is None else str(int(sample_rate))))
     return {"DefaultEditorPerProjectUserSettings.ini": rows}
 
 
@@ -1999,7 +1998,8 @@ PROBE = {
                                                    "set_current_retarget_pose",
                                                    "get_num_retarget_ops", "get_op_name", "get_op_controller", "add_retarget_op",
                                                    "move_retarget_op_in_stack", "set_retarget_op_enabled",
-                                                   "get_retarget_op_enabled", "duplicate_retarget_override_set"],
+                                                   "get_retarget_op_enabled", "duplicate_retarget_override_set",
+                                                   "snap_bone_to_ground"],
     "IKRetargetBatchOperation": ["run_batch_retarget", "duplicate_and_retarget"],
     "IKRetargetBatchOperationInputs": [],
     "IKRigDefinitionFactory": [], "IKRetargetFactory": [],
@@ -2013,7 +2013,7 @@ PROBE = {
     "PoseSearchDatabase": [], "PoseSearchSchema": [], "PoseSearchDatabaseFactory": [], "PoseSearchSchemaFactory": [],
     "PoseSearchMode": [], "PoseSearchDatabaseSequence": [], "PoseSearchDatabaseAnimationAsset": [],
     "AnimNotifyState_PoseSearchBlockTransition": [], "AnimNotifyState_PoseSearchExcludeFromDatabase": [],
-    "AnimNotifyState_PoseSearchOverrideContinuingPoseCostBias": [],
+    "AnimNotifyState_PoseSearchOverrideContinuingPoseCostBias": [], "AnimNotifyState_PoseSearchModifyCost": [],
     "AnimNotifyState_PoseSearchBranchIn": [],
     "SkeletalMeshEditorSubsystem": ["get_lod_count", "regenerate_lod", "get_num_verts"],
     "SkeletonModifier": ["set_skeletal_mesh", "get_all_bone_names", "get_parent_name", "commit_skeleton_to_skeletal_mesh"],
@@ -2278,11 +2278,9 @@ def _legacy_fbx_options(skeleton=None, only_animations=False, sample_rate=None, 
         _set(an, ["import_bone_tracks"], True)
         _set(an, ["do_not_import_curve_with_zero"], True)
         _set(an, ["delete_existing_custom_attribute_curves"], True)
-        if sample_rate is None:
-            _set(an, ["use_default_sample_rate"], True)
-        else:
-            _set(an, ["use_default_sample_rate"], False)
-            _set(an, ["custom_sample_rate"], int(sample_rate))
+        # use_default_sample_rate bakes at 30 Hz; None keeps the source rate as on the Interchange path
+        _set(an, ["use_default_sample_rate"], False)
+        _set(an, ["custom_sample_rate"], 0 if sample_rate is None else int(sample_rate))
     return o
 
 
@@ -2307,7 +2305,7 @@ def _import_errors(path, since=0):
         except Exception:  # noqa: BLE001
             pass
         try:
-            with open(_log_file(), errors="ignore") as fh:
+            with open(_log_file(), encoding="utf-8", errors="ignore") as fh:
                 fh.seek(since)
                 lines = fh.readlines()
         except Exception as exc:  # noqa: BLE001
@@ -2490,11 +2488,13 @@ def ik_rig_facts(rig):
 
 
 def create_retargeter(path, source_rig, target_rig, source_mesh=None, target_mesh=None, template=None,
-                      pose_name="Aligned"):
+                      pose_name="Aligned", ground_bone=None):
     """Retargeter from a template (duplicate, swap target rig and mesh: the retargeter adapts by name
     matching, retargeting doc) or from scratch (default ops, exact chain map, new named pose, auto
-    align). Op settings the controller cannot reach are set once in the GUI on the template.
-    Run on 5.8.3 (IKRetargetFactory; the 5.8.3 controller has no snap-to-ground call)."""
+    align, snap to ground). Op settings the controller cannot reach are set once in the GUI on the template.
+    Run on 5.8.3 (IKRetargetFactory). The ground step is [not yet run]: 5.8's
+    snap_bone_to_ground(bone, TARGET) (Python reference) on ground_bone, else on the end bone (ankle) of the
+    target rig's LeftLeg chain; without that call or bone, gui_todo asks for Snap Character to Ground."""
     u = _u()
     if template:
         rtg = _eas().duplicate_asset(template, path)
@@ -2521,10 +2521,29 @@ def create_retargeter(path, source_rig, target_rig, source_mesh=None, target_mes
                 steps[label] = True
             except Exception as exc:  # noqa: BLE001
                 steps[label] = "failed: %s" % exc
+        if not ground_bone:
+            try:
+                ground_bone = next((ch["end"] for ch in ik_rig_facts(target_rig)["chains"]
+                                    if ch["name"] == "LeftLeg"), None)
+            except Exception as exc:  # noqa: BLE001
+                MISSES.append("ground bone from %s: %s" % (target_rig, exc))
+        if not _has(c, "snap_bone_to_ground"):
+            steps["ground"] = "no snap_bone_to_ground on this engine"
+        elif not ground_bone:
+            steps["ground"] = "no ground bone: pass ground_bone (a target foot bone)"
+        else:
+            try:
+                c.snap_bone_to_ground(ground_bone, T)
+                steps["ground"] = True
+            except Exception as exc:  # noqa: BLE001
+                steps["ground"] = "failed: %s" % exc
     save(rtg)
+    gui_todo = [] if template else ["op settings: Blend to Source on legs, Scale Source if needed, "
+                                    "Root Motion source, Floor Constraint; then save as RTG_Template"]
+    if not template and steps.get("ground") is not True:
+        gui_todo.insert(0, "retarget pose: Snap Character to Ground")
     return {"asset": rtg.get_path_name(), "from_template": bool(template), "steps": steps,
-            "gui_todo": [] if template else ["op settings: Blend to Source on legs, Scale Source if needed, "
-                                             "Root Motion source, Floor Constraint; then save as RTG_Template"]}
+            "ground_bone": ground_bone, "gui_todo": gui_todo}
 
 
 def retargeter_facts(rtg):
@@ -2550,7 +2569,7 @@ def batch_retarget(anims, source_mesh, target_mesh, retargeter, suffix="_Retarge
     """Offline batch retarget. Run on 5.8.3: IKRetargetBatchOperation.run_batch_retarget(inputs) with
     IKRetargetBatchOperationInputs, whose fields are assets_to_retarget (a list of AssetData, not assets),
     source_mesh, target_mesh, ik_retarget_asset, prefix, suffix, target_path (or use_source_path),
-    retain_additive_flags, override_set_names (a list), overwrite_existing_files. It returns AssetData.
+    retain_additive_flags, override_set_names (a list), overwrite_existing_files. It returns a list of AssetData.
     Fallback for older engines: duplicate_and_retarget."""
     u = _u()
     assets = [load(a) for a in anims]
@@ -2584,6 +2603,7 @@ POSE_SEARCH_TAGS = {
     "block_transition_in": ["AnimNotifyState_PoseSearchBlockTransition"],
     "exclude": ["AnimNotifyState_PoseSearchExcludeFromDatabase"],
     "continuing_bias": ["AnimNotifyState_PoseSearchOverrideContinuingPoseCostBias"],
+    "base_bias": ["AnimNotifyState_PoseSearchModifyCost"],   # GUI name "Pose Search: Override Base Cost Bias"
     "branch_in": ["AnimNotifyState_PoseSearchBranchIn"],
 }
 
@@ -2601,7 +2621,8 @@ def duplicate_assets(pairs):
 def set_database(db, schema=None, clips=None, search_mode=None, continuing_pose_cost_bias=None):
     """Set a Pose Search database's schema, search mode, bias and (if Python reaches it) its assets.
     5.7 renamed AnimationAssets to DatabaseAnimationAssets. Entry structs [verify]; when no route works,
-    the report says so and the clips are added in the database editor Asset Browser (GUI)."""
+    the report says so and the clips are added in the database editor Asset Browser (GUI).
+    NOT YET RUN IN UNREAL (no Game Animation Sample in the test project)."""
     u = _u()
     db = load(db)
     rep = {"db": db.get_path_name()}
@@ -2682,8 +2703,9 @@ def schema_facts(schema):
 def add_pose_search_tag(seq_or_path, kind, start_s, duration_s, track="PoseSearch"):
     """Add a Pose Search notify state (Block Transition In, Exclude From Database, Override Continuing Pose
     Cost Bias, Override Base Cost Bias, Branch In) on a frame window: late tuning without schema changes
-    (Jose tNw9lD2PW3U [00:18:28]). Run on 5.8.3 with block_transition_in (PoseSearch plugin on); 5.8.3 has
-    no Override Base Cost Bias class (the continuing-pose one exists)."""
+    (Jose tNw9lD2PW3U [00:18:28]). Run on 5.8.3 with block_transition_in (PoseSearch plugin on). base_bias is
+    the class AnimNotifyState_PoseSearchModifyCost (5.8 C++ API reference: DisplayName "Pose Search: Override
+    Base Cost Bias", property CostAddend) [not yet run]."""
     u = _u()
     seq = load(seq_or_path)
     cls = None
@@ -2745,7 +2767,7 @@ def compile_and_scan(bp_or_path, log_tail_lines=4000):
     save(bp)
     hits = []
     try:
-        with open(_log_file(), errors="ignore") as fh:
+        with open(_log_file(), encoding="utf-8", errors="ignore") as fh:
             lines = fh.readlines()[-log_tail_lines:]
         name = bp.get_name()
         for line in lines:
@@ -2836,7 +2858,8 @@ def budget_console(budget_ms=None, enabled=True, debug=False):
 # ----------------------------------------------------------------------------- MetaHuman, bake, rigs
 
 def metahuman_build(character_path, quality="MEDIUM", pipeline="OPTIMIZED"):
-    """Assemble a MetaHuman for games (MetaHuman doc Python, 'Assemble a Character'). Never CINE for games."""
+    """Assemble a MetaHuman for games (MetaHuman doc Python, 'Assemble a Character'). Never CINE for games.
+    NOT YET RUN IN UNREAL (MetaHuman plugin absent from the test project)."""
     u = _u()
     sub = u.get_editor_subsystem(u.MetaHumanCharacterEditorSubsystem)
     ch = load(character_path)

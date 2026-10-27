@@ -147,15 +147,21 @@ stack = ["/Interchange/Pipelines/DefaultAssetsPipeline", "/Game/MyGame/Pipelines
 print(P.pipeline_stack_problems(stack))            # P02 Graph Inspector, P03 order (Oq6KbrqkGnw [00:20:22])
 ```
 
-The policy (`P.PROP_PIPELINE_SETTINGS`, returned by `P.pipeline_settings()`): use source name for
-asset; static meshes only; combine static meshes; collision by DCC name (`UCX_` `UBX_` `UCP_`
-`USP_`, Interchange doc) and no generated collision (the class rule adds it after import [added]);
-Build Nanite off at import (decided per mesh, P3); Generate Lightmap UVs off for Lumen (Nanite doc);
-**Vertex Color Import Option = Ignore** unless the master reads vertex color (pipeline digest P2
-preset; the Interchange reference lists Replace, Ignore, Override); materials not imported (Maya's
-`lambert1` never becomes an asset; instances come from the plan); textures imported separately from
-staged files with explicit roles. Enum values are `P.EnumRef` rows resolved inside Unreal; a row
-whose names do not exist lands in `failed`, never silently. Run on 5.8.3:
+The policy (`P.PROP_PIPELINE_SETTINGS`, returned by `P.pipeline_settings()`):
+
+- use source name for asset; static meshes only; combine static meshes;
+- collision by DCC name (`UCX_` `UBX_` `UCP_` `USP_`, Interchange doc) and no generated collision:
+  `fallback_collision_type` NONE keeps custom collision (5.8 Python reference), and the class rule
+  adds collision after import [not yet run];
+- Build Nanite off at import (decided per mesh, P3); Generate Lightmap UVs off for Lumen (Nanite
+  doc);
+- **Vertex Color Import Option = Ignore** unless the master reads vertex color (pipeline digest P2
+  preset; the Interchange reference lists Replace, Ignore, Override);
+- materials not imported (Maya's `lambert1` never becomes an asset; instances come from the plan);
+- textures imported separately from staged files with explicit roles.
+
+Enum values are `P.EnumRef` rows resolved inside Unreal; a row whose names do not exist lands in
+`failed`, never silently. Run on 5.8.3:
 
 - `InterchangeVertexColorImportOption.IVCIO_IGNORE` exists. `InterchangeMaterialImportOption` has
   only `IMPORT_AS_MATERIALS` (the default) and `IMPORT_AS_MATERIAL_INSTANCES`: "no materials" is
@@ -173,6 +179,10 @@ whose names do not exist lands in `failed`, never silently. Run on 5.8.3:
   instances (parent `/InterchangeAssets/Materials/PBRSurfaceMaterial_MR`) in
   `<file>/StaticMeshes|Materials|Textures` folders. Duplicate the glTF one for glTF sources
   (`ensure_pipeline_preset(..., source=P.GLTF_PIPELINE)`).
+- Neither is "the" default: the default stack can differ per translator, and `override_pipelines`
+  replaces all of it (5.8 Python reference). Without the preset, glTF instances took the parent
+  `MI_Default_Opaque`. Compare `P.default_stack(path)` [not yet run] or Project Settings > Engine >
+  Interchange > Pipeline Stacks with your override before a batch.
 - In a commandlet, `EditorAssetSubsystem.duplicate_asset` cannot find plugin content
   (`/Interchange/...` is not in that registry) and logs an Error;
   `AssetTools.duplicate_asset(name, folder, unreal.load_asset(source))` works in both channels, and
@@ -244,21 +254,31 @@ else:
     print(r["report"], r["csv"], r["manifest"], "redirectors left:", r["redirectors_left"])
 ```
 
-What `run_import_plan` does (`scripts/ue_pipeline.py`; raw engine calls in P3b): waits for the asset
-registry, then per item an Interchange import with `is_automated` and the preset in
-`override_pipelines` (reimport for a changed sha1 or policy, with the preset passed again because
-reimport otherwise reuses the stack stored on the asset, Interchange doc); rename to the planned
-name only if the importer disagreed (I02), refused when the name is already taken (I03); textures
-imported, then compression, sRGB and texture group set from the role, and the green channel flipped
-for `opengl` normals; one instance per slot from the master, texture parameters set only if the
-master has them (M04 otherwise); facts, then `P.mesh_rules` (class, Nanite, collision, LODs),
-applied in one pass, with the LOD count checked after the LOD group and an explicit chain when it is
-short; facts again and `validate_mesh_facts` / `validate_texture_facts` (L01 count, L02 screen sizes
-decreasing). Per chunk: checkout when `rules["require_checkout"]` (stop on failure, SC01),
-`save_loaded_assets`, `unreal.collect_garbage()` (commandlet-safe since 5.6). After all:
-`engine_validate` (every registered validator), the lead's
-`ue_audit.audit_assets(folders, rules, profile="game")`, and `redirectors_under(folders)` from the
-registry. One exception fails one record (E01), never the run.
+What `run_import_plan` does (`scripts/ue_pipeline.py`; raw engine calls in P3b):
+
+- It waits for the asset registry.
+- Per item, an Interchange import with `is_automated` and the preset in `override_pipelines`. A
+  changed sha1 or policy reimports with the preset passed again: reimport otherwise reuses the stack
+  stored on the asset (Interchange doc).
+- It renames to the planned name only if the importer disagreed (I02), and refuses when the name is
+  already taken (I03).
+- Textures are imported, then compression, sRGB and texture group are set from the role, and the
+  green channel is flipped for `opengl` normals.
+- One instance per slot from the master; texture parameters are set only if the master has them (M04
+  otherwise).
+- Facts, then `P.mesh_rules` (class, Nanite, collision, LODs), applied in one pass. The LOD count is
+  checked after the LOD group, with an explicit chain when it is short.
+- When the pipeline builds a fallback hull (`P.pipeline_builds_hull`, always without a preset),
+  existing collision may be that hull, not `UCX_`: it is kept and flagged C02 [not yet run].
+- Facts again, then `validate_mesh_facts` / `validate_texture_facts` (L01 count, L02 screen sizes
+  decreasing).
+- Per chunk: checkout when `rules["require_checkout"]` (stop on failure, SC01),
+  `save_loaded_assets`, `unreal.collect_garbage()` (commandlet-safe since 5.6).
+- After all: `engine_validate` (every registered validator), the lead's
+  `ue_audit.audit_assets(folders, rules, profile="game")`, and `redirectors_under(folders)` from the
+  registry.
+
+One exception fails one record (E01), never the run.
 
 Commandlet facts behind the toolkit (run on 5.8.3): `StaticMeshEditorSubsystem` is None, and the
 deprecated `EditorStaticMeshLibrary` refuses (`get_lod_count`, `set_lods`, `add_simple_collisions`

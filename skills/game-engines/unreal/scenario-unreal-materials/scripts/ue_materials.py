@@ -2157,8 +2157,8 @@ def apply_texture_fix(tex, fix, dry_run=True):
     enums = {"compression_settings": "TextureCompressionSettings", "lod_group": "TextureGroup",
              "mip_gen_settings": "TextureMipGenSettings"}
     changes = []
-    # compression first: leaving TC_Normalmap resets sRGB, so an sRGB set before it is lost
-    # (run on 5.8.3 through ObjectTools.set_properties)
+    # compression first: an sRGB set while the texture is still TC_Normalmap was lost when the
+    # compression changed (run on 5.8.3 through ObjectTools.set_properties)
     for prop, val in sorted(fix.items(), key=lambda kv: kv[0] != "compression_settings"):
         old = _get(tex, prop)
         new = val
@@ -2228,32 +2228,44 @@ def import_textures(files, dest, role_overrides=None, apply_policy=True):
 # ---------------------------------------------------------------- graph building
 # Engine textures whose compression matches each sampler type (read on 5.8.3). A texture parameter
 # whose default does not match its sampler type fails to compile in a rendering editor.
+# TC_GRAYSCALE is Grayscale with sRGB on and Linear Grayscale with it off (expected_sampler), so the
+# linear BaseFlattenGrayscaleMap serves Linear Grayscale only. No sRGB grayscale engine texture was
+# read, so the Grayscale entry is an unread candidate [verify]: default_texture_for drops any entry
+# whose flags disagree with its sampler type.
 SAMPLER_DEFAULT_TEXTURE = {
     "SAMPLERTYPE_NORMAL": "/Engine/EngineMaterials/FlatNormal",                 # TC_NORMALMAP
     "SAMPLERTYPE_MASKS": "/Engine/EngineMaterials/DefaultDiffuse_TC_Masks",     # TC_MASKS, sRGB off
-    "SAMPLERTYPE_GRAYSCALE": "/Engine/EngineMaterials/BaseFlattenGrayscaleMap",  # TC_GRAYSCALE, linear
-    "SAMPLERTYPE_LINEAR_GRAYSCALE": "/Engine/EngineMaterials/BaseFlattenGrayscaleMap",
+    "SAMPLERTYPE_GRAYSCALE": "/Engine/EngineMaterials/DefaultCalibrationGrayscale",  # [verify]
+    "SAMPLERTYPE_LINEAR_GRAYSCALE": "/Engine/EngineMaterials/BaseFlattenGrayscaleMap",  # TC_GRAYSCALE, linear
     "SAMPLERTYPE_LINEAR_COLOR": "/Engine/EngineMaterials/BaseFlattenLinearColor",  # TC_DEFAULT, sRGB off
 }
 
 
 def default_texture_for(sampler):
     """Engine texture to use as a parameter default for `sampler` (None: keep the engine default,
-    which is a Color texture). unreal.load_asset, not the registry: a headless commandlet's registry
-    can miss /Engine content (run on 5.8.3)."""
-    p = SAMPLER_DEFAULT_TEXTURE.get(str(sampler).split(".")[-1].split(":")[0].strip("<> "))
-    return _load(p) if p else None
+    which is a Color texture). The texture's own compression and sRGB must give `sampler` through
+    expected_sampler, else None and a log line. unreal.load_asset, not the registry: a headless
+    commandlet's registry can miss /Engine content (run on 5.8.3)."""
+    key = str(sampler).split(".")[-1].split(":")[0].strip("<> ")
+    p = SAMPLER_DEFAULT_TEXTURE.get(key)
+    tex = _load(p) if p else None
+    if tex is None:
+        return None
+    comp, srgb = _get(tex, "compression_settings"), _get(tex, "srgb")
+    if comp is not None and srgb is not None and expected_sampler(comp, srgb) != key:
+        log("no default texture for %s: %s is %s with sRGB %s" % (key, p, _norm_enum(comp, "TC_"), srgb))
+        return None
+    return tex
 
 
 def editor_log_path():
     """The running editor's log file (-abslog= when given, else Saved/Logs/<Project>.log)."""
     u = _u()
     try:
-        import re
         m = re.search(r'-abslog=(?:"([^"]+)"|(\S+))', str(u.SystemLibrary.get_command_line()), re.I)
         if m:
             return m.group(1) or m.group(2)
-    except Exception:
+    except Exception:  # command line unreadable: fall back to the project log below
         pass
     try:
         return os.path.join(u.Paths.project_log_dir(), u.SystemLibrary.get_game_name() + ".log")
@@ -2267,35 +2279,46 @@ def compile_check(material, log_path=None):
     Needs a RENDERING editor (offscreen or windowed): under -nullrhi or in a plain commandlet no shader
     is compiled, so a broken graph passes silently and statistics read 0 (run on 5.8.3). A commandlet
     started with -AllowCommandletRendering (ue_run.run_python(..., render=True)) counts as rendering. Errors are
-    the log lines this recompile wrote ('Failed to compile Material <path>' and the reason under
-    it; the recompile is synchronous). Statistics count the surface base pass only: a decal,
-    post-process or UI material reads 0 instructions when it compiled fine, so for those `ok`
-    rests on the log. Returns {"ok", "stats", "errors", "rendering"}."""
+    the list recompile_material returns (Array[str] in the 5.8 Python reference, empty on success).
+    A build that returns no list falls back to the log lines this recompile wrote ('Failed to compile
+    Material <path>' and the reason under it; the recompile is synchronous). Statistics count the
+    surface base pass only: a decal, post-process or UI material reads 0 instructions when it
+    compiled fine, so for those `ok` rests on the errors. Returns {"ok", "stats", "errors", "rendering"}."""
     u = _u()
     MEL = u.MaterialEditingLibrary
     log_path = log_path or editor_log_path()
     start = os.path.getsize(log_path) if log_path and os.path.isfile(log_path) else None
-    MEL.recompile_material(material)
+    returned = MEL.recompile_material(material)
     st = MEL.get_statistics(material)
     stats = {k: int(_get(st, k, 0) or 0) for k in ("num_pixel_shader_instructions", "num_vertex_shader_instructions",
                                                    "num_samplers", "num_pixel_texture_samples")}
-    errors = []
-    if start is not None:
-        with open(log_path, errors="replace") as fh:
-            fh.seek(start)
-            lines = fh.read().splitlines()
-        name = _path(material)
-        for i, line in enumerate(lines):
-            if "Failed to compile Material" in line and name in line:
-                errors.append(" | ".join(x.strip() for x in lines[i:i + 3] if x.strip()))
-            elif ": error:" in line or "error X" in line:
-                errors.append(line.strip())
+    errors = None
+    if returned is not None and not isinstance(returned, (bool, str)):
+        try:
+            errors = [str(x).strip() for x in returned if str(x).strip()]
+        except TypeError:  # not iterable: read the log instead
+            pass
+    if errors is None:
+        errors = []
+        if start is not None:
+            with open(log_path, encoding="utf-8", errors="replace") as fh:
+                fh.seek(start)
+                lines = fh.read().splitlines()
+            # a saved asset can log its disk path (.../Content/Mat/M_X.uasset) instead of /Game/Mat/M_X,
+            # so match the path below the mount point with either separator
+            parts = [x for x in _path(material).replace("\\", "/").split("/") if x] or [_name(material)]
+            own = re.compile(r"[/\\]%s(?!\w)" % r"[/\\]".join(re.escape(x) for x in (parts[1:] or parts)))
+            for i, line in enumerate(lines):
+                if "Failed to compile Material" in line and own.search(line):
+                    errors.append(" | ".join(x.strip() for x in lines[i:i + 3] if x.strip()))
+                elif ": error:" in line or "error X" in line:
+                    errors.append(line.strip())
     rendering = True
     try:
         cmd = str(u.SystemLibrary.get_command_line()).lower()
         rendering = "-nullrhi" not in cmd and ("-run=" not in cmd or "-allowcommandletrendering" in cmd)
-    except Exception:
-        pass
+    except Exception as exc:
+        log("compile_check: command line unreadable (%s), assuming a rendering editor" % exc)
     domain = str(_get(material, "material_domain", ""))
     surface = "SURFACE" in domain.upper() or not domain
     ok = not errors and stats["num_samplers"] >= 0 and (stats["num_pixel_shader_instructions"] > 0 or not surface)

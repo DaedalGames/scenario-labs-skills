@@ -29,7 +29,7 @@ Short names: ST `editor_toolset.toolsets.scene.SceneTools`, AC `...actor.ActorTo
 | Light color                  | OT `set_properties {"LightColor": {"r","g","b","a"}}`                                        | FColor: floats 0..1 are stored as bytes (0.2 reads 0.2000, i.e. 51/255, no linear conversion); 0-255 integers return true and saturate to 1                        |
 | Exposure                     | OT `set_properties` on the PPV `{"bUnbound": true, "Settings": {...}}`                       | partial nested JSON merges; each value needs its `bOverride_*`; dotted `Settings.X` paths fail                                                                     |
 | Read anything back           | OT `get_properties {"instance", "properties": [...]}`                                        | returns a JSON string; keys come back as requested at top level, camelCase inside structs (`autoExposureBias`), `bOverride_*` as is                                |
-| Does a cvar exist            | EA `SearchCVars {"name"}`                                                                    | prefix search: `r.MegaLights.Allow` returns `r.MegaLights.Allowed`; "{}" when absent; existence = exact key                                                        |
+| Does a cvar exist            | EA `SearchCVars {"name"}`                                                                    | partial match: `r.MegaLights.Allow` returns `r.MegaLights.Allowed`; "{}" when absent; existence = exact key                                                        |
 | Import an equirect sky       | TT `import_file`                                                                             | `.hdr` becomes a TextureCube; `.exr` and `.png` a long-lat Texture2D                                                                                               |
 | Count lights before handover | ST `find_actors {"actor_type", "name": "", "tag": "", "collision_channels": []}`             | `name` matches label substrings                                                                                                                                    |
 | Camera                       | EA `SetCameraTransform {"transform"}`, `GetCameraTransform`                                  |                                                                                                                                                                    |
@@ -194,9 +194,9 @@ def run():
     return out
 ```
 
-On 5.8.3 the first four are exact; `r.MegaLights.Allow` only prefix-matches `r.MegaLights.Allowed`;
-`r.Shadow.Virtual.ShowStats` is absent (now `r.Shadow.Virtual.Stats.Visible`).
-`ue_light.cvar_search_hit` does the same check host side.
+On 5.8.3 the first four are exact; `r.MegaLights.Allow` only partially matches
+`r.MegaLights.Allowed`; `r.Shadow.Virtual.ShowStats` is absent (now
+`r.Shadow.Virtual.Stats.Visible`). `ue_light.cvar_search_hit` does the same check host side.
 
 ### S5. Generated equirect as the sky light's cubemap, sun aimed at the panorama's sun (1 call instead of 10)
 
@@ -263,7 +263,8 @@ the frame step is one `run_python` (or editor console) call and the numbers are 
 3. Meter on the host:
    `ue_light.meter_pretonemap(<stem>_PreTonemapHDRColor.exr, ev, {"ground": {"box": [0.3, 0.82, 0.7, 0.97]}})`
    returns cd/m2, lux for a 0.18 surface and the EV100 that puts it on mid gray (calibrated with an
-   emissive card: 1.0 reads 0.248 at EV100 2; the compensation is not in this buffer).
+   emissive card: 1.0 reads 0.248 at EV100 2, set as compensation -2). The buffer carries the
+   compensation: pass the EV100 that S1 wrote (compensation = -EV100, physical camera off).
 4. Correct and capture again; check `ue_review.image_checks(png)` is neither `all_white` nor
    `all_black`.
 

@@ -92,7 +92,8 @@ SaveSection(categoryName: str, containerName: str, sectionName: str) -> bool
 Four or more toolset calls in a row go through one
 `ProgrammaticToolset.execute_tool_script {"script": "<text>"}` call: the scripts below replace 6 to
 20 round trips each. The single-call JSON stays for one-off fixes and as the signature reference.
-How the sandbox behaves (run on 5.8.3):
+Call `ProgrammaticToolset.get_execution_environment` once per session, before the first script. How
+the sandbox behaves (run on 5.8.3):
 
 - The script defines `run()` and returns a dict; the tool returns it as a JSON string in
   `returnValue`. Imports are limited to `json`, `math`, `re`, `time`, `datetime`, `copy`;

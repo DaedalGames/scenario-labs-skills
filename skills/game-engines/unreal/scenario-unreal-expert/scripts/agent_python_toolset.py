@@ -8,8 +8,9 @@ traceback on error. Not tried: 5.6 and 5.7 (no Toolset Registry there), Windows,
 
 Why: Epic's 5.8 toolsets cover many edits but none executes editor Python (execute_tool_script is a
 sandbox without the unreal module), and Python Remote Execution needs a project setting, a matching
-multicast bind address (0.0.0.0 on macOS) and a client that speaks Epic's UDP discovery protocol.
-This toolset runs behind the MCP connection the agent already has, with no multicast.
+multicast bind address (0.0.0.0 on macOS and Linux, which opens the editor to the local network) and
+a client that speaks Epic's UDP discovery protocol. This toolset runs behind the MCP connection the
+agent already has, with no multicast.
 
 Opt-in and unsafe by design: it runs any code with full editor access, and Epic's MCP endpoint has
 no authentication (loopback only). Install in throwaway or trusted projects, never on a machine
@@ -21,6 +22,8 @@ or by hand: copy this file to <project>/Content/Python/ and add to <project>/Con
 
 then restart the editor (init_unreal.py runs at startup; a running editor does not pick it up).
 Call: call_tool(toolset_name="agent.AgentPythonToolset", tool_name="run_python", arguments={"code": ...}).
+The `agent.` prefix comes from this file's name, not the class: keep the file name, or every call
+and ue_env.install_python_toolset must change with it.
 """
 
 __version__ = "0.2.1"

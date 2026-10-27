@@ -96,11 +96,12 @@ call, and turn each view off before the next.
    read it back. GATE: gray card within half a stop, no `all_white` or `all_black`, one sun, one sky
    light, one unbound PPV (counted with `find_actors`).
 1. **Probe and settings (P0, P1).** `probe()`, `render_settings_report`, `ini_patch` after a backup;
-   extended luminance range only in a new project. A blank project has
-   `r.DefaultFeature.AutoExposure.ExtendDefaultLuminanceRange` 0: Auto Min/Max Brightness are then
-   luminance (defaults 0.03 and 8), not EV100, so EV100 numbers written there blow the frame out
-   (arena h03: 9.5 to 11.5, floor 20 times too bright). Read the cvar first; at 0 use Manual, or Min
-   = Max = 2^EV100 (engine source, not metered). GATE: probe JSON read.
+   extended luminance range only in a new project. Read
+   `r.DefaultFeature.AutoExposure.ExtendDefaultLuminanceRange` first: it depends on how the project
+   was made (0 in the 5.8.3 test project). At 0, Auto Min/Max Brightness are luminance (defaults
+   0.03 and 8), not EV100, so EV100 numbers written there blow the frame out (arena h03: 9.5 to
+   11.5, floor 20 times too bright). Then use Manual, or Min = Max = 2^EV100 (engine source, not
+   metered). GATE: probe JSON read.
 2. **Calibrate the camera (P2).** `spawn_calibrator` at the subject, then one unbound `PPV_Global`:
    `apply_exposure(ppv, exposure_plan("gameplay", ("interior", "blue_hour")))`, `apply_look` (Local
    Exposure mandatory with Lumen GI; Film only here). GATE: `ppv_lint` no fail; HDR view shows each
@@ -137,20 +138,20 @@ call, and turn each view off before the next.
 
 ## Numbers
 
-| Item                                               | Value                                                                                                                                                                                                        | Relative to, source                                 |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
-| Sun, moon                                          | 120,000 lux at zenith (0.545 degrees); moon 0.26 lux                                                                                                                                                         | Epic sky doc                                        |
-| Look targets (EV100)                               | sunlit 14, cloudy 10, low sun 7, interior 4, moonlit 1, moonless -2                                                                                                                                          | Gobey chart [00:12:02]; targets, not meter readings |
-| Fixtures                                           | candle 12 lm 1,900 K; decorative 300; interior 1,000; exterior 10,000; street 2,500 to 10,000 lm                                                                                                             | Gobey chart; Argyriou [00:13:36]                    |
-| Units                                              | 1 cd = 625 unitless = 12.6 lm (point) = 3.14 lm (rect) = 1.76 lm (spot, 44 degrees)                                                                                                                          | exposure doc                                        |
-| Exposure                                           | EV100 = log2(N^2 / t x 100 / ISO); pre-tone-mapper pixel = L / 2^EV100 x 0.99; compensation acts after (positive brightens); Manual without physical camera: EV100 = -compensation; default compensation 1.0 | exposure doc; run on 5.8.3                          |
-| Sun on the ground (SkyAtmosphere, 120,000 lux sun) | 101,700 lux at 90 degrees, 68,000 at 45, 18,500 at 15, 2,600 at 5, 450 at 2; the real-time sky light added about 1 stop at 5 degrees                                                                         | run on 5.8.3 (`SUN_TRANSMITTANCE_583`)              |
-| Defaults                                           | spawned sun 10 lux, Stationary, temperature off; 10 lux at 35 degrees gives 4.96 lux on a 0.18 floor                                                                                                         | run on 5.8.3                                        |
-| Cached lighting range                              | `r.EyeAdaptation.CachedLightingPreExposure` 4 covers EV100 about -8 to 12, 8 covers -4 to 16                                                                                                                 | 5.8.3 console help                                  |
-| Auto exposure                                      | Low 70 to 80, High 80 to 95 percent; Speed Up 3 above Speed Down 1                                                                                                                                           | exposure doc; Gobey frame [00:21:52]                |
-| Albedo                                             | 0.02 [added] to 0.8 path traced, 0.9 Lumen                                                                                                                                                                   | path tracer doc; Faucher 1e6oOiKh91U [00:13:35]     |
-| MegaLights                                         | 20 percent of samples to hidden lights (50 after failed reprojection); sun up to 50                                                                                                                          | SIGGRAPH [00:10:37] [00:16:40]                      |
-| Path-traced still                                  | 1 temporal, spatial 256 draft to 1024 or more final; glass 10 bounces; Max Path Intensity default                                                                                                            | path tracer doc; Faucher X5zVhc5ahl0 [00:16:47]     |
+| Item                                               | Value                                                                                                                                                                                 | Relative to, source                                 |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Sun, moon                                          | 120,000 lux at zenith (0.545 degrees); moon 0.26 lux                                                                                                                                  | Epic sky doc                                        |
+| Look targets (EV100)                               | sunlit 14, cloudy 10, low sun 7, interior 4, moonlit 1, moonless -2                                                                                                                   | Gobey chart [00:12:02]; targets, not meter readings |
+| Fixtures                                           | candle 12 lm 1,900 K; decorative 300; interior 1,000; exterior 10,000; street 2,500 to 10,000 lm                                                                                      | Gobey chart; Argyriou [00:13:36]                    |
+| Units                                              | 1 cd = 625 unitless = 12.6 lm (point) = 3.14 lm (rect) = 1.76 lm (spot, 44 degrees)                                                                                                   | exposure doc                                        |
+| Exposure                                           | Manual: EV100 = camera EV - compensation, camera EV = log2(N^2 / t x 100 / ISO) or 0 without physical camera; PreTonemapHDRColor pixel = L / 2^EV100 x 0.99; default compensation 1.0 | exposure doc; run on 5.8.3                          |
+| Sun on the ground (SkyAtmosphere, 120,000 lux sun) | 101,700 lux at 90 degrees, 68,000 at 45, 18,500 at 15, 2,600 at 5, 450 at 2; the real-time sky light added about 1 stop at 5 degrees                                                  | run on 5.8.3 (`SUN_TRANSMITTANCE_583`)              |
+| Defaults                                           | spawned sun 10 lux, Stationary, temperature off; 10 lux at 35 degrees gives 4.96 lux on a 0.18 floor                                                                                  | run on 5.8.3                                        |
+| Cached lighting range                              | `r.EyeAdaptation.CachedLightingPreExposure` 4 covers EV100 about -8 to 12, 8 covers -4 to 16                                                                                          | 5.8.3 console help                                  |
+| Auto exposure                                      | Low 70 to 80, High 80 to 95 percent; Speed Up 3 above Speed Down 1                                                                                                                    | exposure doc; Gobey frame [00:21:52]                |
+| Albedo                                             | 0.02 [added] to 0.8 path traced, 0.9 Lumen                                                                                                                                            | path tracer doc; Faucher 1e6oOiKh91U [00:13:35]     |
+| MegaLights                                         | 20 percent of samples to hidden lights (50 after failed reprojection); sun up to 50                                                                                                   | SIGGRAPH [00:10:37] [00:16:40]                      |
+| Path-traced still                                  | 1 temporal, spatial 256 draft to 1024 or more final; glass 10 bounces; Max Path Intensity default                                                                                     | path tracer doc; Faucher X5zVhc5ahl0 [00:16:47]     |
 
 ## Quality gates
 

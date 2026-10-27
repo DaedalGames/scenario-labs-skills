@@ -116,11 +116,12 @@ def run():
     return out
 ```
 
-Result on a Blank-template project: `r.ShaderPrint` 0, `r.ShaderPrintEnable` None (renamed),
+Result on the 5.8.3 test project: `r.ShaderPrint` 0, `r.ShaderPrintEnable` None (renamed),
 `r.Shadow.Virtual.Stats.Visible` false, `r.Shadow.Virtual.ShowStats` None (deprecated: typing it
 fires an ensure), `r.Nanite.ShowMeshDrawEvents` None (gone in 5.8.3), `r.GPUCsvStatsEnabled` 0, GI
 method 0, reflection method 2, hitch threshold 60. A None is a name to fix before it goes into a
-capture command.
+capture command. Epic's Lumen doc says newly created projects have Lumen GI and reflections on, so
+read the two methods, never assume them.
 
 ```python
 # execute_tool_script: R2 read, set and read back a project setting (default collision complexity)
@@ -260,10 +261,12 @@ def run():
 ```
 
 Result: 1,600 actors merged in about 1 s into one Static actor with a 76,800-triangle mesh and one
-LOD; `name` is ignored, the mesh is `/Game/Perf/SM_CubesMerged` (the last part of `output_path` with
-an `SM_` prefix, in its parent folder). The source actors are gone and their tags too. Merging
-trades culling for draw calls: one mesh is drawn whole when any part is visible, so merge what is
-seen together (or use instances; world-building owns that choice).
+LOD; the mesh is `/Game/Perf/SM_CubesMerged` (`SM_` plus `CubesMerged`, in the parent folder of
+`output_path`). This run gave `name` and the last part of `output_path` the same value, so it does
+not show which one names the asset: pass the same value in both and read the mesh path back. The
+source actors are gone and their tags too. Merging trades culling for draw calls: one mesh is drawn
+whole when any part is visible, so merge what is seen together (or use instances; world-building
+owns that choice).
 
 ```python
 # execute_tool_script: R7 generate LODs on a dense mesh, set explicit screen sizes, read back
@@ -394,7 +397,8 @@ was `EventWait/Shadows` and GPU ShadowDepths took 32 ms: `P.csv_breakdown(csv)` 
   `NaniteStats`, `fx.Niagara.Debug.Hud`, `r.RHISetGPUCaptureOptions`) never appear, and plugin cvars
   (`a.Budget.*`) appear only with the plugin enabled.
 - `GetLogEntries` without `"category": ""` fails ("Log category 'LogsToolset' not found").
-- `merge_actors` ignores `name`; the asset is `SM_` plus the last part of `output_path`.
+- `merge_actors` made `SM_` plus the last part of `output_path`, which matched `name` in that run:
+  pass the same value in both and read the mesh path back.
 - `generate_lods` leaves screen sizes at 0 or nearly equal: set them.
 - `find_assets` returns package paths; tools that take an object want `/Game/F/T_X.T_X`.
 - `RunTests` blocks; a world-creating test in a `-nullrhi` editor crashed it.

@@ -178,7 +178,7 @@ SUN_TRANSMITTANCE_583 = {90.0: 0.848, 45.0: 0.801, 15.0: 0.597, 5.0: 0.248, 2.0:
 SUN_GROUND_RGB_583 = {  # normalised colour of the light reaching the ground, white sun, no temperature
     90.0: (0.38, 0.35, 0.30), 5.0: (0.24, 0.10, 0.026), 2.0: (0.18, 0.046, 0.005)}
 EXPOSURE_FACTS_583 = {
-    "pixel": "linear pixel before the tone mapper = L / 2^EV100 times 0.985 to 0.99 (tone mapper off, or the PreTonemapHDRColor dump); the compensation acts later",
+    "pixel": "linear pixel before the tone mapper = L / 2^EV100 times 0.985 to 0.99 (tone mapper off, or the PreTonemapHDRColor dump); in the dump EV100 is the frame's, compensation included (measured with the physical camera off)",
     "pretonemap_dump": "r.BufferVisualizationDumpFrames 1 + DumpFramesAsHDR 1 writes <shot>_PreTonemapHDRColor.exr beside a take_high_res_screenshot: emissive 1.0 at EV100 2 read 0.248; the same floor metered 4.96 lux at EV100 0 and at 3",
     "default_sun_on_ground": "the default 10 lux sun at elevation 35 gave 4.96 lux on a 0.18 floor (sun plus sky): metered, PreTonemapHDRColor",
     "cached_lighting_range": "r.EyeAdaptation.CachedLightingPreExposure 4 (default) covers about EV100 -8 to 12; 8 covers about -4 to 16 (5.8.3 console help): a physical noon sun (EV100 about 14) sits outside the default",
@@ -187,7 +187,7 @@ EXPOSURE_FACTS_583 = {
     "manual_physical_camera": "EV100 from ISO, shutter, aperture; the compensation is added on top, so keep it 0",
     "auto_min_equals_max": "Auto with Min = Max = X EV100 and compensation 0 equals manual EV100 X (extended range project)",
     "default_compensation": "r.DefaultFeature.AutoExposure.Bias is 1.0: an un-overridden compensation adds 1 stop",
-    "extended_range": "r.DefaultFeature.AutoExposure.ExtendDefaultLuminanceRange is 0 in a blank 5.8.3 project: Min/Max Brightness are then luminance, not EV100",
+    "extended_range": "r.DefaultFeature.AutoExposure.ExtendDefaultLuminanceRange depends on how the project was made (0 in the 5.8.3 test project): read it first; at 0, Min/Max Brightness are luminance, not EV100",
     "adaptation": "Speed Up 3, Speed Down 1 EV/s by default: a frame taken seconds after a big light change shows the old exposure; set both speeds to 50 or use Manual before measuring",
     "hdr_capture": "take_high_res_screenshot(capture_hdr=True) writes the frame after the tone mapper; it is scene-linear only with ShowFlag.Tonemapper 0; prefer the PreTonemapHDRColor dump",
     "default_sun": "a spawned DirectionalLight is 10 lux, Stationary, Use Temperature off (6500 K stored)",
@@ -272,7 +272,7 @@ def exposure_check(sun_lux, elevation_deg, pp, extended_range=True):
 
 def cvars_in_help(help_html_text, names):
     """Which names exist in the console help dump (Saved/ConsoleHelp.html after the `help` command).
-    Returns {name: bool}. Exact, case-insensitive match; SearchCVars is a prefix search, so
+    Returns {name: bool}. Exact, case-insensitive match; SearchCVars also returns partial matches, so
     r.MegaLights.Allow 'finds' r.MegaLights.Allowed (run on 5.8.3)."""
     have = {m.lower() for m in re.findall(r'name:\s*"([^"]+)"', help_html_text)}
     return {n: n.lower() in have for n in names}
@@ -280,7 +280,7 @@ def cvars_in_help(help_html_text, names):
 
 def cvar_search_hit(search_json, name):
     """True only if EditorAppToolset.SearchCVars(name) returned that exact name (it also returns
-    names that merely start with it, and "{}" when nothing matches)."""
+    partial matches, and "{}" when nothing matches)."""
     try:
         d = json.loads(search_json) if isinstance(search_json, str) else dict(search_json)
     except ValueError:
@@ -592,13 +592,16 @@ def buffer_dump_paths(screenshot_path, hdr=True):
 
 
 # Calibrated on 5.8.3 (2026-10-21): an emissive 1.0 card rendered at manual EV100 2 reads 0.248 in
-# <shot>_PreTonemapHDRColor.exr, and the reading scales by exactly 2^-dEV between EV100 0 and 3. The
-# exposure compensation is NOT in this buffer (it is applied later); the tone mapper is not either.
+# <shot>_PreTonemapHDRColor.exr, and the reading scales by exactly 2^-dEV between EV100 0 and 3. Those
+# EV100 values were set as compensation, physical camera off (camera EV100 0, exposure doc): the buffer
+# carries the compensation, not the tone mapper. A physical camera's EV100 in it was not measured, so
+# meter with exposure_settings_for_ev100(ev100, "manual") and pass that ev100.
 PRETONEMAP_GAIN_583 = 0.99
 
 
 def luminance_from_pretonemap(value, ev100, gain=PRETONEMAP_GAIN_583):
-    """cd/m2 from a PreTonemapHDRColor dump value rendered at a known EV100 (L = B * 2^EV100 / gain)."""
+    """cd/m2 from a PreTonemapHDRColor dump value rendered at a known EV100 (L = B * 2^EV100 / gain).
+    ev100 is the frame's, compensation included: -compensation in Manual without a physical camera."""
     return float(value) * (2.0 ** ev100) / gain
 
 
@@ -609,7 +612,8 @@ def illuminance_from_pretonemap(value, ev100, albedo=MID_GREY, gain=PRETONEMAP_G
 
 def meter_pretonemap(path, ev100, regions, albedo=MID_GREY, gain=PRETONEMAP_GAIN_583):
     """Median luminance (cd/m2), lux for `albedo`, and the EV100 that would put each region on mid grey,
-    from a <shot>_PreTonemapHDRColor.exr. regions: {name: region spec as in region_mask}. Host side (numpy)."""
+    from a <shot>_PreTonemapHDRColor.exr rendered under exposure_settings_for_ev100(ev100, "manual").
+    regions: {name: region spec as in region_mask}. Host side (numpy)."""
     img, kind = load_image(path)
     lum = luminance(img)
     out = {}
@@ -789,8 +793,8 @@ def exposure_plan(use="gameplay", conditions=("interior", "blue_hour"), subject=
 
 def pp_values_for_exposure(plan):
     """PostProcessSettings fields for an exposure plan (names exist on 5.8.3, probe()). Enum values are 'enum:Type.NAME'.
-    Min/Max Brightness are EV100 only when ExtendDefaultLuminanceRange is on (it is off in a blank 5.8.3
-    project); check it first (probe()["cvars"] or SearchCVars)."""
+    Min/Max Brightness are EV100 only when ExtendDefaultLuminanceRange is on (it depends on how the
+    project was made; off in the 5.8.3 test project); check it first (probe()["cvars"] or SearchCVars)."""
     v = {"auto_exposure_bias": float(plan.get("bias", 0.0))}
     mode = plan["mode"]
     if mode == "histogram":
@@ -2260,7 +2264,7 @@ def write_report(report, out_dir, frame=None):
     lines = ["| status | id | subject | message | fix | source |", "|---|---|---|---|---|---|"]
     for x in report["findings"]:
         lines.append("| %s | %s | %s | %s | %s | %s |" % (x["status"], x["id"], x.get("subject") or "", x["message"], x.get("fix") or "", x.get("src") or ""))
-    with open(os.path.join(out_dir, "critique.md"), "w") as f:
+    with open(os.path.join(out_dir, "critique.md"), "w", encoding="utf-8") as f:
         f.write("Verdict: %s (code screens, the eye decides)\n\n%s\n" % (report.get("verdict"), "\n".join(lines)))
     if frame and isinstance(frame, str) and np is not None:
         try:
@@ -2906,7 +2910,7 @@ def log_since(tag, path=None):
     path = path or _log_file()
     if not path:
         return ""
-    with open(path, errors="ignore") as f:
+    with open(path, encoding="utf-8", errors="ignore") as f:
         text = f.read()
     i = text.rfind("UE_LIGHT_MARK %s" % tag)
     return text[i:] if i >= 0 else ""
@@ -3099,9 +3103,9 @@ def main(argv=None):
     elif a.cmd == "lint-lights":
         r = light_lint(json.load(open(a.lights_json)), json.load(open(a.context)) if a.context else None)
     elif a.cmd == "lint-ini":
-        r = render_settings_report(open(a.ini).read(), tuple(a.wants.split(",")))
+        r = render_settings_report(open(a.ini, encoding="utf-8-sig").read(), tuple(a.wants.split(",")))
     elif a.cmd == "budget":
-        r = pass_budget(profilegpu_passes(open(a.log, errors="ignore").read()), a.fps)
+        r = pass_budget(profilegpu_passes(open(a.log, encoding="utf-8", errors="ignore").read()), a.fps)
     elif a.cmd == "albedo":
         r = albedo_check(a.image, renderer=a.renderer)
     print(json.dumps(r, indent=1, default=str))

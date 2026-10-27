@@ -67,8 +67,17 @@ Fixes that ran on 5.8.3, all through a preset passed in `override_pipelines`
   `/Interchange/Pipelines/DefaultGLTFAssetsPipeline`, not `DefaultAssetsPipeline`. From the generic
   one, glTF materials became plain `Material` assets in a flat folder; from the glTF one, instances
   stayed (parent `/InterchangeAssets/Materials/PBRSurfaceMaterial_MR`) in the nested folders.
+- **The preset replaces the whole default stack:** `override_pipelines` uses "the specific custom
+  set of pipelines" (5.8 Python reference). With the glTF preset alone, the parent moved from the
+  default stack's `MI_Default_Opaque` to `PBRSurfaceMaterial_MR`. A stack can carry per-translator
+  pipelines, so glTF, FBX and OBJ may each get a different default. Read it before overriding:
+  `P.default_stack(path)`, or Project Settings > Engine > Interchange > Pipeline Stacks. To keep one
+  of its pipelines, pass it after the preset (`pipeline=[preset, other]`) [not yet run].
 - **Nanite and collision decided later:** `mesh_pipeline.build_nanite = False` and
-  `mesh_pipeline.collision = False` gave Nanite off and no convex hull.
+  `mesh_pipeline.collision = False` gave Nanite off and no convex hull. `collision = False` also
+  drops `UCX_` meshes (5.8 Python reference), so the preset sets
+  `fallback_collision_type = InterchangeMeshCollision.NONE` instead: it "generates no collisions"
+  but keeps custom ones [not yet run]. The older `import_collision` is deprecated for `collision`.
 
 ### FBX
 

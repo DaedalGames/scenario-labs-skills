@@ -85,8 +85,10 @@ import frame-rate 30 fps") was only in the log, which the functions return as `e
 `ShoulderLeft1`).
 
 **Project-wide import defaults** (Lake [00:06:50]: change defaults in config, not per asset; import
-options doc: Do not import curves with 0 values for gameplay clips; one sample rate, 30 Hz default
-or the project rate). People importing through the dialog then get the same options as the agent.
+options doc: Do not import curves with 0 values for gameplay clips). People importing through the
+dialog then get the same options as the agent. `sample_rate` means the same in `import_animations`,
+its legacy fallback and `import_defaults_plan`: None keeps the source rate (custom rate 0), a number
+forces that rate on every path.
 
 ```python
 cfg = "/abs/MyGame/Config"
@@ -174,7 +176,7 @@ r = A.create_retargeter("/Game/Characters/Hero/Rigs/RTG_UEFN_to_Hero",
                         "/Game/Characters/Hero/Rigs/IK_Hero",
                         source_mesh="/Game/Characters/UEFN_Mannequin/Meshes/SKM_UEFN_Mannequin",
                         target_mesh="/Game/Characters/Hero/SK_Hero")
-print(r["steps"], r["gui_todo"])
+print(r["steps"], r["ground_bone"], r["gui_todo"])   # ground_bone= overrides the LeftLeg chain's ankle
 ops = A.retargeter_facts("/Game/Characters/Hero/Rigs/RTG_UEFN_to_Hero")
 print(A.op_stack_check(ops, proportions_differ=True, runtime=False)["issues"])
 ```
@@ -183,7 +185,9 @@ Order that decides contact (Richardson; 5.8 doc), set once, in the GUI where the
 reach (`gui-paths.md`):
 
 1. Retarget pose: new named pose (never Default), Auto Align, Snap Character to Ground, slight knee
-   and elbow bend.
+   and elbow bend. `create_retargeter` scripts the first three; the snap calls 5.8's
+   `snap_bone_to_ground` [not yet run], and `gui_todo` asks for the GUI button when it could not
+   snap.
 2. Scale Source at the top only if heights differ a lot; dial while watching IK goal debug draws.
 3. Pelvis Motion: Floor Constraint Weight 1 with crotch offsets for shorter targets; Scale
    Horizontal and Vertical for stride and bounce.
@@ -220,7 +224,7 @@ reach (`gui-paths.md`):
    `t_op_stack_check`. Status: run on 5.8.3: `IKRetargetFactory` plus the controller made the
    retargeter; its default stack read Pelvis Motion, FK Chains, Run IK Rig, Root Motion, Remap
    Curves (`get_op_name`), and `op_stack_check` flagged it as expected (no Blend to Source, Root
-   Motion source unset). The GUI steps above are not scripted.
+   Motion source unset). The other GUI steps above are not scripted.
 
 ## P6. Batch retarget and validate contact
 

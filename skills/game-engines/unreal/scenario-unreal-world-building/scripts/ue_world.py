@@ -2114,8 +2114,8 @@ def pcg_builder_args(map_path: str, graph_names: Sequence[str] = (), settings_as
 
 
 def minimap_builder_args(map_path: str) -> Tuple[str, List[str]]:
-    """Minimap builder; class name [not yet run] (WPdoc names the Minimap Builder commandlet;
-    minimap display needs virtual texture support)."""
+    """Minimap builder: UWorldPartitionMiniMapBuilder (5.8 C++ API); the run is [not yet run]
+    (WPdoc names the Minimap Builder commandlet; minimap display needs virtual texture support)."""
     return WP_BUILDER, [map_path, "-Builder=WorldPartitionMiniMapBuilder", "-AllowCommandletRendering"]
 
 

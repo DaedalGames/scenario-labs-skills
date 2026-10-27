@@ -127,9 +127,13 @@ by a saved source; `[verify]` = check on the installed engine (the probe job
 
 ## 3. Remote Control and MCP
 
-- **Remote Control server is off until started**: `WebControl.StartServer` (or
-  `WebControl.EnableServerOnStartup`); off in packaged and `-game` builds unless
-  `-RCWebControlEnable -RCWebInterfaceEnable`; binds 127.0.0.1; HTTP 30010, WebSocket 30020 (rc).
+- **Remote Control server: probe before starting it.** Epic's quick start says it runs only once
+  started (`WebControl.StartServer` or `WebControl.EnableServerOnStartup`), but 5.8 also has the
+  setting 'Auto Start Web Server' (`bAutoStartWebServer`), so it may already listen. A `-nullrhi`
+  editor may not start it at all: use an offscreen editor. Off in packaged and `-game` builds unless
+  `-RCWebControlEnable -RCWebInterfaceEnable`. HTTP 30010 binds 127.0.0.1; the WebSocket server
+  (30020) has its own bind address setting (`RemoteControlWebsocketServerBindAddress`), so read it
+  before assuming loopback (rc; 5.8 C++ API reference, `URemoteControlSettings`).
 - **5.8: remote UFUNCTION execution is disabled by default**, re-allowable in Remote Control project
   settings, with an allow list (rn58 § Motion Design, Virtual Production). Every 2022-era
   `/remote/object/call` example fails on a fresh 5.8 project. The refusal reads "not allowed by
@@ -140,7 +144,9 @@ by a saved source; `[verify]` = check on the installed engine (the probe job
   editor (BlueprintVisible in PIE and -game), calls static functions on the CDO
   (`/Script/Module.Default__Class`, Python classes at `/Engine/PythonTypes.Default__Class`), and PIE
   objects carry a `UEDPIE_N_` map prefix (rc). 5.5 made per-preset transactions and change events
-  opt-in and added an option to block console commands over the web API (rn55).
+  opt-in and added an option to block console commands over the web API (rn55); in 5.8
+  `ExecuteConsoleCommand` needs 'Allow Console Command Remote Execution'
+  (`bAllowConsoleCommandRemoteExecution`), separate from the remote-call permission.
 - **Epic Unreal MCP is Experimental** (plugin `ModelContextProtocol`); it has no tools alone: enable
   `AllToolsets`, which pulls in `EditorToolset` (Epic's webinar called the Editor Toolset "missing
   from the online documentation", k0tgmrBuIJc [00:06:00]; on 5.8.3 nothing extra is needed). Auto
@@ -158,13 +164,18 @@ by a saved source; `[verify]` = check on the installed engine (the probe job
   use a new `-ModelContextProtocolPort` for each launch. A headless
   `UnrealEditor-Cmd -ModelContextProtocolStartServer ... -nullrhi -unattended -nosound` listens
   about 30 s after the launch.
-- **Python Remote Execution on macOS needs bind address 0.0.0.0 in the editor and the client.**
-  Epic's default `127.0.0.1` finds no editor there (an editor socket bound to one unicast address
-  never receives datagrams sent to the multicast group). `ue_env.enable_remote_execution(project)`
-  writes the editor side, `ue_remote.PythonRemote` the client side (run on 5.8.3 with Epic's
-  `remote_execution.py` and with our fallback client). Without multicast:
-  `ue_env.install_python_toolset(project)` adds `run_python` to the MCP server (a project-local
-  `unreal.ToolsetDefinition`, registered from `Content/Python/init_unreal.py`; opt-in and unsafe).
+- **Python Remote Execution on macOS and Linux needs bind address 0.0.0.0 in the editor and the
+  client.** Epic's default `127.0.0.1` finds no editor there (a socket bound to one unicast address
+  never receives datagrams sent to the multicast group; editor run on macOS, socket test on Linux).
+  It stays right on Windows. `ue_env.enable_remote_execution(project)` writes the editor side,
+  `ue_remote.PythonRemote` the client side (run on 5.8.3 with Epic's `remote_execution.py` and with
+  our fallback client).
+- **With 0.0.0.0, any host on the local network can run code in the editor.** The editor joins the
+  group on the network interface; TTL 0 limits what it sends, not what it receives. Use it on a
+  trusted network or behind a firewall that drops inbound UDP 6766 from other hosts. Without
+  multicast: `ue_env.install_python_toolset(project)` adds `run_python` to the loopback MCP server
+  (a project-local `unreal.ToolsetDefinition`, registered from `Content/Python/init_unreal.py`;
+  opt-in and unsafe).
 - `[HTTPServer.Listeners] DefaultBindAddress=0.0.0.0` (the RC LAN recipe) is read by the MCP
   listener too, so it likely exposes the unauthenticated MCP server [added inference, verify with
   `ue_remote.loopback_only(8000)`].
@@ -352,8 +363,8 @@ behind them.
   that error; `try` does not catch it. Keep a call that is expected to fail (a compile check, a
   refused import) as its own `call_tool`. Keys of one `ObjectTools.set_properties` apply in order:
   moving a texture off `TC_Normalmap` turns sRGB back off, so set compression first and sRGB after.
-- A cvar exists only if `ConsoleHelp` knows it exactly; `SearchCVars` matches prefixes and returns
-  near misses. Check the exact name before setting it.
+- A cvar exists only if `ConsoleHelp` knows it exactly; `SearchCVars` matches part of the name and
+  returns near misses. Check the exact name before setting it.
 - Scripted screenshots: the HDR capture is taken after tone mapping, so for linear data use
   `r.BufferVisualizationDumpFrames`; `viewmode` commands do not change a scripted shot, use ShowFlag
   overrides. `ProfileGPU` now prints a box-drawn table and may open a window: run it only in an
@@ -380,8 +391,10 @@ behind them.
   `r.Shadow.Virtual.Stats.Visible` (typing the old name fires an ensure);
   `r.Nanite.ShowMeshDrawEvents` is gone.
 - `AutomationTestToolset.RunTests` blocks until done, and a test that creates a world crashed a
-  `-nullrhi` editor. `merge_actors` ignores `name`. `spawn_actor_from_object` returns None in a
-  commandlet. `GetLogEntries` needs `"category": ""`.
+  `-nullrhi` editor. `merge_actors`: pass the same value in `name` and at the end of `output_path`,
+  then read the mesh path back (which one names the asset is unsettled). `spawn_actor_from_object`
+  returns None in a commandlet. `GetLogEntries` needs `"category": ""`, although its schema marks it
+  optional.
 - Blueprint DSL: members of a Blueprint made in the same session are not listed by
   `find_node_types`; write `Class|BPHero|GetCoins` (the Blueprint name without underscores). A
   function with the same name in a second Blueprint binds to the first one's; `read_graph_dsl` can

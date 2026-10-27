@@ -304,9 +304,11 @@ wiring, never compilation.
 
 Default textures that match each sampler type (run on 5.8.3): Color
 `/Engine/EngineMaterials/DefaultDiffuse`, Normal `/Engine/EngineMaterials/FlatNormal`, Masks
-`/Engine/EngineMaterials/DefaultDiffuse_TC_Masks`, Grayscale
-`/Engine/EngineMaterials/BaseFlattenGrayscaleMap`, Linear color
-`/Engine/EngineMaterials/BaseFlattenLinearColor`.
+`/Engine/EngineMaterials/DefaultDiffuse_TC_Masks`, Linear grayscale
+`/Engine/EngineMaterials/BaseFlattenGrayscaleMap` (`TC_Grayscale`, `SRGB` false), Linear color
+`/Engine/EngineMaterials/BaseFlattenLinearColor`. A Grayscale sampler needs `TC_Grayscale` with
+`SRGB` true, and no engine texture was verified for it. Assign the real texture, or read a
+candidate's `SRGB` and `compressionSettings` with `ObjectTools.get_properties` (R5) before using it.
 
 ### R5. Texture import flags (packed ORM)
 
@@ -324,8 +326,9 @@ blue-dominant color image can be detected as a normal map too, so read the flags
 Enum values through ObjectTools use the reflected spelling (`TC_Masks`, `TC_Normalmap`), which
 differs from the Python enum (`TC_MASKS`).
 
-As one script (run on 5.8.3, 1 call instead of 6). Inside one `set_properties`, keys apply in order
-and leaving `TC_Normalmap` resets `SRGB`: put `compressionSettings` before `SRGB`.
+As one script (run on 5.8.3, 1 call instead of 6). Inside one `set_properties`, keys apply in order,
+and an `SRGB` set while the texture is still `TC_Normalmap` was lost when the compression changed:
+put `compressionSettings` before `SRGB`.
 
 ```python
 # execute_tool_script: R5 texture import flags (packed ORM)

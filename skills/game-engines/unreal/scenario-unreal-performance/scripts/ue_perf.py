@@ -499,7 +499,7 @@ STAT_SEQUENCES = {
             ("stat gpu", "per pass, live"),
             ("ProfileGPU", "one frame to the log; 5.8 includes graphics pipe waits (TL part 2)"),
             ("r.RDG.AsyncCompute 1", "restore before any proof")],
-    # Restore what was printed, not 1: a project without Lumen (the 5.8.3 Blank base had GI 0,
+    # Restore what was printed, not 1: a project without Lumen (the 5.8.3 test project had GI 0,
     # reflections 2) would be switched on. lumen_delta_sequence(gi, refl) writes the restore.
     "lumen_delta": [("r.DynamicGlobalIlluminationMethod", "print: value to restore (1 = Lumen)"),
                     ("r.ReflectionMethod", "print: value to restore (1 = Lumen)"),

@@ -110,8 +110,8 @@ Items marked [not yet run] come from older screenshots.
   for trunks and boulders).
 - Grass mask: Landscape Grass Type assets with no meshes, painted through the landscape material;
   Generate Grass Maps node in the graph.
-- Teleports: add a PCG Generation Source component (class name [not yet run]) to the teleport target
-  actor, next to its World Partition Streaming Source.
+- Teleports: add a PCG Generation Source component (`PCGGenSourceComponent`, 5.8 Python reference)
+  to the teleport target actor, next to its World Partition Streaming Source.
 - Runtime and partition settings: select PCGWorldActor in the Outliner: Partition Grid Size, Treat
   Editor Viewport as Generation Source, Enable World Partition Generation Sources, landscape cache.
 - GPU: node Details > Execute on GPU, Skip Readback to CPU; Get Landscape Data > Get Height Only;

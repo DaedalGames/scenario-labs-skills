@@ -340,14 +340,17 @@ def install_python_toolset(project, backup_dir=None):
     shutil.copy(os.path.join(here, "agent_python_toolset.py"), dst)
     init = os.path.join(pydir, "init_unreal.py")
     line = "import agent_python_toolset\nagent_python_toolset.register()\n"
-    text = open(init).read() if os.path.exists(init) else ""
+    text = ""
+    if os.path.exists(init):
+        with open(init, "r", encoding="utf-8-sig") as fh:
+            text = fh.read()
     changed = "agent_python_toolset.register()" not in text
     if changed:
         if text:
             bdir = backup_dir or os.path.join(pydir, "_backup")
             os.makedirs(bdir, exist_ok=True)
             shutil.copy(init, os.path.join(bdir, "init_unreal.%s.py" % time.strftime("%Y%m%d-%H%M%S")))
-        with open(init, "w") as fh:
+        with open(init, "w", encoding="utf-8") as fh:
             fh.write(text + ("\n" if text and not text.endswith("\n") else "") + line)
     return {"installed": True, "changed_init": changed, "files": [dst, init], "needs_restart": True,
             "call": 'call_tool(toolset_name="agent.AgentPythonToolset", tool_name="run_python", '
@@ -423,18 +426,27 @@ def enable_remote_execution(project, bind=None, backup_dir=None):
     """Turn on Python Remote Execution in a project (Config/DefaultEngine.ini) so `ue_remote.PythonRemote`
     can find the editor. `project` is a .uproject path or its folder.
 
-    Sets bRemoteExecution=True, the multicast bind address and TTL 0 (host only). `bind` defaults to
-    0.0.0.0 on macOS and 127.0.0.1 elsewhere: on macOS the editor never sees multicast pings when its
-    socket is bound to 127.0.0.1 (Epic's default), checked live on 5.8.3, so both the editor and the
-    client use 0.0.0.0 there. TTL 0 keeps the traffic on this machine. The editor must restart.
-    Opt-in: any process on this machine that can send to the group can run code in the editor. Returns
-    {"changed", "backup", "bind", "needs_restart": True}."""
+    Sets bRemoteExecution=True, the multicast bind address and TTL 0. `bind` defaults to 127.0.0.1
+    (Epic's default) on Windows and 0.0.0.0 on macOS and Linux, where a socket bound to 127.0.0.1
+    never sees the multicast pings (editor checked live on 5.8.3 on macOS). The editor must restart.
+
+    Security: any process on this machine can run code in the editor. With 0.0.0.0 the editor also
+    joins the group on the network interface, so any host on the local network can run code in it:
+    TTL 0 limits what the editor sends, not what it receives. Use it on a trusted network or behind a
+    firewall that drops inbound UDP 6766 from other hosts, and prefer Epic's MCP server (loopback)
+    when its toolsets or install_python_toolset are enough. Say so before calling this. Returns
+    {"changed", "backup", "bind", "needs_restart": True, "warning"}; warning is None on loopback."""
     root = project if os.path.isdir(project) else os.path.dirname(os.path.abspath(project))
-    bind = bind or ("0.0.0.0" if sys.platform == "darwin" else "127.0.0.1")
+    bind = bind or ("127.0.0.1" if sys.platform == "win32" else "0.0.0.0")
     res = set_ini_values(os.path.join(root, "Config", "DefaultEngine.ini"), PYTHON_SETTINGS_SECTION,
                          {"bRemoteExecution": "True", "RemoteExecutionMulticastBindAddress": bind,
                           "RemoteExecutionMulticastTtl": "0"}, backup_dir)
-    res.update({"bind": bind, "needs_restart": True})
+    warning = None
+    if not bind.startswith("127."):
+        warning = ("Python Remote Execution bound to %s: any host on the local network can run code "
+                   "in this editor; use a trusted network or a firewall, and turn bRemoteExecution "
+                   "off when done" % bind)
+    res.update({"bind": bind, "needs_restart": True, "warning": warning})
     return res
 
 

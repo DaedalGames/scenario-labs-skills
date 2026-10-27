@@ -1314,7 +1314,9 @@ def exr_pixels(path, ffmpeg="ffmpeg", layer=None):
     hdr = parse_exr_header(path)
     w, h = hdr["width"], hdr["height"]
     pre = ["-layer", layer] if layer else []
-    probe_ = subprocess.run([ffmpeg.replace("ffmpeg", "ffprobe"), "-v", "error"] + pre +
+    # rename the file, not its folders (C:/ffmpeg/bin/ffmpeg.exe)
+    ffprobe = os.path.join(os.path.dirname(ffmpeg), os.path.basename(ffmpeg).replace("ffmpeg", "ffprobe"))
+    probe_ = subprocess.run([ffprobe, "-v", "error"] + pre +
                             ["-show_entries", "stream=pix_fmt", "-of", "csv=p=0", path],
                             capture_output=True, text=True, check=True).stdout.strip()
     if probe_ not in _NATIVE_FMT:
@@ -1752,8 +1754,10 @@ def _bound(binding):
 def add_spawnable(seq, cls=None, instance=None):
     """Spawnable binding from a class or a level actor. Uses the sequence's own
     add_spawnable_from_class / add_spawnable_from_instance (MovieSceneSequenceExtensions), which
-    work in a commandlet; LevelSequenceEditorSubsystem's versions act through the open Sequencer
-    and returned an empty proxy (sequence None, no tracks) in a commandlet (run on 5.8.3)."""
+    work in a commandlet; the 5.8 Python reference marks them deprecated for
+    LevelSequenceEditorSubsystem's versions. Those act through the open Sequencer and returned an
+    empty proxy (sequence None, no tracks) in a commandlet (run on 5.8.3), so they are the
+    fallback here, and the only route once the sequence's own calls are removed."""
     fn = getattr(seq, "add_spawnable_from_instance" if instance is not None else "add_spawnable_from_class", None)
     b = None
     if fn is not None:

@@ -335,6 +335,7 @@ Helper toolsets used by the recipes (same generator, filtered):
 - OT `set_properties(instance: Ref<Object>, values: str) -> bool`
 - AT `save_assets(asset_paths: [str]) -> bool`
 - `ProgrammaticToolset.execute_tool_script(script: str) -> str` (section 9)
+- `ProgrammaticToolset.get_execution_environment() -> {ProgrammaticApiExecutionEnvironmentInfo}`
 
 ## 6. Recipes (run on 5.8.3)
 
@@ -476,26 +477,28 @@ No MCP toolset renders or edits a Movie Render Graph on 5.8.3. Use the Python la
 | A render                                                                       | `render_generator` in a latent offscreen job (`job_30_render_latent.py`): one shot rendered in about 32 s, end frame exclusive, EXR half PIZ and PNG, output folder and file name format respected |
 
 Python is also the better channel for loops over many shots, any check that needs the asset on disk,
-and spawnable bindings in a headless job (`ue_cine.add_spawnable` calls
-`MovieSceneSequence.add_spawnable_from_class`; the `LevelSequenceEditorSubsystem` versions return an
-empty binding in a commandlet). Over MCP, `ProgrammaticToolset.execute_tool_script` batches many
-toolset calls in one turn (section 9). Compare binding ids in Python with `guid.to_string()`: on
-5.8.3 two `Guid` objects for the same id are not `==`.
+and spawnable bindings in a headless job. `ue_cine.add_spawnable` calls
+`MovieSceneSequence.add_spawnable_from_class`, deprecated in the 5.8 Python reference, because the
+`LevelSequenceEditorSubsystem` versions it points to return an empty binding in a commandlet. Over
+MCP, `ProgrammaticToolset.execute_tool_script` batches many toolset calls in one turn (section 9).
+Compare binding ids in Python with `guid.to_string()`: on 5.8.3 two `Guid` objects for the same id
+are not `==`.
 
 ## 9. Batched recipes: one `execute_tool_script` call each
 
 Four or more toolset calls in a row go through one
 `editor_toolset.toolsets.programmatic.ProgrammaticToolset.execute_tool_script {"script": "<text>"}`
-call. The script defines `run()`, calls `execute_tool("<toolset>.<tool>", json_string)` (full dotted
-name; it returns a dict with `returnValue` and raises `RuntimeError` when a call fails) and returns
-a dict, which comes back as JSON text in `returnValue`. Imports are limited to json, math, re, time,
-datetime, copy. Inside a script the same order holds: `open_sequence` before `add_actors`. A failed
-call ends the whole script (it raises `RuntimeError` with the tool's message and the script line),
-so guard calls that can refuse: `load_level` refuses while the open level has unsaved changes, hence
-the `get_current_level` check in B1 and B4. The scripts below are the recipes of section 6 on their
-own assets; each ran live as written (`live_mcp_recipes.py` extracts and runs every block that
-starts with `# script:`). B5 edits the sequence B4 made. Paths are the test project's: change them
-for yours.
+call. Call `ProgrammaticToolset.get_execution_environment` once per session, before the first
+script. The script defines `run()`, calls `execute_tool("<toolset>.<tool>", json_string)` (full
+dotted name; it returns a dict with `returnValue` and raises `RuntimeError` when a call fails) and
+returns a dict, which comes back as JSON text in `returnValue`. Imports are limited to json, math,
+re, time, datetime, copy. Inside a script the same order holds: `open_sequence` before `add_actors`.
+A failed call ends the whole script (it raises `RuntimeError` with the tool's message and the script
+line), so guard calls that can refuse: `load_level` refuses while the open level has unsaved
+changes, hence the `get_current_level` check in B1 and B4. The scripts below are the recipes of
+section 6 on their own assets; each ran live as written (`live_mcp_recipes.py` extracts and runs
+every block that starts with `# script:`). B5 edits the sequence B4 made. Paths are the test
+project's: change them for yours.
 
 ```python
 # script: B1  (R1) sequence at 24 fps, 120 frames, a marker at display frame 60

@@ -687,7 +687,7 @@ def input_verdict(plan):
         if not a["name"].startswith("IA_"):
             out.append("warn: input action %s should start with IA_ (Epic naming)" % a["name"])
     if plan.get("pmi") or plan.get("player_mappable_input_config"):
-        out.append("error: UPlayerMappableInputConfig is deprecated (5.4): use Player "
+        out.append("error: UPlayerMappableInputConfig is deprecated (5.3): use Player "
                    "Mappable Key Settings and UEnhancedInputUserSettings")
     expected_wasd = {"W": {"SwizzleAxis:YXZ"}, "S": {"Negate", "SwizzleAxis:YXZ"},
                      "A": {"Negate"}, "D": set()}
@@ -946,7 +946,7 @@ LINT_RULES = {
     "ABILITY_NEVER_ENDS": ("error", "ActivateAbility without EndAbility in the class: it can "
                            "never re-trigger", "Shao 8bi0rnXnRj4 [00:13:02]"),
     "NONINSTANCED": ("error", "NonInstanced abilities are deprecated (5.5)", "5.5 release notes"),
-    "DEPRECATED_INPUT": ("error", "deprecated input API (PMI 5.4, Combo trigger 5.8)",
+    "DEPRECATED_INPUT": ("error", "deprecated input API (PMI 5.3, Combo trigger 5.8)",
                          "5.4 and 5.8 release notes"),
     "SYNC_SAVE": ("warn", "SaveGameToSlot is synchronous: AsyncSaveGameToSlot during play",
                   "framework doc (Asynchronous Saving)"),
@@ -2227,7 +2227,7 @@ def rewrite_gate(totals, candidates, hot_share=0.8):
     return out
 
 # =============================================================================================
-# 9. IN-EDITOR layer (import unreal). NOT YET RUN IN UNREAL.
+# 9. IN-EDITOR layer (import unreal). Run on UE 5.8.3 (module STATUS); [verify] names were not checked.
 # =============================================================================================
 
 

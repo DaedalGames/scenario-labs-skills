@@ -1,7 +1,8 @@
 # Execution channels: which door into the engine, and how to open it safely
 
-Status: run on UE 5.8.3 (macOS 26.5, Apple silicon) on 2026-10-21 unless a row says "not yet run".
-The v0.1 text of this table moved here from SKILL.md; v0.2 corrects what the live runs disproved.
+Status: run on UE 5.8.3 (macOS 26.5, Apple silicon) on 2026-10-21 unless an entry says "not yet
+run". The v0.1 text of this list moved here from SKILL.md; v0.2 corrects what the live runs
+disproved.
 
 ## Choose in this order
 
@@ -22,16 +23,85 @@ plain `UnrealEditor ... -ExecCmds=...` launch opens a window; the toolkit adds
 
 ## The channels
 
-| Channel                                                                                                                                                         | Use for                                                                                                                                                  | Rules                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Epic Unreal MCP** (plugin `ModelContextProtocol`, Experimental; toolsets from `AllToolsets`, which pulls in `EditorToolset`), your MCP client via `.mcp.json` | structured edits covered by shipped toolsets (actors, scene, assets, materials, Blueprints, UMG, Sequencer, PCG, Niagara, animation), in the open editor | `tools/list` shows three meta-tools: `list_toolsets`, `describe_toolset`, `call_tool`. Start with `-ModelContextProtocolStartServer -ModelContextProtocolPort=N` (listening about 30 s after a headless launch) or the console command `ModelContextProtocol.StartServer`. Port 8000 is the default; pick another when anything else may run. Calls from separate sessions run concurrently (4 parallel 2 s scripts finished in 2.2 s): serialize calls that depend on each other. Loopback only, no authentication. Protocol, batching, sizes: SKILL.md section 2 and `references/mcp-toolsets.md`.                                                               |
-| **Python Remote Execution** (`ue_remote.PythonRemote`)                                                                                                          | loops, audits, anything toolsets lack, screenshots, in the open editor                                                                                   | Run live: both Epic's `remote_execution.py` and our fallback client connect, execute statements and files, report failure. Needs `ue_env.enable_remote_execution(project)` (writes `bRemoteExecution`, bind address and TTL 0 to `Config/DefaultEngine.ini`, with a backup) and an editor restart. **On macOS the multicast bind address must be `0.0.0.0` in the editor and in the client**: Epic's default `127.0.0.1` finds no editor there. Full `unreal` API, the editor ticks between calls. One call = one named transaction that reports what it did. Any local process that can reach the multicast group can run code in the editor: opt in per project. |
-| **Project-local Python toolset on the MCP server** (`ue_env.install_python_toolset`)                                                                            | the same as above, when no multicast setup is wanted, or one connection must do everything                                                               | Adds `agent.AgentPythonToolset` with `run_python(code)`: persistent namespace, captured output, `result` variable, traceback on error. Run live in a headless editor. Editor restart needed after install; 5.8 only (the toolset registry does not exist in 5.6 or 5.7). Unsafe by design (arbitrary code over an unauthenticated loopback port): throwaway or trusted projects only; say so before installing.                                                                                                                                                                                                                                                    |
-| **Headless commandlet** (`ue_run.run_python`, `UnrealEditor-Cmd <uproject> -run=pythonscript`)                                                                  | audits, imports, batch edits, validation, CI, when no editor has the project open                                                                        | No level loaded (`map=` loads one), fewer modules, no rendering. The boot waits for the Asset Registry (`get_asset_registry().wait_for_completion()`); a job passes only on its boot's job-id `UE_RESULT` line, never on the exit code (a good run can exit 1). A commandlet that saves must not touch a project an open editor has loaded: the editor holds a write lock (Jamie Dale, 0guOMTiwmhk [01:17:18]). `-nosound` is added by `ue_run`.                                                                                                                                                                                                                   |
-| **Full editor, one shot** (`mode="editor"`: `-ExecutePythonScript`; `mode="latent"`: ticking boot that quits after)                                             | jobs needing full modules; latent: screenshots and renders without a running editor                                                                      | `-ExecutePythonScript` shuts down right after the script, so nothing ticks; `ue_run` adds `-ScriptErrorsAreFatal` (5.5) so a failing script fails the process. Latent jobs are generators: `yield` = one tick. Both run with `-RenderOffscreen` unless `window=True`.                                                                                                                                                                                                                                                                                                                                                                                              |
-| **Remote Control API** (`ue_remote.RemoteControl`, 127.0.0.1:30010)                                                                                             | batched property writes on known objects, live presets, `-game` builds                                                                                   | Off until `WebControl.StartServer`. **5.8 refuses remote function calls by default** (HTTP 400, "not allowed by remote control settings"); allow them under 'Custom Allowed Remote Function Calls' or 'Allow Any Remote Function Call'. Property reads and transactional writes worked live. C++ names, `WRITE_TRANSACTION_ACCESS` for undo, public EditAnywhere properties only.                                                                                                                                                                                                                                                                                  |
-| **Console and cvars**                                                                                                                                           | stats, view modes, quality switches, `HighResShot`                                                                                                       | From Python `unreal.SystemLibrary.execute_console_command(world, cmd)`; `EditorAppToolset.SearchCVars` over MCP; at launch `-DPCVars=` (before init, overrides read-only cvars; Profiling with Purpose, C-AjCqjKRSs [00:14:13]), not `-ExecCmds`. Restore what you change. `r.Shadow.Virtual.ShowStats` was renamed `r.Shadow.Virtual.Stats.Visible`.                                                                                                                                                                                                                                                                                                              |
-| **Commandlets and UAT** (`ue_run.run_commandlet`, `run_uat`)                                                                                                    | `DataValidation`, `ResavePackages -fixupredirects`, `WorldPartitionBuilderCommandlet`, `BuildCookRun`                                                    | Headless; parse the log (`ue_run.scan_log`). Not yet run here except through `-run=pythonscript`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+Each channel: what it is for, then its rules.
+
+- **Epic Unreal MCP** (plugin `ModelContextProtocol`, Experimental; toolsets from `AllToolsets`,
+  which pulls in `EditorToolset`), your MCP client via `.mcp.json`.
+  - For structured edits covered by shipped toolsets (actors, scene, assets, materials, Blueprints,
+    UMG, Sequencer, PCG, Niagara, animation), in the open editor.
+  - `tools/list` shows three meta-tools: `list_toolsets`, `describe_toolset`, `call_tool`.
+  - Start with `-ModelContextProtocolStartServer -ModelContextProtocolPort=N` (listening about 30 s
+    after a headless launch) or the console command `ModelContextProtocol.StartServer`. Port 8000 is
+    the default; pick another when anything else may run.
+  - Calls from separate sessions run concurrently (4 parallel 2 s scripts finished in 2.2 s):
+    serialize calls that depend on each other.
+  - Loopback only, no authentication. Protocol, batching, sizes: SKILL.md section 2 and
+    `references/mcp-toolsets.md`.
+- **Python Remote Execution** (`ue_remote.PythonRemote`).
+  - For loops, audits, anything toolsets lack, screenshots, in the open editor.
+  - Run live: both Epic's `remote_execution.py` and our fallback client connect, execute statements
+    and files, report failure. Full `unreal` API; the editor ticks between calls. One call = one
+    named transaction that reports what it did.
+  - Needs `ue_env.enable_remote_execution(project)` (writes `bRemoteExecution`, bind address and TTL
+    0 to `Config/DefaultEngine.ini`, with a backup) and an editor restart.
+  - The multicast bind address must match the OS, in the editor and in the client. Windows: Epic's
+    default `127.0.0.1`. macOS and Linux: `0.0.0.0`, since a socket bound to `127.0.0.1` never
+    receives the group's datagrams (editor run on macOS; socket test on Linux).
+  - **Security.** Any local process that can reach the multicast group can run code in the editor.
+    With `0.0.0.0` the editor also listens on the network interface, so any host on the local
+    network can run code in it: TTL 0 limits what the editor sends, not what it receives. Opt in per
+    project, say so to the user, and use it only on a trusted network or behind a firewall that
+    drops inbound UDP 6766 from other hosts. Prefer the MCP channels (loopback) when they are
+    enough.
+- **Project-local Python toolset on the MCP server** (`ue_env.install_python_toolset`).
+  - For the same work as Python Remote Execution, when no multicast setup is wanted, or one
+    connection must do everything.
+  - Adds `agent.AgentPythonToolset` with `run_python(code)`: persistent namespace, captured output,
+    `result` variable, traceback on error. Run live in a headless editor.
+  - Editor restart needed after install; 5.8 only (the toolset registry does not exist in 5.6 or
+    5.7).
+  - Unsafe by design (arbitrary code over an unauthenticated loopback port): throwaway or trusted
+    projects only; say so before installing.
+- **Headless commandlet** (`ue_run.run_python`, `UnrealEditor-Cmd <uproject> -run=pythonscript`).
+  - For audits, imports, batch edits, validation, CI, when no editor has the project open.
+  - No level loaded (`map=` loads one), fewer modules, no rendering.
+  - The boot waits for the Asset Registry (`get_asset_registry().wait_for_completion()`); a job
+    passes only on its boot's job-id `UE_RESULT` line, never on the exit code (a good run can exit
+    1).
+  - A commandlet that saves must not touch a project an open editor has loaded: the editor holds a
+    write lock (Jamie Dale, 0guOMTiwmhk [01:17:18]). `-nosound` is added by `ue_run`.
+- **Full editor, one shot** (`mode="editor"`: `-ExecutePythonScript`; `mode="latent"`: ticking boot
+  that quits after).
+  - For jobs needing full modules; latent: screenshots and renders without a running editor.
+  - `-ExecutePythonScript` shuts down right after the script, so nothing ticks; `ue_run` adds
+    `-ScriptErrorsAreFatal` (5.5) so a failing script fails the process.
+  - Latent jobs are generators: `yield` = one tick. Both run with `-RenderOffscreen` unless
+    `window=True`.
+- **Remote Control API** (`ue_remote.RemoteControl`, 127.0.0.1:30010).
+  - For batched property writes on known objects, live presets, `-game` builds.
+  - The server may start with the editor (setting 'Auto Start Web Server'): probe with
+    `RemoteControl().info()`, then `WebControl.StartServer` only if nothing answers. A `-nullrhi`
+    (headless) editor may not start it at all: launch offscreen for this channel.
+  - HTTP binds 127.0.0.1 by default. The WebSocket server has its own bind address setting
+    (`RemoteControlWebsocketServerBindAddress`): read it before assuming loopback.
+  - **5.8 refuses remote function calls by default** (HTTP 400, "not allowed by remote control
+    settings"); allow them under 'Custom Allowed Remote Function Calls' or 'Allow Any Remote
+    Function Call'. `ExecuteConsoleCommand` also needs 'Allow Console Command Remote Execution', a
+    separate setting.
+  - Property reads and transactional writes worked live. C++ names, `WRITE_TRANSACTION_ACCESS` for
+    undo, public EditAnywhere properties only.
+- **Console and cvars**.
+  - For stats, view modes, quality switches, `HighResShot`.
+  - From Python `unreal.SystemLibrary.execute_console_command(world, cmd)`;
+    `EditorAppToolset.SearchCVars` over MCP; at launch `-DPCVars=` (before init, overrides read-only
+    cvars; Profiling with Purpose, C-AjCqjKRSs [00:14:13]), not `-ExecCmds`.
+  - Restore what you change. `r.Shadow.Virtual.ShowStats` was renamed
+    `r.Shadow.Virtual.Stats.Visible`.
+- **Commandlets and UAT** (`ue_run.run_commandlet`, `run_uat`).
+  - For `DataValidation`, `ResavePackages -fixupredirects`, `WorldPartitionBuilderCommandlet`,
+    `BuildCookRun`.
+  - Headless; parse the log (`ue_run.scan_log`). Not yet run here except through
+    `-run=pythonscript`.
 
 ## Capability matrix (what each channel can do in 5.8.3)
 

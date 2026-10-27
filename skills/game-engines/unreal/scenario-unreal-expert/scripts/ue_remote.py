@@ -1,24 +1,28 @@
 """
 ue_remote: talk to a RUNNING Unreal Editor from the agent side (system python3).
 
-STATUS: not yet run in Unreal. Written 2026-09-24 before UE 5.8 was installed. Request
-builders, error hints, path helpers, the SSE parser and the lsof parser ran offline, and each
-client ran against a local fake server (tests/code/unreal-expert/test_ue_remote_offline.py).
+STATUS: written 2026-09-24 before UE 5.8 was installed; request builders, error hints, path
+helpers, the SSE parser and the lsof parser ran offline, each client against a local fake server.
+PythonRemote (Epic's client and the fallback) and RemoteControl property reads, transactional
+writes and the 5.8 call refusal then ran against 5.8.3 on macOS (references/channels.md).
 
 Channels, in order of preference for live work (see SKILL.md, capability matrix):
   1. Epic's Unreal MCP server (5.8, Experimental): the agent's MCP client talks to it
      directly through .mcp.json (ModelContextProtocol.GenerateClientConfig ClaudeCode).
-     Tool calls run serially on the game thread: never overlap them. McpHttp below is only
-     for scripted health checks and tests, not a replacement for the agent's MCP client.
+     Calls from separate sessions run concurrently: serialize calls that depend on each other.
+     McpHttp below is only for scripted health checks and tests, not a replacement for the
+     agent's MCP client.
   2. PythonRemote: Editor Python in the running editor through Python Remote Execution
      (Project Settings > Plugins > Python > Enable Remote Execution, off by default). Full
      `unreal` API, no third-party plugin; the editor ticks between calls, so screenshots
-     requested in one call exist a moment later.
-  3. RemoteControl: HTTP on 127.0.0.1:30010 (plugin Remote Control API, Beta; server off
-     until `WebControl.StartServer`). Best for batched property writes and live presets.
+     requested in one call exist a moment later. Outside Windows it opens the editor to the
+     local network (DEFAULT_BIND).
+  3. RemoteControl: HTTP on 127.0.0.1:30010 (plugin Remote Control API, Beta). The server may
+     start with the editor (setting 'Auto Start Web Server'): probe with info() before
+     `WebControl.StartServer`. Best for batched property writes and live presets.
      5.8: remote UFUNCTION calls are DISABLED by default with an allow list (5.8 release
-     notes, Motion Design and Virtual Production); property access is not described as
-     affected [verify].
+     notes, Motion Design and Virtual Production); property reads and transactional writes
+     still work (run on 5.8.3).
 
 Library:
   import ue_remote as R
@@ -35,7 +39,10 @@ Library:
 Security: every channel here is unauthenticated. Keep them on 127.0.0.1. The Remote Control
 docs tell users to set [HTTPServer.Listeners] DefaultBindAddress=0.0.0.0 for LAN access;
 Epic's MCP listener reads the same key, so that change likely exposes MCP too [added
-inference, verify with loopback_only(8000) after any change].
+inference, verify with loopback_only(8000) after any change]. The Remote Control WebSocket
+server has its own bind address setting (RemoteControlWebsocketServerBindAddress): read it
+before assuming loopback. Python Remote Execution bound to 0.0.0.0 lets any host on the local
+network run code in the editor: TTL 0 limits what the editor sends, not what it receives.
 """
 
 __version__ = "0.2.1"  # Unreal Engine Expert Skills v0.2.1
@@ -96,11 +103,15 @@ HINTS = {
     "offline": ("server not reachable: enable the Remote Control API plugin, then run "
                 "`WebControl.StartServer` in the editor console (or set "
                 "WebControl.EnableServerOnStartup); packaged or -game builds need "
-                "-RCWebControlEnable -RCWebInterfaceEnable"),
+                "-RCWebControlEnable -RCWebInterfaceEnable; a -nullrhi (headless) editor may "
+                "not start it at all, so launch offscreen for this channel"),
     "call": ("UE 5.8 disables remote UFUNCTION calls by default: allow them in Project "
-             "Settings > Plugins > Remote Control or add this function to the allow list "
-             "[verify setting names]; function and parameter names are C++ names (bSweep, "
-             "not Sweep); static functions are called on the CDO (cdo_path)"),
+             "Settings > Plugins > Remote Control ('Custom Allowed Remote Function Calls' or "
+             "'Allow Any Remote Function Call'); function and parameter names are C++ names "
+             "(bSweep, not Sweep); static functions are called on the CDO (cdo_path)"),
+    "console": ("ExecuteConsoleCommand needs 'Allow Console Command Remote Execution' "
+                "(bAllowConsoleCommandRemoteExecution) in Project Settings > Plugins > Remote "
+                "Control, a setting separate from the remote-call permission"),
     "property": ("property access rules: editor needs public EditAnywhere (not EditConst) "
                  "and no BlueprintGetter/Setter; PIE and -game need BlueprintVisible (not "
                  "BlueprintReadOnly to write). Otherwise call the setter with call(); use "
@@ -162,7 +173,8 @@ def search_body(query="", classes=(), paths=(), packages=(), recursive_paths=Tru
 
 
 class RemoteControl(object):
-    """Minimal Remote Control API client (HTTP, JSON only). Not yet run in Unreal."""
+    """Minimal Remote Control API client (HTTP, JSON only). Property reads, transactional writes
+    and the 5.8 call refusal ran on 5.8.3; the other routes are not yet run."""
 
     def __init__(self, host="127.0.0.1", port=30010, timeout=10.0):
         self.base = "http://%s:%d" % (host, int(port))
@@ -233,14 +245,16 @@ class RemoteControl(object):
 
     def console(self, command, world_context=None):
         """Run a console command through KismetSystemLibrary.ExecuteConsoleCommand on the
-        CDO. Needs the 5.8 remote-call permission; whether RC fills WorldContextObject by
-        itself is [verify]. Alternative: a Python uclass in init_unreal.py with a static
-        ufunction that runs the command, called at python_cdo_path(<Class>)."""
+        CDO. Needs the 5.8 remote-call permission and, separately, 'Allow Console Command
+        Remote Execution' (bAllowConsoleCommandRemoteExecution); whether RC fills
+        WorldContextObject by itself is [verify]. Alternative: a Python uclass in init_unreal.py
+        with a static ufunction that runs the command, called at python_cdo_path(<Class>)."""
         params = {"Command": command}
         if world_context:
             params["WorldContextObject"] = world_context
-        return self.call(cdo_path("Engine", "KismetSystemLibrary"), "ExecuteConsoleCommand",
-                         params, transaction=False)
+        return self.request("/remote/object/call", "PUT",
+                            call_body(cdo_path("Engine", "KismetSystemLibrary"),
+                                      "ExecuteConsoleCommand", params, False), hint="console")
 
 
 # =========================================================================== Python Remote Execution
@@ -248,11 +262,13 @@ PROTOCOL_VERSION = 1
 PROTOCOL_MAGIC = "ue_py"
 DEFAULT_GROUP = ("239.0.0.1", 6766)      # multicast discovery  [verify defaults on 5.8]
 DEFAULT_COMMAND = ("127.0.0.1", 6776)    # our TCP listener the editor connects back to
-# Epic's default is 127.0.0.1. On macOS an editor socket bound to 127.0.0.1 never receives datagrams sent
-# to the group address, so no editor is ever found (checked live on 5.8.3, macOS 26.5, 2026-10-21): the
-# editor setting "Multicast Bind Address" and this client must both be 0.0.0.0 there (TTL 0 keeps the
-# traffic on this machine). ue_env.enable_remote_execution writes the editor side.
-DEFAULT_BIND = "0.0.0.0" if sys.platform == "darwin" else "127.0.0.1"
+# Epic's default is 127.0.0.1, which keeps discovery on this machine on Windows. On macOS and Linux a
+# socket bound to 127.0.0.1 never receives datagrams sent to the group address, so no editor is ever
+# found (editor checked live on 5.8.3, macOS 26.5; the same socket test fails on Linux): the editor
+# setting "Multicast Bind Address" and this client must both be 0.0.0.0 there. The editor then joins
+# the group on the network interface, so any host on the local network can reach it and run code:
+# TTL 0 limits what it sends, not what it receives. ue_env.enable_remote_execution writes the editor side.
+DEFAULT_BIND = "127.0.0.1" if sys.platform == "win32" else "0.0.0.0"
 EXEC_FILE, EXEC_STATEMENT, EVAL_STATEMENT = "ExecuteFile", "ExecuteStatement", "EvaluateStatement"
 
 
@@ -267,6 +283,8 @@ def multicast_self_test(group=DEFAULT_GROUP, bind=DEFAULT_BIND, wait=1.5):
         r.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         if hasattr(socket, "SO_REUSEPORT"):
             r.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        # Wildcard on purpose: on macOS and Linux a socket bound to a unicast address gets no
+        # group datagrams. IP_ADD_MEMBERSHIP below picks the interface it listens on.
         r.bind(("", group[1]))
         r.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, socket.inet_aton(group[0]) + socket.inet_aton(bind))
         r.settimeout(wait)
@@ -361,13 +379,13 @@ def call_code(module, function, args=(), kwargs=None, scripts_dir=_HERE, reload=
 
 
 class PythonRemote(object):
-    """Run Python in a running editor through Python Remote Execution. Not yet run.
+    """Run Python in a running editor through Python Remote Execution. Run on 5.8.3 (macOS).
 
     Prefers Epic's own remote_execution.py from the engine (found through ue_env) and
     falls back to the minimal client below. Discovery: UDP multicast ping on 239.0.0.1:6766
-    with TTL 0 (loopback); the editor answers pong with its project; open_connection asks
-    it to connect back to our TCP listener; commands and results travel over that TCP
-    connection; pings continue every second while connected."""
+    with TTL 0 (sent to this host only); the editor answers pong with its project;
+    open_connection asks it to connect back to our TCP listener; commands and results travel
+    over that TCP connection; pings continue every second while connected."""
 
     def __init__(self, project=None, group=DEFAULT_GROUP, command=DEFAULT_COMMAND,
                  bind=DEFAULT_BIND, timeout=30.0, prefer_epic=True):
@@ -403,7 +421,7 @@ class PythonRemote(object):
 
     def _epic_rx(self):
         """Epic's RemoteExecution built from this object's group, bind address and command endpoint
-        (multicast TTL 0, host only). Its own defaults bind 127.0.0.1, which finds nothing on macOS."""
+        (multicast TTL 0). Its own defaults bind 127.0.0.1, which finds nothing on macOS or Linux."""
         cfg = self._epic.RemoteExecutionConfig()
         cfg.multicast_group_endpoint = tuple(self.group)
         cfg.multicast_bind_address = self.bind

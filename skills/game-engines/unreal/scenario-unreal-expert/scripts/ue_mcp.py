@@ -9,8 +9,9 @@ What the live server does (5.8.3, plugins ModelContextProtocol + AllToolsets):
   - `tools/list` returns exactly three tools: list_toolsets, describe_toolset, call_tool.
   - Every tool result is `{"content": [{"type": "text", "text": "<json>"}], "isError": bool}`;
     the text of a toolset tool is JSON with the value under `returnValue`.
-  - Toolset names are `Plugin.Class` for C++ toolsets (NiagaraToolsets.NiagaraToolset_System)
-    and the Python module path for Python toolsets (editor_toolset.toolsets.actor.ActorTools).
+  - Toolset names are `Module.Class` for C++ toolsets, from the class path /Script/<Module>
+    (NiagaraToolsets.NiagaraToolset_System), and the Python module path for Python toolsets
+    (editor_toolset.toolsets.actor.ActorTools).
     `describe_toolset` lists tools with fully qualified names; `call_tool` takes the short name.
   - The agent's own MCP client (from .mcp.json) is the normal channel. Use this module for
     scripted health checks, catalog snapshots and tests, or when no MCP client is available.
@@ -55,7 +56,7 @@ def parse_sse(text):
                 try:
                     events.append(json.loads(raw))
                 except ValueError:
-                    pass
+                    continue  # not JSON, so not a JSON-RPC message: skip the line
     return events
 
 
@@ -74,7 +75,7 @@ class Result(object):
         try:
             self.json = json.loads(self.text)
         except ValueError:
-            pass
+            self.json = None  # plain-text tool output: keep it in .text
 
     @property
     def ok(self):
@@ -98,7 +99,7 @@ class Mcp(object):
         self.last_ms = 0.0
         self.server_info = None
 
-    def _post(self, msg):
+    def _post(self, msg, retry=True):
         headers = {"Content-Type": "application/json",
                    "Accept": "application/json, text/event-stream",
                    "MCP-Protocol-Version": MCP_PROTOCOL}
@@ -114,6 +115,17 @@ class Mcp(object):
                     self.session = sid
                 ctype = resp.headers.get("Content-Type", "")
                 body = resp.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as exc:  # before URLError, its base class
+            try:
+                detail = exc.read().decode("utf-8", "replace")
+            except OSError:
+                detail = ""
+            if exc.code == 404 and self.session and retry:
+                # The server dropped the session (an editor restart does): the MCP spec says
+                # start a new one with initialize, then send the request again.
+                self.connect()
+                return self._post(msg, retry=False)
+            raise McpError("HTTP %d from %s: %s" % (exc.code, self.url, detail[:300] or exc.reason))
         except (urllib.error.URLError, OSError) as exc:
             raise McpError("cannot reach %s: %s (is the editor running with the MCP server "
                            "started? ModelContextProtocol.StartServer)" % (self.url, exc))
@@ -125,7 +137,12 @@ class Mcp(object):
                 if isinstance(ev, dict) and ev.get("id") == msg["id"]:
                     return ev
             raise McpError("no response for id %s in the event stream" % msg["id"])
-        return json.loads(body) if body.strip() else None
+        if not body.strip():
+            return None
+        try:
+            return json.loads(body)
+        except ValueError:
+            raise McpError("not JSON from %s: %s" % (self.url, body[:300]))
 
     def rpc(self, method, params=None):
         self._id += 1
@@ -138,12 +155,13 @@ class Mcp(object):
         return resp
 
     def connect(self):
+        self.session = None  # initialize never carries a session id
         resp = self.rpc("initialize", {"protocolVersion": MCP_PROTOCOL, "capabilities": {},
                                        "clientInfo": {"name": self.client, "version": __version__}})
         if "error" in resp:
             raise McpError("initialize failed: %s" % resp["error"])
         self.server_info = resp.get("result", {})
-        self._post({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        self._post({"jsonrpc": "2.0", "method": "notifications/initialized"}, retry=False)
         return self.server_info
 
     def top_level_tools(self):
@@ -155,12 +173,14 @@ class Mcp(object):
         return Result(self.rpc("tools/call", {"name": name, "arguments": arguments or {}}))
 
     def toolsets(self):
-        """[(name, description)] from list_toolsets. Names are `Plugin.Class` or a module path."""
+        """[(name, description)] from list_toolsets. Names are `Module.Class` or a module path.
+        A toolset with no description is listed as `- Name` and comes back with ""."""
         res = self.call_top("list_toolsets")
         if not res.ok:
             raise McpError("list_toolsets failed: %s" % res.text[:200])
         out = []
-        for m in re.finditer(r"^- (\w+\.[\w\.]+): (.*?)(?=^- \w+\.[\w\.]+: |\Z)", res.text, re.M | re.S):
+        for m in re.finditer(r"^- (\w+\.[\w.]+)(?::|[ \t]*$)(.*?)(?=^- \w+\.[\w.]+(?::|[ \t]*$)|\Z)",
+                             res.text, re.M | re.S):
             out.append((m.group(1), m.group(2).strip()))
         return out
 

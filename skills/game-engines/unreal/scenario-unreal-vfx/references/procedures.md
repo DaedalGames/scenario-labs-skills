@@ -739,7 +739,7 @@ common = {
     "strip_on_cook": True,                  # stripping non-Nanite geometry cut about 95 % of asset size [00:05:28]
     "enable_nanite_fallback": False,        # True only if a non-Nanite platform ships
     "root_proxy_meshes": ["/Game/Destruction/SM_Wall"],             # renders until the first break; collision stays on the GC
-    "custom_renderer_class": "GeometryCollectionRootProxyRenderer", # ISM batching (5.5 notes); not a Python class on 5.8.3: set in the GUI
+    "custom_renderer_class": "GeometryCollectionRootProxyRenderer", # ISM batching (5.5 notes); no Python type on 5.8.3, loaded by class path [not yet run]
     "remove_on_max_sleep": True, "maximum_sleep_time": (3.0, 5.0), "removal_duration": (1.0, 2.0),
     "automatic_crumble_partial_clusters": True,   # asset-level crumbling for Remove on Sleep (GeometryCollection doc)
     "slow_moving_as_sleeping": True,

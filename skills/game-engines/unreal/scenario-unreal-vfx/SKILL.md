@@ -109,9 +109,9 @@ disagrees). No editor: `ue_run` jobs.
    `scan_paths`. `duplicate_template` or `CreateNiagaraSystem`, then `user_parameters`,
    `contract_verdict`; a missing control is added with `AddUserVariables` and a Linked stack input
    (`mcp-niagara.md` R4), else one GUI request. After every edit: wait for the compile, then
-   `GetStackIssues` (works headless). Curves in that request pass `fade_curve_verdict` (opacity
-   fades from mid-life, never shrink-only) and `flipbook_playback_verdict` (fast then slow). GATE:
-   contract ok.
+   `GetStackIssues` (headless editor, not a commandlet). Curves in that request pass
+   `fade_curve_verdict` (opacity fades from mid-life, never shrink-only) and
+   `flipbook_playback_verdict` (fast then slow). GATE: contract ok.
 5. **Look: materials and textures.** Master material and instances from scenario-unreal-materials
    (erosion, gradient-map LUT, depth fade); reuse textures first (Trümpler [00:16:33]), generate
    glows, LUTs and noise in Python. Import masks with sRGB off, `TEXTUREGROUP_Effects`, big sources
@@ -153,8 +153,8 @@ disagrees). No editor: `ue_run` jobs.
     Debug HUD, Insights with `-statnamedevents` (Niagara is invisible without it, Kiraly
     [00:10:52]); `init_for_performance_baseline()`; `lever_check` before each change;
     `budget_oscillation` when budgets are on. Destruction: frame series around the break, CVD,
-    `t.OverrideFPS 60` (exists on 5.8.3). GATE: `niagara_overview_verdict`, `before_after`,
-    `destruction_run_verdict` within budget, visual parity.
+    `t.OverrideFPS 60`. GATE: `niagara_overview_verdict`, `before_after`, `destruction_run_verdict`
+    within budget, visual parity.
 11. **Deliver** the budget sheet to scenario-unreal-performance.
 
 ## Numbers

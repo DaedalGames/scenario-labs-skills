@@ -115,12 +115,12 @@ project-local `run_python` tool in the open editor.
    `P.plan_imports(..., previous=manifest, policy="PL_Props@3")`, `P.stage_plan`. GATE: items plus
    rejections equal sources; D01 to D07 read; sources byte-identical (P1).
 3. **Import policy.** Job `describe`, then `preset` (duplicated from `DefaultAssetsPipeline`, or
-   `DefaultGLTFAssetsPipeline` for glTF so material instances survive) with a route: `post_import`
-   (default: materials off, instances built after import with an explicit parameter map) or
-   `interchange_mi` (Material Import = Import as Material Instance, Parent Material = master; fills
-   only parameters Interchange knows by name). Vertex Color Import Option Ignore unless the master
-   reads vertex color; Generate Lightmap UVs off for Lumen. GATE: `failed` empty;
-   `P.pipeline_stack_problems(stack)` clean (P2).
+   `DefaultGLTFAssetsPipeline` for glTF so material instances survive). It replaces the per-format
+   default stack (`P.default_stack`). Route: `post_import` (default: materials off, instances built
+   after import with an explicit parameter map) or `interchange_mi` (Material Import = Import as
+   Material Instance, Parent Material = master; fills only parameters Interchange knows by name).
+   Vertex Color Import Option Ignore unless the master reads vertex color; Generate Lightmap UVs off
+   for Lumen. GATE: `failed` empty; `P.pipeline_stack_problems(stack)` clean (P2).
 4. **Trial.** `make_fixtures.py` plus 5 to 10 real files. GATE: each broken fixture shows its issue
    id; seconds per file known.
 5. **Import.** Headless: job `import` through `ue_run.run_python`; editor open: `P.run_import_plan`
@@ -216,8 +216,9 @@ scenario-unreal-performance as archive path, UAT verdict, BootTest result and ch
 - 5.8.3 Python: `InterchangeMaterialImportOption` has only `IMPORT_AS_MATERIALS` and
   `IMPORT_AS_MATERIAL_INSTANCES` (no materials: `import_materials` False); the texture pipeline sits
   under `material_pipeline`; `combine_static_meshes` is deprecated for
-  `combine_static_meshes_behavior`. The legacy GLTFImporter plugin is absent; glTF goes through
-  Interchange even though `Interchange.FeatureFlags.Import.GLTF` reads False.
+  `combine_static_meshes_behavior`, `import_collision` for `collision` (5.8 reference;
+  `fallback_collision_type` NONE keeps `UCX_` without a hull). The legacy GLTFImporter plugin is
+  absent; glTF goes through Interchange.
 - Interchange handles FBX (production since 5.5); 5.8 renamed dialog options, added uFBX
   (Experimental), made USD asset import production ready. `InterchangeManager.import_asset` and
   `reimport_asset` return the objects or None (5.8 API).
