@@ -55,19 +55,23 @@ Skills follow the [Agent Skills](https://agentskills.io) format.
 ## Install
 
 **Claude Code: install as plugins, with auto-update.** The repository is a Claude Code plugin
-marketplace named `scenario-skills`, with one plugin per topic group of the Skills list below. In a
-Claude Code session:
+marketplace named `scenario-skills`, with one plugin per topic group of the Skills list below. Add
+it from the `stable` branch, which moves only at releases. From your shell:
 
-```text
-/plugin marketplace add scenario-labs/skills
-/plugin install 01.-getting-started@scenario-skills
+```bash
+claude plugin marketplace add scenario-labs/skills#stable
+# Every Scenario plugin, without the expert tools
+for p in scenario-getting-started scenario-finding-a-direction scenario-images scenario-game-art-and-3d scenario-video-and-audio scenario-socials scenario-consistency-and-custom-models scenario-reviewing-and-organizing-output scenario-formats-and-placements scenario-workflows-and-apps scenario-troubleshooting scenario-team-administration scenario-image-model-families scenario-video-model-families scenario-audio-model-families scenario-3d-model-families; do claude plugin install "$p@scenario-skills"; done
 ```
 
-Then run `/plugin`: add more groups from the **Discover** tab, and under **Marketplaces**, select
-`scenario-skills` and choose **Enable auto-update**. Auto-update is off by default for third-party
-marketplaces, and once on, Claude Code updates your plugins at each release. A plugin's skills
-appear as `/<plugin>:<skill>`, for example `/03.-images:scenario-image`. Install through plugins or
-through `npx skills add`, not both, or each skill loads twice.
+Or, in a Claude Code session, run `/plugin marketplace add scenario-labs/skills#stable`, then pick
+groups from the **Discover** tab of `/plugin`. An expert-tools family is one plugin, for example
+`claude plugin install scenario-expert-tools-blender@scenario-skills`.
+
+Then turn on auto-update once: run `/plugin`, open **Marketplaces**, select `scenario-skills`, and
+choose **Enable auto-update**. It is off by default for third-party marketplaces. A plugin's skills
+appear as `/<plugin>:<skill>`, for example `/scenario-images:scenario-image`. Install through
+plugins or through `npx skills add`, not both, or each skill loads twice.
 
 **Other agents.** The commands below use the [skills CLI](https://www.skills.sh), which works with
 Claude Code too.
@@ -127,11 +131,13 @@ tags a version, updates `CHANGELOG.md` in this repository, publishes a
   on GitHub) or check any of the changelog pages above. An entry scoped to a single skill carries
   that skill's name; changes spanning several skills appear under broader scopes such as `skills`.
 - Claude Code plugins update at each release once auto-update is on (see Install). To update now,
-  run `/plugin`, select the `scenario-skills` marketplace, and choose **Update marketplace**.
+  run `claude plugin marketplace update scenario-skills`, then
+  `claude plugin update <plugin>@scenario-skills` for each installed plugin, and restart Claude
+  Code.
 - A `npx skills add` install copies the skills from `main` once. `npx skills update` refreshes every
   skill whose files changed since; re-running your original `npx skills add` command does the same.
 - Each `SKILL.md` names the release it comes from in its frontmatter, as `metadata.version`.
-  `claude plugin list` shows the same version for each installed plugin.
+  `claude plugin list` shows each plugin's version as the commit of its release.
 
 ## Skills
 

@@ -30,6 +30,8 @@ Connect and generate.
 ## Install
 
 \`\`\`bash
+# Every Scenario plugin, without the expert tools
+for p in scenario-getting-started; do claude plugin install "$p@scenario-skills"; done
 # Every Scenario skill, without the expert tools
 ${COMMAND}
 \`\`\`
@@ -37,7 +39,7 @@ ${COMMAND}
 
 // A minimal repository that passes check-readme.mjs with the given role
 // paragraph above the one INSTALL.md command.
-function check(t, paragraph) {
+function check(t, paragraph, plugins = ["scenario-getting-started"]) {
   const root = mkdtempSync(join(tmpdir(), "skills-readme-"));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   for (const file of ["check-readme.mjs", "lib/skills.mjs"]) {
@@ -61,6 +63,16 @@ function check(t, paragraph) {
     }),
   );
   writeFileSync(join(root, "README.md"), README);
+  mkdirSync(join(root, ".claude-plugin"));
+  writeFileSync(
+    join(root, ".claude-plugin/marketplace.json"),
+    JSON.stringify({
+      plugins: plugins.map((name) => ({
+        name,
+        skills: ["./skills/scenario", "./skills/scenario-demo"],
+      })),
+    }),
+  );
   writeFileSync(
     join(root, "INSTALL.md"),
     `## By role\n\n### Everyone\n\n${paragraph}\n\n\`\`\`bash\n${COMMAND}\n\`\`\`\n`,
@@ -95,5 +107,15 @@ test("does not borrow a number from across a heading", (t) => {
   assert.match(
     check(t, "Connection and generation. 2\n### Later\nskills."),
     /"Later" has no "N skills\." line before its command/,
+  );
+});
+
+test("catches a core plugin missing from the install loop", (t) => {
+  assert.match(
+    check(t, "Connection and generation. 2 skills.", [
+      "scenario-getting-started",
+      "scenario-images",
+    ]),
+    /the plugin install loop: missing scenario-images/,
   );
 });

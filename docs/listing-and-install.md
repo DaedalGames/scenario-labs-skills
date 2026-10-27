@@ -18,17 +18,20 @@ How skills.sh, the installer picker, and the install commands work. [AGENTS.md](
   - The manifest gives the `npx skills add` picker its group headers. The skills CLI groups the
     picker by the manifest's plugin entries and never reads `skills.sh.json`, which only drives the
     skills.sh repo page.
-  - Plugin names carry a two-digit position prefix (`01.-getting-started`, shown as "01. Getting
-    Started"), because the picker sorts group names alphabetically. The prefix makes it follow the
-    `skills.sh.json` order, so inserting or merging a grouping renumbers the plugin ids on
-    regeneration.
   - The manifest also makes the repo a Claude Code plugin marketplace, `scenario-skills`, one plugin
-    per grouping. Claude Code namespaces a plugin's skills under the plugin name, so users see
-    `/03.-images:scenario-image`. Renaming a plugin changes its install key
-    (`<plugin>@scenario-skills`), so existing installs stop matching it.
-  - Each plugin entry carries the release version, so Claude Code updates installed plugins at
-    releases, not at every commit to `main`
-    ([docs/ci-and-releases.md](ci-and-releases.md#releases)).
+    per grouping. A plugin's name is its install key (`<plugin>@scenario-skills`) and the namespace
+    of its skills (`/scenario-images:scenario-image`).
+  - Plugin names are `scenario-` plus the grouping title's slug, never a position, so inserting a
+    grouping renames nothing. The picker therefore lists groups alphabetically.
+  - `pnpm manifest:check` fails unless the names equal `plugins` in `scripts/plugin-names.json`. A
+    new grouping adds its name there. Renaming or removing a grouping breaks every install of its
+    plugin, so it moves the old name to `retired` in the same reviewed change.
+  - Plugin entries carry no `version`, so Claude Code versions each plugin by commit and its catalog
+    entry and files always come from the same commit. Users add the marketplace from the `stable`
+    branch, which the release workflow fast-forwards to each release, so plugins change only at
+    releases ([docs/ci-and-releases.md](ci-and-releases.md#releases)).
+  - The README's Claude Code loop installs every plugin holding core skills; `pnpm readme` checks it
+    lists exactly those.
 - Install commands:
   - `npx skills add scenario-labs/skills` opens a picker with nothing preselected, so a reader who
     runs the bare command and hits enter installs nothing. The README says so on the command.

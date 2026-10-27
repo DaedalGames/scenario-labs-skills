@@ -7,8 +7,7 @@
 // - every skill directory is listed in a grouping, so a new skill cannot
 //   land in the automatic "Other skills" section unnoticed
 // - expert-tool groupings hold expert tools only and come after every core
-//   grouping, so the expert tools stay at the bottom of skills.sh and the
-//   installer picker
+//   grouping, so the expert tools stay at the bottom of skills.sh
 // - every listed skill exists and is listed only once, so renames and
 //   removals cannot leave stale entries behind
 import { readFileSync } from "node:fs";

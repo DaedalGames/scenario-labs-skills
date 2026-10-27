@@ -44,9 +44,9 @@ than the MCP server:
 - cspell skips code, fenced and inline, and YouTube video ids. Prose is checked as everywhere else
   (`cspell.json` overrides).
 - Each family is one `skills.sh.json` grouping titled "Expert tools: <app>". Every expert grouping
-  comes after every core grouping, so the expert tools stay at the bottom of skills.sh and the
-  installer picker (`pnpm groupings` enforces both). A new core grouping goes above them, which
-  renumbers their plugin ids.
+  comes after every core grouping, so the expert tools stay at the bottom of skills.sh
+  (`pnpm groupings` enforces both). The installer picker sorts groups by plugin name, so there they
+  sit together under "Scenario Expert Tools".
 - The [application test protocol](application-test.md) grades MCP plans. For an expert tool, grade
   the plan against the lead skill's execution channels and the application's own documentation
   instead.

@@ -61,10 +61,18 @@ expert descriptions at the time. The default command names the core skills inste
   distribution layer, not to the agent.
 - One release-wide version, not one per skill: `npx skills update` and plugin updates refresh
   everything at once, so a per-skill version adds bookkeeping without changing what a user does.
-- Plugin entries in the marketplace carry the release version. Without one, Claude Code versions a
-  relative-path plugin by commit, and every plugin here has `source: "./"`, so every merge to `main`
-  (CI and chore commits included) was an update for all of them. With it, Claude Code updates
-  plugins at releases, the same points the changelog announces.
+- Plugins release through a `stable` branch, not pinned versions. Every plugin here has
+  `source: "./"`, and without a `version` Claude Code versions it by commit, so every merge to
+  `main` was an update for all of them. Pinning the entry version to the release was tried and
+  failed in a real install: the catalog follows the branch while the cached files stay at the old
+  version. A fresh install then labeled unreleased files with the old release, and a skill added to
+  a group between releases broke the whole plugin ("Path not found") until the next release. The
+  `stable` branch moves catalog and files together, only at releases, and unpinned entries keep a
+  marketplace added from `main` consistent too.
+- Plugin names carry no position prefix. The `NN.-` prefix kept the skills CLI picker in
+  `skills.sh.json` order (the picker sorts groups by name), but every inserted grouping renumbered
+  install keys: three times between September and October 2026, once for 16 plugins. A stable
+  install key matters more than picker order.
 
 ## Release tags
 

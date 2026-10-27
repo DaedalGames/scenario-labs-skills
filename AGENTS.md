@@ -395,7 +395,7 @@ and command lines.
 - Run `pnpm stamp` to add `metadata.version` to its frontmatter
   ([docs/ci-and-releases.md](docs/ci-and-releases.md#releases)).
 - Never edit `.claude-plugin/marketplace.json`: the pre-commit hook regenerates it from
-  `skills.sh.json`.
+  `skills.sh.json`. A new grouping also adds its plugin name to `scripts/plugin-names.json`.
 - How skills.sh, the installer picker, and the install commands work:
   [docs/listing-and-install.md](docs/listing-and-install.md).
 

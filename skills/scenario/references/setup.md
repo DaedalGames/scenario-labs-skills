@@ -118,16 +118,19 @@ Each `SKILL.md` names the release it comes from in its frontmatter, as `metadata
 are listed at
 [github.com/scenario-labs/skills/releases](https://github.com/scenario-labs/skills/releases).
 
-- Claude Code: install the skills as plugins from the `scenario-skills` marketplace, then turn on
-  auto-update once. Auto-update is off by default for third-party marketplaces.
+- Claude Code: install the skills as plugins from the `scenario-skills` marketplace, added from the
+  `stable` branch, which moves only at releases. Every core plugin at once, from a shell, is the
+  loop in the [README](https://github.com/scenario-labs/skills#install). One group from a session:
 
   ```text
-  /plugin marketplace add scenario-labs/skills
-  /plugin install 01.-getting-started@scenario-skills
+  /plugin marketplace add scenario-labs/skills#stable
+  /plugin install scenario-getting-started@scenario-skills
   ```
 
-  Then, in `/plugin`: add more groups from **Discover**, and under **Marketplaces**, select
-  `scenario-skills` and choose **Enable auto-update**. Plugins then update at each release.
+  Then turn on auto-update once: `/plugin`, **Marketplaces**, `scenario-skills`, **Enable
+  auto-update** (off by default for third-party marketplaces). To update now:
+  `claude plugin marketplace update scenario-skills`, then
+  `claude plugin update <plugin>@scenario-skills`, then restart.
 
 - Any other agent: `npx skills add scenario-labs/skills` installs, and `npx skills update` refreshes
   the skills whose files changed.
