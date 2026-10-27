@@ -21,6 +21,8 @@
 // - the Claude Code loop (the line after "# Every Scenario plugin, without
 //   the expert tools") installs exactly the marketplace plugins that hold core
 //   skills, so a new or renamed grouping cannot be left out of it
+// - every plugin a `claude plugin install` command or loop names, in README.md
+//   and INSTALL.md, exists in the marketplace manifest
 // - every core skill appears in at least one INSTALL.md role command, and
 //   each role's and goal's "N skills." count matches its command
 import { existsSync, readFileSync } from "node:fs";
@@ -264,6 +266,29 @@ if (defaults.length !== 1) {
 }
 
 const PLUGIN_MARKER = "# Every Scenario plugin, without the expert tools";
+const manifestPlugins = JSON.parse(
+  readFileSync(".claude-plugin/marketplace.json", "utf8"),
+).plugins;
+for (const file of ["README.md", "INSTALL.md"]) {
+  if (!existsSync(file)) continue;
+  readFileSync(file, "utf8")
+    .split("\n")
+    .forEach((line, index) => {
+      const loop = line.match(/^for p in (.+); do claude plugin install /);
+      const named = loop
+        ? loop[1].trim().split(/\s+/)
+        : [...line.matchAll(/plugin install ([\w.-]+)@scenario-skills/g)].map(
+            (match) => match[1],
+          );
+      for (const name of named) {
+        if (!manifestPlugins.some((plugin) => plugin.name === name)) {
+          errors.push(
+            `${file}:${index + 1}: names plugin "${name}", which is not in .claude-plugin/marketplace.json`,
+          );
+        }
+      }
+    });
+}
 const pluginLoops = readme
   .split("\n")
   .map((line, index, all) => ({ line, after: (all[index - 1] ?? "").trim() }))
@@ -284,13 +309,10 @@ if (pluginLoops.length !== 1) {
     const expertDirs = new Set(
       skills.filter((skill) => skill.expert).map((skill) => `./${skill.dir}`),
     );
-    const manifest = JSON.parse(
-      readFileSync(".claude-plugin/marketplace.json", "utf8"),
-    );
     compareSets(
       "README.md: the plugin install loop",
       match[1].trim().split(/\s+/),
-      manifest.plugins
+      manifestPlugins
         .filter((plugin) => !plugin.skills.some((dir) => expertDirs.has(dir)))
         .map((plugin) => plugin.name),
     );

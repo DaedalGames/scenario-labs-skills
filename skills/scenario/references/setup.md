@@ -119,12 +119,14 @@ are listed at
 [github.com/scenario-labs/skills/releases](https://github.com/scenario-labs/skills/releases).
 
 - Claude Code: install the skills as plugins from the `scenario-skills` marketplace, added from the
-  `stable` branch, which moves only at releases. Every core plugin at once, from a shell, is the
-  loop in the [README](https://github.com/scenario-labs/skills#install). One group from a session:
+  `stable` branch, which moves only at releases. Install the getting-started plugin plus the groups
+  for the user's job: [INSTALL.md](https://github.com/scenario-labs/skills/blob/main/INSTALL.md) has
+  one line per role. Each installed skill costs context in every session, so avoid installing every
+  group. From a session:
 
   ```text
   /plugin marketplace add scenario-labs/skills#stable
-  /plugin install scenario-getting-started@scenario-skills
+  /plugin install 010-getting-started@scenario-skills
   ```
 
   Then turn on auto-update once: `/plugin`, **Marketplaces**, `scenario-skills`, **Enable

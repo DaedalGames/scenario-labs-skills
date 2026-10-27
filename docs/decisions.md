@@ -69,10 +69,14 @@ expert descriptions at the time. The default command names the core skills inste
   a group between releases broke the whole plugin ("Path not found") until the next release. The
   `stable` branch moves catalog and files together, only at releases, and unpinned entries keep a
   marketplace added from `main` consistent too.
-- Plugin names carry no position prefix. The `NN.-` prefix kept the skills CLI picker in
-  `skills.sh.json` order (the picker sorts groups by name), but every inserted grouping renumbered
-  install keys: three times between September and October 2026, once for 16 plugins. A stable
-  install key matters more than picker order.
+- Plugin names carry a fixed three-digit number, assigned once with gaps and stored in
+  `scripts/plugin-names.json` (`030-images`). The skills CLI picker sorts groups by plugin name, so
+  a number is what keeps it in `skills.sh.json` order, a deliberate path from getting started to the
+  expert tools. The earlier `NN.-` prefix was recomputed from position, so every inserted grouping
+  renamed install keys: three times between September and October 2026, once for 16 plugins.
+- The README recommends per-role plugin sets over installing everything. Every installed skill puts
+  its name and description in every session: the 16 core plugins measured about 10,100 tokens, the
+  role sets 700 to 4,000.
 
 ## Release tags
 

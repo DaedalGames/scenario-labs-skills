@@ -56,22 +56,32 @@ Skills follow the [Agent Skills](https://agentskills.io) format.
 
 **Claude Code: install as plugins, with auto-update.** The repository is a Claude Code plugin
 marketplace named `scenario-skills`, with one plugin per topic group of the Skills list below. Add
-it from the `stable` branch, which moves only at releases. From your shell:
+it from the `stable` branch, which moves only at releases, then install the getting-started plugin
+and the groups for your job. [INSTALL.md](INSTALL.md#claude-code-plugins-by-role) has one line per
+role, from about 700 to 4,000 tokens. From your shell:
 
 ```bash
 claude plugin marketplace add scenario-labs/skills#stable
-# Every Scenario plugin, without the expert tools
-for p in scenario-getting-started scenario-finding-a-direction scenario-images scenario-game-art-and-3d scenario-video-and-audio scenario-socials scenario-consistency-and-custom-models scenario-reviewing-and-organizing-output scenario-formats-and-placements scenario-workflows-and-apps scenario-troubleshooting scenario-team-administration scenario-image-model-families scenario-video-model-families scenario-audio-model-families scenario-3d-model-families; do claude plugin install "$p@scenario-skills"; done
+claude plugin install 010-getting-started@scenario-skills
 ```
 
 Or, in a Claude Code session, run `/plugin marketplace add scenario-labs/skills#stable`, then pick
 groups from the **Discover** tab of `/plugin`. An expert-tools family is one plugin, for example
-`claude plugin install scenario-expert-tools-blender@scenario-skills`.
+`claude plugin install 180-expert-tools-blender@scenario-skills`.
 
 Then turn on auto-update once: run `/plugin`, open **Marketplaces**, select `scenario-skills`, and
 choose **Enable auto-update**. It is off by default for third-party marketplaces. A plugin's skills
-appear as `/<plugin>:<skill>`, for example `/scenario-images:scenario-image`. Install through
-plugins or through `npx skills add`, not both, or each skill loads twice.
+appear as `/<plugin>:<skill>`, for example `/030-images:scenario-image`. Install through plugins or
+through `npx skills add`, not both, or each skill loads twice.
+
+Every installed skill puts its name and description in every session. Installing every core plugin
+costs about 10,100 tokens per session (measured with `claude plugin details`, October 2026), so
+prefer the role sets. To install them all anyway:
+
+```bash
+# Every Scenario plugin, without the expert tools
+for p in 010-getting-started 020-finding-a-direction 030-images 040-game-art-and-3d 050-video-and-audio 060-socials 070-consistency-and-custom-models 080-reviewing-and-organizing-output 090-formats-and-placements 100-workflows-and-apps 110-troubleshooting 120-team-administration 130-image-model-families 140-video-model-families 150-audio-model-families 160-3d-model-families; do claude plugin install "$p@scenario-skills"; done
+```
 
 **Other agents.** The commands below use the [skills CLI](https://www.skills.sh), which works with
 Claude Code too.
