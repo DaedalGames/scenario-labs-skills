@@ -9,15 +9,15 @@
 //   expert tools under skills/<category>/<family>/),
 //   which also makes the repo installable as a Claude Code plugin marketplace,
 //   one plugin per grouping
-// - every plugin carries the release version from version.txt, which
-//   release-please rewrites in this file too (a json extra-files entry), so
-//   Claude Code updates installed plugins at each release rather than at every
-//   commit to main
-// - plugin names carry a two-digit position prefix (01.-getting-started,
-//   displayed by the picker as "01. Getting Started") because the picker sorts
-//   group names alphabetically, so the prefix is what makes it follow
-//   skills.sh.json order; inserting or merging a grouping renumbers the plugin
-//   identifiers on the next regeneration
+// - plugin names are `scenario-` plus the title slug, never a position: a
+//   plugin name is its Claude Code install key, so a renumbered name breaks
+//   every install of it. The picker therefore lists groups alphabetically.
+//   --check fails unless the names equal the `plugins` list in
+//   scripts/plugin-names.json, so a rename or removal is a reviewed edit there
+//   (the old name moves to `retired`).
+// - entries carry no version: Claude Code then versions a plugin by commit, so
+//   its catalog entry and its files always come from the same commit. Releases
+//   reach plugin users through the stable branch the release workflow moves.
 // Never edit the manifest by hand; edit skills.sh.json and run `pnpm manifest`.
 // By default regenerates the file in place and, for the pre-commit hook, its
 // staged copy from the staged skills.sh.json and skill folders. --check
@@ -45,7 +45,7 @@ const pluginNameOf = (title) =>
     .replace(/^-+|-+$/g, "");
 
 // `source` names the skills.sh.json being read in error messages.
-function render(source, read, skills, version) {
+function render(source, read, skills) {
   let config;
   try {
     config = JSON.parse(read());
@@ -80,10 +80,9 @@ function render(source, read, skills, version) {
         `${source}: grouping "${title}" needs a skills array (see pnpm groupings)`,
       );
     }
-    const name = `${String(index + 1).padStart(2, "0")}.-${slug}`;
+    const name = `scenario-${slug}`;
     const plugin = { name };
     if (group.description) plugin.description = group.description;
-    plugin.version = version;
     plugin.source = "./";
     plugin.strict = false;
     plugin.skills = group.skills.map((skill) => {
@@ -109,14 +108,14 @@ function render(source, read, skills, version) {
   return {
     rendered: `${JSON.stringify(manifest, null, 2)}\n`,
     groups: plugins.length,
+    names: plugins.map((plugin) => plugin.name),
   };
 }
 
-const { rendered, groups } = render(
+const { rendered, groups, names } = render(
   "skills.sh.json",
   () => readFileSync("skills.sh.json", "utf8"),
   listSkills(),
-  readFileSync("version.txt", "utf8").trim(),
 );
 
 const existing = existsSync(MANIFEST_PATH)
@@ -124,6 +123,29 @@ const existing = existsSync(MANIFEST_PATH)
   : null;
 
 if (process.argv.includes("--check")) {
+  const NAMES_PATH = "scripts/plugin-names.json";
+  const registry = JSON.parse(readFileSync(NAMES_PATH, "utf8"));
+  const listed = registry.plugins ?? [];
+  const retired = registry.retired ?? [];
+  const added = names.filter((name) => !listed.includes(name));
+  const gone = listed.filter((name) => !names.includes(name));
+  const revived = names.filter((name) => retired.includes(name));
+  if (added.length > 0 || gone.length > 0 || revived.length > 0) {
+    bail(
+      [
+        `${NAMES_PATH}: plugin names are install keys, so every change is deliberate.`,
+        ...added.map((name) => `  new plugin "${name}": add it to "plugins"`),
+        ...gone.map(
+          (name) =>
+            `  plugin "${name}" disappears: existing installs of it break; move it to "retired" only if that is intended`,
+        ),
+        ...revived.map(
+          (name) =>
+            `  plugin "${name}" is listed as retired: pick another name`,
+        ),
+      ].join("\n"),
+    );
+  }
   if (existing !== rendered) {
     bail(
       `${MANIFEST_PATH} is out of sync with skills.sh.json; run pnpm manifest`,
@@ -154,7 +176,6 @@ let index;
 try {
   index = {
     config: git(["show", ":skills.sh.json"]),
-    version: git(["show", ":version.txt"]).trim(),
     paths: git(["ls-files", "-z", "--", "skills"]).split("\0"),
   };
 } catch {
@@ -165,7 +186,6 @@ if (index) {
     "staged skills.sh.json",
     () => index.config,
     listSkillsFromPaths(index.paths),
-    index.version,
   ).rendered;
   let indexed = null;
   try {

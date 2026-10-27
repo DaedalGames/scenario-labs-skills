@@ -3,7 +3,6 @@ import { execFileSync } from "node:child_process";
 import {
   appendFileSync,
   copyFileSync,
-  readFileSync,
   mkdirSync,
   mkdtempSync,
   renameSync,
@@ -13,7 +12,6 @@ import {
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
 const scripts = dirname(fileURLToPath(import.meta.url));
@@ -44,7 +42,10 @@ function repo(t) {
       JSON.stringify({ groupings: [{ title, skills: [EXPERT, CORE] }] }),
     );
   groupings("Expert tools: ZBrush");
-  writeFileSync(join(root, "version.txt"), "1.2.3\n");
+  writeFileSync(
+    join(root, "scripts/plugin-names.json"),
+    JSON.stringify({ plugins: ["scenario-expert-tools-zbrush"], retired: [] }),
+  );
   const run = (file, args) =>
     execFileSync(file, args, {
       cwd: root,
@@ -101,39 +102,27 @@ test("an unstaged skills.sh.json edit stays out of the staged manifest", (t) => 
   groupings("Expert tools: ZBrush 2");
   manifest();
   const [plugin] = stagedManifest().plugins;
-  assert.equal(plugin.name, "01.-expert-tools-zbrush");
+  assert.equal(plugin.name, "scenario-expert-tools-zbrush");
   assert.ok(plugin.skills.includes(MOVED));
 });
 
-test("every plugin carries the version.txt release", (t) => {
-  const { stagedManifest } = repo(t);
-  for (const plugin of stagedManifest().plugins) {
-    assert.equal(plugin.version, "1.2.3");
-  }
-});
-
-// release-please's own pinned updater, driven by this repository's config:
-// the release PR must leave the manifest exactly as the generator would
-// render it from the new version.txt, or manifest:check fails on that PR.
-test("release-please bumps the manifest as the generator would render it", (t) => {
-  const { root, manifest } = repo(t);
-  const config = JSON.parse(
-    readFileSync(join(scripts, "../release-please-config.json"), "utf8"),
-  );
-  const entry = config.packages["."]["extra-files"].find(
-    (file) => file.path === MANIFEST,
-  );
-  assert.equal(entry?.type, "json");
-  const releasePlease = createRequire(
-    createRequire(import.meta.url).resolve("release-please"),
-  );
-  const { GenericJson } = releasePlease("./updaters/generic-json.js");
-  const { Version } = releasePlease("./version.js");
-  const bumped = new GenericJson(
-    entry.jsonpath,
-    Version.parse("1.3.0"),
-  ).updateContent(readFileSync(join(root, MANIFEST), "utf8"));
-  writeFileSync(join(root, "version.txt"), "1.3.0\n");
+test("the check fails when a plugin name appears or disappears unlisted", (t) => {
+  const { root, groupings, manifest } = repo(t);
+  const check = () =>
+    execFileSync(
+      process.execPath,
+      [join(root, "scripts/generate-plugin-manifest.mjs"), "--check"],
+      { cwd: root, env, encoding: "utf8", stdio: "pipe" },
+    );
+  check();
+  groupings("Expert tools: ZBrush 2");
   manifest();
-  assert.equal(bumped, readFileSync(join(root, MANIFEST), "utf8"));
+  assert.throws(check, (error) => {
+    assert.match(error.stderr, /new plugin "scenario-expert-tools-zbrush-2"/);
+    assert.match(
+      error.stderr,
+      /plugin "scenario-expert-tools-zbrush" disappears/,
+    );
+    return true;
+  });
 });
