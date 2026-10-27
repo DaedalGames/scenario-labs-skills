@@ -1111,6 +1111,7 @@ pano
 pcall
 pdftoppm
 pheomelanin
+phonk
 pixol
 pixols
 pluggnsb
@@ -1228,6 +1229,7 @@ tampo
 texel
 texturer
 theodox
+thock
 thresholded
 ticka
 toon
