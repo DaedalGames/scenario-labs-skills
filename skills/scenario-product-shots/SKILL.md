@@ -3,7 +3,7 @@ name: scenario-product-shots
 description: "Use when producing product photography with Scenario from a real product photo: e-commerce packshots on white, transparent, or brand backgrounds, lifestyle scenes placing the product in an environment, hero shots for a landing page or marketplace listing, angle and colorway sets, relighting or shadow fixes, or any shot where the label, logo, and shape must stay exact. Keywords: product photo, packshot, e-commerce, lifestyle shot, compositing, relight, label fidelity, catalog."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Product Shots
@@ -17,8 +17,9 @@ relight) and generative scene placement with an instruction-editing model. Conne
 loop: see the `scenario` skill. Edit-model contracts: `scenario-image`. Deterministic tools:
 `scenario-image-editing`. Reading assets back: `scenario-asset-analysis`. Animating an approved
 still into an ad: `scenario-video-ads`. If a sibling skill named here is missing from your available
-skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

@@ -3,7 +3,7 @@ name: scenario-unreal-materials
 description: 'Use when a UE5 task involves materials or textures: a master material and instances for a kit, Substrate or legacy, Blendable vs Adaptive GBuffer, glass, emissive screens, decals, edge wear and dirt, landscape layers and RVT, toon or cel shading, "too many shaders" or shader permutations, static switches, usage flags, texture compression (BC7, normal maps, ORM packing, sRGB), texture memory, or "is this material expensive".'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unreal materials (master materials, Substrate, textures, shader cost)
@@ -13,8 +13,9 @@ permutation count, cost proven in milliseconds on a fixed camera, and physically
 before any artistic push. The graph is authored once (scripted build or template); everything else
 is instances, Custom Primitive Data and textures that follow a role policy. Never trust the
 instruction count or a pretty preview. If a sibling skill named here is missing from your available
-skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-unreal-expert (channels, review loop, 5.8 traps).
 

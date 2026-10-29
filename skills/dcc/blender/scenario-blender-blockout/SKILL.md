@@ -3,7 +3,7 @@ name: scenario-blender-blockout
 description: "Use when a text brief or a reference image must become a Blender blockout whose playblast guides a render-to-real video pass (a video model that takes a reference clip, such as Seedance, or the Render Video lane of the Scenario Blender Plugin): graybox or previs built for a video model, color-coded proxies at metric scale from rough to detailed, density levels from a simple shot to an expert scene with crowds, traffic and many cuts, character stand-ins chosen per video model (colored capsules, capsules with signature features, rigged gray mannequins), a camera locked to the timeline, rail or tracking camera rigs, lens per shot, framing and occlusion checks, a playblast, a hand-off sheet for the video prompt. Also when a render-to-real pass renders the proxies as boxes, reads one figure as two people, gives runners a stiff, lockstep or sliding gait, swaps a car's front and rear, drifts at the end, or the guide camera pops on a cut."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Blender blockout for a render-to-real video pass
@@ -15,9 +15,10 @@ faces, wardrobe, extras, sound). So the blockout has full authority over motion 
 over look. Ambiguity ruins the pass; crudeness does not: a bent lamppost comes back as a snake,
 loose limb blocks as extra people, an unmarked car driving backward. Fix identity in geometry first,
 in prompt text second, and judge the result on a synced side-by-side of playblast and video, never
-in the viewport alone. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+in the viewport alone. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 Video generation: `scenario-blender` (the plugin's quote, generate and place flow), the `scenario`

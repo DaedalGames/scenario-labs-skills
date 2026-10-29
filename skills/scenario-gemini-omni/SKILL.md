@@ -3,7 +3,7 @@ name: scenario-gemini-omni
 description: "Use when generating, extending, or editing video with Gemini Omni models on Scenario via MCP: text-to-video, image-to-video from a first frame, reference-to-video keeping a character, product, or place consistent, appending footage to a clip, restyling footage by prompt (season, wardrobe, art style), native audio with dialogue and ambience, or picking between first-frame and reference conditioning. Keywords: Gemini Omni Flash, 1.1 Flash, Google, T2V, I2V, V2V, extend, subject consistency."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Gemini Omni Video
@@ -20,9 +20,10 @@ below the original line at authoring time), then treat `model_schema_get` as the
 image models are the `scenario-gemini-image` skill's domain; Gemini TTS belongs to audio.
 
 Connection and the core loop: see the `scenario` skill; model-agnostic video work: the
-`scenario-video` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-video` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

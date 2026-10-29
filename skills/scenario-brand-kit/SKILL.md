@@ -3,7 +3,7 @@ name: scenario-brand-kit
 description: "Use when building a visual identity or brand kit with Scenario: a logo, wordmark, or icon as editable SVG, a color palette and typography spec, logo variants (mono, reversed, favicon), and brand applications like social templates, avatars, banners, or merchandise mockups. Also for a rebrand or refreshing an existing mark. Keywords: brandkit, brand kit, visual identity, logo, monogram, wordmark, SVG, vectorize, color palette, typography, brand guidelines, brand board, launch kit."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Brand Kit
@@ -16,9 +16,10 @@ references the approved mark instead of re-imagining it. Connection and the core
 `scenario` skill. Finding the direction when nothing is decided: `scenario-inspiration`. Image runs
 and reference wiring: `scenario-image`. Exact taglines and CTAs on applications:
 `scenario-text-overlay`. Per-placement sizes: `scenario-formats`. Gating contract:
-`scenario-asset-analysis`. If a sibling skill named here is missing from your available skills, ask
-the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed
-from tool schemas and flag the gap.
+`scenario-asset-analysis`. If a sibling skill named here is missing from your available skills, load
+it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

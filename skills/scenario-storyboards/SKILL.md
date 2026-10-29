@@ -3,7 +3,7 @@ name: scenario-storyboards
 description: "Use when a story must unfold across a sequence of Scenario images: a comic page or strip, manga or webtoon panels, a children's storybook, a film, game, or ad storyboard, animatic pre-viz frames, or any shot list where the same characters and world must persist from panel to panel and dialogue must stay legible. Keywords: storyboard, comic, panel, sequential art, storybook, shot list, pre-viz, animatic, scene to scene, character consistency."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Storyboards and Comics
@@ -16,9 +16,9 @@ garble. The unit of generation is the panel, never the page. Script first, lock 
 `model_run` per panel anchored to the same references, letter in post, assemble the page last.
 Connection and the core loop: see the `scenario` skill. Character lock: `scenario-consistency`.
 Per-model image contracts: `scenario-image`. Lettering: `scenario-text-overlay`. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 ## Quick reference
 

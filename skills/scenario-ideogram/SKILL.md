@@ -3,7 +3,7 @@ name: scenario-ideogram
 description: "Use when generating or editing images with Ideogram models on Scenario via MCP: posters, logos, menus, packaging, or signage with exact in-image text, editing an image in place while keeping its exact size, transparent PNG generation, background removal that keeps hair and glass edges, editable text layers for localization, or one consistent character from a reference. Keywords: Ideogram 4.5, Precise Edit, V4, V3, typography, aspect ratio, layerize, character reference, inpainting."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Ideogram Image
@@ -22,9 +22,9 @@ and treat its `model_schema_get` as the contract.
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic image work
 (sizing families, reference cardinality, masks): the `scenario-image` skill; running a bake-off
 against another family: `scenario-model-comparison`. If a sibling skill named here is missing from
-your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

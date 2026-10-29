@@ -3,7 +3,7 @@ name: scenario-roblox-animation
 description: "Use when animating Roblox characters, NPCs or creatures: animation not playing, wrong animation wins, animation priority or weight, blending, animation events and markers, hit timing, import from Blender or FBX, custom rig or creature rig, Motor6D or AnimationConstraint joints, procedural animation, IKControl look-at or foot and hand IK, FaceControls and dynamic head expressions, replacing the default Animate animations, KeyframeSequence or CurveAnimation built in code, Animator replication, AnimationController NPCs, Character Controller Library abilities, adaptive animation for custom humanoids."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox animation and characters
@@ -15,9 +15,9 @@ Expert level here means every clip, layer, IK chain and face is proven in Studio
 track wins each joint, when each marker fires, what the server sees, and that the stepped pose
 matches its source. An agent cannot drive the Animation Editor, so it builds clips in code, steps
 them in Edit, plays them in a playtest and measures joints and tracks before it calls anything done.
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

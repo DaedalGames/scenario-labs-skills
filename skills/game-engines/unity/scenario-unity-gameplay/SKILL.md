@@ -3,7 +3,7 @@ name: scenario-unity-gameplay
 description: "Use when building or debugging Unity gameplay systems: enemy AI that patrols, chases and attacks, NavMesh baking and agents (AI Navigation 2), feet sliding on agents, state machines or behavior trees, physics projectiles that tunnel, the physics spiral, layers and the collision matrix, CharacterController vs Rigidbody characters, object pooling, 'hundreds of enemies', DOTS, Burst or Jobs decisions, Netcode for GameObjects multiplayer, audio mixers, snapshots, volume sliders and 3D combat sounds."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity gameplay systems (gameplay systems programmer)
@@ -13,9 +13,9 @@ someone chose, and is proven by a measurement: steps per frame, a tunneling test
 a path query through the real door, a timed transition, the worst frame at the real agent count.
 This skill carries the expert delta from the 6.3 manuals, AI Navigation 2, NGO and shipped games
 (Survival Kids, Very Very Valet), with jobs and tests run in 6000.3.21f1. If a sibling skill named
-here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user
+to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, review loop, 6.3 traps). Install:
 `ut_gameplay.install(P)` (core AgentKit + `AgentKit.Gameplay` jobs + the `AgentKit.Gameplay.Runtime`

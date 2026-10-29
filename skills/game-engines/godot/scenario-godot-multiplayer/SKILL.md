@@ -3,7 +3,7 @@ name: scenario-godot-multiplayer
 description: "Use when a Godot 4 game goes online or co-op: host and join with ENet, WebSocket for a web build, RPCs (@rpc, rpc_id, any_peer), MultiplayerSpawner and MultiplayerSynchronizer, player authority, lobbies and login, a dedicated or headless server export, lag, rubber-banding, prediction or netfox, cheating, bandwidth, Steam, Nakama or WebRTC. Symptoms: players do not appear on the client, 'rpc node checksum failed', 'node not found' on an RPC, desync, the server build is huge, a client never connects."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot multiplayer (network programmer)
@@ -15,8 +15,9 @@ before anyone plays it: authority is a written decision per object, every client
 request the server checks, and replication cost is measured in KiB/s. This skill builds the
 replication in code, runs a server and 2 to 3 clients headless on localhost (plus a browser client),
 and passes only on numbers from those runs. If a sibling skill named here is missing from your
-available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-godot-expert (channels, `gd_run`, review loop, 4.7 traps).
 

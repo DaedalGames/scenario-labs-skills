@@ -3,7 +3,7 @@ name: scenario-maya-groom
 description: "Use when grooming hair or fur in Maya with XGen (Interactive Groom splines or legacy descriptions): scalp hair, eyebrows, eyelashes, fur, guides, clumps, noise, parting, density maps, a fill layer, aiStandardHair shading, noisy or flickering hair renders, hair that must move (Linear Wire, nHair, Alembic caches), or a groom for Unreal (groom Alembic, cards). Also when XGen hair looks CG, clumps look uniform, the scalp shows through, or an XGen script fails."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Hair and fur grooming (XGen Interactive Groom, Maya 2027)
@@ -14,9 +14,9 @@ side-lit renders with the real hair shader. Interactive Groom brushes have no st
 agent grooms with data (guides from a flow sheet wired into the stack, masks written as images,
 modifiers set by value) and judges with numbers from exported strands plus renders. Code:
 [`scripts/mx_groom.py`](scripts/mx_groom.py) (`import mx_groom as G`). If a sibling skill named here
-is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-maya-expert (execution channel, review loop, 2027 version traps).
 

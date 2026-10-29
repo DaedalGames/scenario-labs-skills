@@ -3,7 +3,7 @@ name: scenario-luma-image
 description: "Use when generating or editing images with Luma Uni-1 models on Scenario via MCP: text-to-image, prompt-based editing of an existing image, style or character reference images with named roles, web search grounding for real-world subjects, rendering exact title text into posters, aspect ratio control, or choosing between Uni-1 Max and Uni-1. Keywords: Luma Labs, Uni-1, Photon, txt2img, img2img, image edit, reference images, webSearch, reasoning image model."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Luma Image
@@ -20,9 +20,9 @@ tiers share every field name and disagree on caps and price. Luma's video models
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic image work
 (sizing families, masks, batch fields): the `scenario-image` skill. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 ## Quick reference
 

@@ -3,7 +3,7 @@ name: scenario-godot-performance-export
 description: "Use when a Godot game stutters, drops frames, hitches when entering new areas, overheats a phone, or must ship: profiling and Performance monitors, CPU or GPU bound, draw calls, MultiMesh, occlusion culling, LOD, shader compilation hitches, export to macOS, Windows, Linux, Steam, Android (APK, AAB, keystore), iOS (Xcode), web (itch.io, COOP/COEP headers, SharedArrayBuffer, JavaScript interop), build size budgets, demo and DLC builds, signing and notarization."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot performance and release
@@ -14,9 +14,9 @@ Expert level here means every claim about speed comes with a before and after nu
 harness, every build is verified as a file before anyone calls it shipped, and the agent knows which
 numbers Godot reports wrongly. The stance: measure, classify the bound, fix the biggest cost,
 re-measure, compare pictures, then ship builds you have opened, run and listed. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-godot-expert (channels, the review loop, toolkit, 4.7 traps).
 

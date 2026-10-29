@@ -3,7 +3,7 @@ name: scenario-maya-lighting-rendering
 description: 'Use when lighting or rendering in Maya with Arnold: a product hero shot, a character close-up or a sequence (master and shot lighting), key, fill and rim placement, "the Arnold render is noisy" or fireflies, render settings and time budgets, AOVs, light groups and EXRs for Nuke, OIDN or noice denoising, ACES or OCIO color, renders that look flat or too dark, Render Setup layers, batch or command-line renders, or judging a lit frame like a lighting supervisor.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Lighting and rendering in Maya 2027 (Arnold)
@@ -12,9 +12,9 @@ Expert lighting is a story decision made measurable: know where the eye must lan
 with one dominant light, structure values back to front, prove it with light groups and numbers
 before the eye signs off. Rendering is engineering: find the noise in the AOVs before touching a
 sampler, deliver scene-linear EXRs whose passes rebuild the beauty, judge through a tone-mapping
-view. If a sibling skill named here is missing from your available skills, ask the user to install
-it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+view. If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-maya-expert (execution channel, review loop, 2027 version traps).
 

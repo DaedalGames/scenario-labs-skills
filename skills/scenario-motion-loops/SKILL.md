@@ -3,7 +3,7 @@ name: scenario-motion-loops
 description: "Use when someone wants seamless looping motion graphics for video in their own brand colors: animated backgrounds behind titles, filler for the dead seconds between AI shots, bumpers, transitions or shape animations, built as code and rendered to MP4, optionally with their mascot, product or character from Scenario composited over the loop. Keywords: seamless loop, motion background, canvas animation, motion graphics, loop seam, motion blur, H.264 export, alpha composite."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Motion Loops
@@ -28,9 +28,10 @@ Needs Node 18 or newer, ffmpeg 5.1 or newer with ffprobe, and Playwright where t
 (`npm install playwright`, then `npx playwright install chromium`, or `--channel chrome` with Google
 Chrome installed). Connection, model discovery, uploads and pricing: see the `scenario` skill. The
 cut-out: `scenario-image-editing`. The video shot: `scenario-video`, and its background removal:
-`scenario-video-editing`. If a sibling skill named here is missing from your available skills, ask
-the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed
-from tool schemas and flag the gap.
+`scenario-video-editing`. If a sibling skill named here is missing from your available skills, load
+it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

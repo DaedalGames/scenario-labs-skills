@@ -3,7 +3,7 @@ name: scenario-unity-world-building
 description: "Use when building a Unity 6.3 level or open world: terrain from code or heightmaps, procedural islands, erosion, splat and foliage rules, trees and grass, ProBuilder graybox, level gym, modular kit and prefab placement, set dressing, landmarks and player guidance, the island's edge, spline roads, WFC, fog, additive scene streaming, or a world that hitches, pops in, leaks memory or runs slow on mobile. Keywords: Terrain, TerrainData, ProBuilder, blockout, graybox, modular kit, NavMesh, LoadSceneAsync, open world."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity world building (level and environment artist)
@@ -14,9 +14,10 @@ space and walk back, the edge of the world holds content, and the worst viewpoin
 budget in a Player. An agent without a mouse does all of it through `TerrainData`, the ProBuilder
 API, `PrefabUtility` and scene APIs, then checks with raycasts, NavMesh paths, captures, a profiling
 tour and a Player probe. Target: Unity 6000.3.21f1, URP 17.3, ProBuilder 6.1.2, Splines 2.9.0, AI
-Navigation 2.0.14. If a sibling skill named here is missing from your available skills, ask the user
-to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool
-schemas and flag the gap.
+Navigation 2.0.14. If a sibling skill named here is missing from your available skills, load it with
+`skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, review loop, 6.3 traps). Import its
 toolkit; this skill adds [`scripts/ut_world.py`](scripts/ut_world.py), C# jobs in

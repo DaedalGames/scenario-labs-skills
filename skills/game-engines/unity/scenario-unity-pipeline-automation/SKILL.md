@@ -3,7 +3,7 @@ name: scenario-unity-pipeline-automation
 description: "Use when automating a Unity 6.3 content pipeline or build: importing an art drop (FBX, PNG) with AssetPostprocessor rules and naming conventions, generating prefabs or editing scenes from script with correct Undo and SetDirty, Addressables groups, labels and content builds, content-validation tests, batch-mode, command-line or CI builds (Build Profiles, GameCI, GitHub Actions, Accelerator), editor tools; or when textures import wrong or reimport every run, a scripted edit vanishes, bundles duplicate assets, a batch build ignores its defines, or CI cannot activate Unity."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity pipeline automation (tools and build engineer)
@@ -12,9 +12,9 @@ Expert level here means a pipeline that gives the same result on every machine a
 applied at import time, edits made through serialization, content packed by when it loads, tests
 that gate the build, and a build that CI runs from a clean checkout. The stance: nothing is done by
 hand twice, nothing is trusted without a count, a test or a frame, and a second run changes nothing.
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, job protocol, review loop, 6.3 traps).
 Import its toolkit; this skill adds [`scripts/ut_pipeline.py`](scripts/ut_pipeline.py) and

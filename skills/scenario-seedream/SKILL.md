@@ -3,7 +3,7 @@ name: scenario-seedream
 description: "Use when generating or editing images with Seedream models on Scenario via MCP: text-to-image, image-to-image editing with reference images, posters or packaging with exact in-image text (non-Latin scripts too), subject-preserving edits, sets of related images in one run, editing a transparent asset without losing its alpha, or splitting an image into transparent PNG layers with Layerize. Keywords: Seedream 5.0 Pro, Lite, Flash, 4.5, Layerize, ByteDance, txt2img, img2img, layer extraction."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Seedream Images
@@ -16,9 +16,10 @@ members agree on little else, so discover them with `search` and read `model_sch
 every run.
 
 Connection and the core loop: see the `scenario` skill; model-agnostic image work: the
-`scenario-image` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-image` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

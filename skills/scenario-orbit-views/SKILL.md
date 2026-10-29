@@ -3,7 +3,7 @@ name: scenario-orbit-views
 description: "Use when a single image of a character, creature, prop, vehicle, or building must be seen from new camera angles through the Scenario MCP server: turnarounds, a 360 orbit, views from behind, above, below, or straight down, consistent multi-angle renders on the same grounded background or on transparency, or novel views that go through a 3D intermediary instead of guessing."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Orbit Views
@@ -16,9 +16,10 @@ untextured mesh, render a gray clay layout for every camera, then let a referenc
 model repaint each layout from the original picture. The mesh fixes silhouette, scale, and
 perspective; the picture supplies identity, colors, and finish. Connection and the core generation
 loop: see the `scenario` skill. Image-to-3D model choice: `scenario-3d`. The background panorama:
-`scenario-skyboxes`. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-skyboxes`. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 The Blender steps run locally in a shell with Blender 4.x or later; everything that generates goes
 through MCP tools. Check for Blender before the first paid step (on macOS it is usually

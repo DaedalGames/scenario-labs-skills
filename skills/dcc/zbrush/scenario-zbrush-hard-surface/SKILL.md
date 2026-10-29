@@ -3,7 +3,7 @@ name: scenario-zbrush-hard-surface
 description: "Use when modeling hard surface in ZBrush 2026 (sci-fi helmet, weapon, prop, armor plates, mechanical parts, kitbash, vents, panel lines, bolts, concept to game asset), when using ZModeler, Dynamic Subdivision and creasing, Live Boolean, Knife, Clip, Slice or Trim curves, IMM, ArrayMesh, NanoMesh or Panel Loops, or when edges look razor sharp, a Make Boolean Mesh fails or leaves holes, planes look wobbly, Mirror And Weld erased an edit, or ZRemesher ruins a hard-surface part."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # ZBrush hard surface
@@ -13,9 +13,9 @@ clearly curved, planes carry an even highlight, edges are wide enough to catch l
 could be built (Plouffe, Klimer). The agent builds that language from deterministic operations
 (primitives, Live Boolean stacks, polygroups as the crease plan, Dynamic Subdivision numbers,
 ArrayMesh, Panel Loops) and uses clicks and strokes only where nothing else exists. If a sibling
-skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+skill named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or
+ask the user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed
+from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-zbrush-expert (bridge, stroke engine, review loop, 2026 traps).
 Toolkit: [`scripts/zb_hardsurface.py`](scripts/zb_hardsurface.py)

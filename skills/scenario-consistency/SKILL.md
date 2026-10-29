@@ -3,7 +3,7 @@ name: scenario-consistency
 description: "Use when one look must hold across Scenario generations: one character across scenes, a turnaround, or a video animated from its references, one product across angles, one style across icon sets, a character from an uploaded drawing, a variant off an approved baseline, or deciding when references stop scaling and a trained model is due. Triggers: make this match, same character, on-model, reference to video, style reference. Keywords: consistency, identity, control map, seed, LoRA."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Consistency
@@ -16,9 +16,9 @@ rising order of durability: a prompt baseline, reference images, a style referen
 trained model. The same references carry a character into video. Connection and the core loop: see
 the `scenario` skill; training: see `scenario-model-training`; creating and filing a named character
 or prop library, with its sheets: see `scenario-identity-library`. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 ## Quick reference
 

@@ -3,7 +3,7 @@ name: scenario-video-color-grade
 description: "Use when color grading, color correcting, or relighting an existing video or still with deterministic code instead of a generative model: cinematic looks (teal and orange, film stock, bleach bypass, noir, duotone, faded 70s), golden hour, blue hour or day-for-night, log footage (S-Log3) to Rec.709, matching a reference image's colors, black and white with one kept or swapped color, .cube LUT export, a look comparison grid, or a grading showreel."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Video Color Grade
@@ -20,8 +20,9 @@ Scenario supplies two preset LUT tool models and the segmentation masks that mak
 exact. New footage is out of scope. Connection and the core loop: the `scenario` skill. Running the
 LUT tool models on long clips (cost follows the clip, `wait=false`): `scenario-video-editing`. Music
 for a reel: `scenario-audio`. If a sibling skill named here is missing from your available skills,
-ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended,
-proceed from tool schemas and flag the gap.
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 The scripts run locally with `python3` and need ffmpeg, numpy, scipy, and Pillow. Each prints its
 usage when run without arguments, refuses to overwrite outputs without `--force`, and never calls

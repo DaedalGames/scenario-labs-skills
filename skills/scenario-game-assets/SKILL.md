@@ -3,7 +3,7 @@ name: scenario-game-assets
 description: "Use when creating game art through Scenario MCP: sprites, sprite sheets, icons, props, loot, tilesets and autotile terrain transitions, seamless tiles, isometric buildings, top-down maps, pixel art, UI buttons and panels, parallax background layers or depth planes for side-scrollers, and character or concept art; or when assets need transparent backgrounds, background removal, style-consistent variation batches, upscaling, pixel-grid cleanup, or PNG export for Unity, Godot, or Unreal."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Game Assets
@@ -15,9 +15,9 @@ tilesets, isometric scenes, pixel art, concept art) plus utilities for backgroun
 upscaling, and pixel cleanup. Discover by asset type, inspect the schema, generate, post-process,
 export. A sheet whose cells are one character's animation frames, and any walk cycle, loop, or GIF,
 belongs to `scenario-sprite-animation`. Connection and core loop: see the `scenario` skill. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 ## Quick reference
 

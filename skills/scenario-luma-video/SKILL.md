@@ -3,7 +3,7 @@ name: scenario-luma-video
 description: "Use when generating or editing video with Luma Ray models on Scenario via MCP: cinematic text-to-video, image-to-video from a start frame, start plus end frame anchors, seamless looping clips, HDR output, restyling footage while preserving motion with edit strengths and face, pose, depth, or trajectory controls, reframing to another aspect ratio by outpainting, or budget prompt edits on real footage. Keywords: Luma, Dream Machine, Ray 3.2, Ray 3, Modify Video, Reframe, T2V, I2V, V2V, loop, HDR."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Luma Video
@@ -17,9 +17,10 @@ anything; Luma's image models belong to the `scenario-luma-image` skill. Discove
 `search` and treat `model_schema_get` as the contract.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic video work: the
-`scenario-video` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-video` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

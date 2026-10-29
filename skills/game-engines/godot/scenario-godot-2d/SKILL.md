@@ -3,7 +3,7 @@ name: scenario-godot-2d
 description: "Use when building a 2D game in Godot 4.7: make a platformer or top-down controller that feels right (coyote time, jump buffer, jump height), TileMapLayer and TileSet in code, terrains and autotiles that pick wrong tiles, a dual grid, a camera that jitters or stutters, pixel art that looks blurry or uneven, stretch and integer scaling, 2D lights and shadows, y-sort order wrong, parallax gaps, or importing AI-generated sprites and tilesets from Scenario."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot 2D (developer and artist)
@@ -15,9 +15,9 @@ Expert level in 2D means feel and pixels are measured, not eyeballed: a jump has
 and a coyote window in ticks, a camera has a lag in pixels, a pixel-art screen has an integer factor
 and a fringe count. The agent builds tiles, controllers and cameras in code, proves them with
 deterministic physics runs and frame read-backs, and only then calls them done. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-godot-expert (channels, review loop, toolkit `gd_env`, `gd_run`,
 `gd_review`, 4.x traps).

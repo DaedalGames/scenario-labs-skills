@@ -3,7 +3,7 @@ name: scenario-workflows
 description: "Use when a task involves running a Scenario workflow through MCP, including anything the user calls a Scenario app, a saved pipeline, or a multi-step generation graph. Triggers include listing workflows, building workflow_run's inputs object, pricing a run with a dry run, approving or rejecting a stuck approval node, a run rejected for input length, or a workflows_list reply flooding the context. Creating or editing graphs is scenario-workflow-authoring. Keywords: workflow, app, approval gate."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Workflows
@@ -16,9 +16,9 @@ mean one whose status is `ready`. `workflow_run` returns a job tracked like any 
 Only `workflows_list`, `workflow_get` and `workflow_run` are listed by default; approve and reject
 run through `scenario_tools_search` plus their executor lane. Connection and the core loop: the
 `scenario` skill. Creating, editing and publishing graphs: the `scenario-workflow-authoring` skill.
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 ## Quick reference
 

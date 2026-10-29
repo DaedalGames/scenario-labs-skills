@@ -3,7 +3,7 @@ name: scenario-fan-cam
 description: "Use when putting a person from a photo into live-broadcast crowd footage with Scenario: a stadium or arena fan-cam reaction, a jumbotron or kiss-cam moment, a spectator cutaway at a match or concert, a courtside or front-row sighting, or a personalized sports-TV still that then animates into video. Keywords: fan cam, crowd reaction, jumbotron, stadium screen, kiss cam, broadcast cutaway, spectator, crowd shot, sports TV, courtside, arena."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Fan Cam
@@ -19,9 +19,9 @@ decision worth approving.
 Use only photos of the user or of people who gave them permission; refuse celebrity or stranger
 insertions. Real faces also trip provider filters more than most subjects: on a block, see
 `scenario-moderation`. Connection and the core loop: see the `scenario` skill in this repo. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 ## Quick reference
 

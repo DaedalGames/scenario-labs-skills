@@ -3,7 +3,7 @@ name: scenario-elevenlabs
 description: "Use when generating or transforming audio with ElevenLabs models on Scenario via MCP: text-to-speech with inline emotion tags, music from a prompt or sectioned songs, sound effects and loops, dubbing audio or video into another language, re-voicing a recording with a preset or cloned voice, or isolating speech from noise. Keywords: ElevenLabs, Eleven v3, Multilingual v2, Turbo 2.5, Music v2, Sound Effects 2, Dubbing, Voice Changer, Speech to Speech, Voice Isolator, TTS, SFX, localization."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario ElevenLabs Audio
@@ -16,9 +16,10 @@ picking the right member, not coaxing one model into a mode. Discover them with 
 `model_schema_get` as the contract: the members agree on almost nothing.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic audio work: the
-`scenario-audio` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-audio` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

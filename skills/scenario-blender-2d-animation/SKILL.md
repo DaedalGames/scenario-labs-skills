@@ -3,7 +3,7 @@ name: scenario-blender-2d-animation
 description: "Use when a 2D side-scroller shot, platformer cutscene, game trailer or parallax animation has to be built in Blender from Scenario-generated pictures (flat image cards, an orthographic camera, keyed jumps, rigid-body props), or when a finished shot needs a new theme or look without re-animating. Also use when image planes in Blender float above the ground, a tiled parallax layer shows a seam, or physics props leave the picture plane."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Blender 2D animation
@@ -33,9 +33,9 @@ and quote the rest from `recommend`, since a `dry_run` naming an asset that does
 returns 404. Then `dry_run` each later payload once its input exists, before running it.
 
 Connection, uploads and the core loop: the `scenario` skill. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 The scripts run locally and never call Scenario. Blender 5.x runs the scene script, headless or in
 an open session (through a Blender MCP connection, for example); in a session, start from File >

@@ -3,7 +3,7 @@ name: scenario-gpt-image
 description: "Use when generating or editing images with OpenAI's GPT Image models on Scenario via MCP: text-to-image, edits from reference images, inpainting with an alpha mask, in-image text for logos and infographics, transparent cutouts, pixel sizing up to 4K, quality tiers up to xhigh and max, input fidelity for product or face detail, or choosing between Flare, Sunburst, GPT Image 2 and 1.5. Keywords: GPT Image 2.5, GPT Image 2, OpenAI, DALL-E, gpt-image, ChatGPT image, txt2img, img2img, background."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario GPT Image
@@ -19,9 +19,10 @@ and GPT Image 1.5, the one member with a fidelity dial and ratio sizing. Discove
 and splits on sizing, quality tiers, and fidelity.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic image work: the
-`scenario-image` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-image` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

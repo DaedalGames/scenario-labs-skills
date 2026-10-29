@@ -3,7 +3,7 @@ name: scenario-seedance-music-video
 description: "Use when turning a song, track, or audio master into a finished music video with Scenario and Seedance: planning shots against beats and sections, transcribing lyrics, generating clips that cut to music, keeping the shots' own sound while the song stays the only score, assembling a delivery over the untouched master soundtrack, or verifying the final cut. Keywords: music video, beat sync, shot list, lyric transcription, reference frames, ffmpeg assembly, Seedance."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Seedance Music Video
@@ -17,9 +17,9 @@ land on its structure. The scripts need ffmpeg and ffprobe on PATH, and numpy fo
 
 Connection and the core generation loop: see the `scenario` skill in this repo. The Seedance
 parameter contract and conditioning traps: see the `scenario-seedance` skill. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 ## The two soundtracks
 

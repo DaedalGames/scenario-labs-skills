@@ -3,7 +3,7 @@ name: scenario-ugc
 description: "Use when producing UGC-style creator video with Scenario: a talking-head ad or testimonial from a portrait and a script, a founder clip, a product demo or unboxing, a reaction or before-after cut, a faceless voiceover over b-roll, or vertical social video for TikTok, Reels, or Shorts that must feel filmed on a phone rather than produced. Keywords: UGC, creator ad, talking head, testimonial, avatar, lipsync, founder video, social proof, faceless voiceover, organic, vertical video."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario UGC Creator Video
@@ -14,9 +14,9 @@ UGC is a register, not a length: content that reads as a person talking into the
 brand talking through a camera crew. Everything in this skill serves that register, and most
 failures come from importing ad craft into it. This skill routes the production; mechanics live in
 the sibling skills named per lane. Connection and the core loop: see the `scenario` skill in this
-repo. If a sibling skill named here is missing from your available skills, ask the user to install
-it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+repo. If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 Two rules are non-negotiable. The product is never generated: demo shots start from an uploaded
 photo or footage of the real product (`scenario-product-shots` for stills). And the words are never

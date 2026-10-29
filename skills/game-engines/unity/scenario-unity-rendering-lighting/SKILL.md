@@ -3,7 +3,7 @@ name: scenario-unity-rendering-lighting
 description: "Use when setting up URP (or choosing URP vs HDRP), configuring URP assets and quality tiers for PC and phones, lighting a stylized or realistic Unity scene (sun, sky, baked or mixed lightmaps, Shadowmask, Adaptive Probe Volumes, reflection probes), or fixing blurry shadows, light leaks, gray bakes, washed-out images, tonemapping and grading, bloom too expensive on mobile, TAA, STP or MSAA choices, GPU Resident Drawer setup, shader warm-up hitches, or a custom shader that vanished or lost its baked light."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Rendering and lighting (lighter / graphics TA)
@@ -12,9 +12,9 @@ Expert lighting in Unity is a measured loop: fix exposure, light to anchors, bak
 every stage from the same camera bookmarks with numbers (gray cards, clipping, bake memory, native
 passes) before taste. This skill drives URP 17.3 on Unity 6.3 from code; everything here ran in
 Unity 6000.3.21f1 on an Apple M5 Max (Metal) on 2026-09-24. If a sibling skill named here is missing
-from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, `ut_run`, `AgentCapture`, `AgentProfile`,
 `ut_review`, 6.3 traps).

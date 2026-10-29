@@ -3,7 +3,7 @@ name: scenario-blender-hard-surface
 description: "Use when modeling hard-surface objects in Blender (sci-fi panels, props, weapons, vehicles, robots, machined or product parts) with booleans and cutters, bevel modifiers, weighted normals, or subdivision with support loops or creases. Also when shading is broken (smears on flat faces, stretching near a cut, pinching), a bevel shrinks or vanishes after a boolean, a boolean empties the mesh or leaves holes, choosing n-gons vs quads, or making a game-ready mid-poly."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Blender hard surface
@@ -13,9 +13,9 @@ support loop, flat faces read perfectly flat, and cuts stay editable until the d
 The experts disagree on method (n-gons and booleans vs quad cages and subdivision), not on the
 checks: order of operations, cutter hygiene, planar faces, a shiny matcap orbit. The agent builds
 the stack with the toolkit and lets the measurable gates find what a human finds by orbiting. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 Toolkit: [`scripts/bx_hardsurface.py`](scripts/bx_hardsurface.py)

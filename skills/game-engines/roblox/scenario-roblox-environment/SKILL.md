@@ -3,7 +3,7 @@ name: scenario-roblox-environment
 description: "Use when building or lighting a Roblox map: graybox or blockout, level layout, landmarks, doors and walls, parts versus unions (CSG), collision fidelity, terrain (generate, sculpt, paint, water, Part to Terrain), MaterialVariants, custom terrain materials, PBR textures from Scenario, skyboxes, Lighting, Atmosphere, Clouds, bloom, color correction, day or night moods, interior light, scattering rocks, bushes and trees, level of detail (SLIM, RenderFidelity), per-model streaming or a streaming test, collision overlays, invisible walls, or texture sizes. Also when a map looks flat, foggy, too dark or plastic, grass pokes through floors, a doorway blocks players, content pops in or never unloads, a custom material disappears, or the sun lights the wrong side."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox environment (builder, environment artist and lighter)
@@ -16,9 +16,9 @@ camera, terrain and materials made from code with their silent failures checked,
 from a mood with the sun aimed first and post effects last. This skill carries those rules from the
 sources, corrected by live tests in Studio 0.743 on a village, terrain and interior built for the
 purpose, plus kit modules that build, light, measure and audit a scene. If a sibling skill named
-here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user
+to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

@@ -3,7 +3,7 @@ name: scenario-blender-previs-storyboard
 description: "Use when turning a script or story into previs, layout, storyboards or an animatic in Blender: beats to shot list, camera and lens per shot, staging, camera height, 180-degree rule, screen direction, shot sizes, when to cut, camera moves, timing stills in the Video Sequencer, markers bound to cameras, Story Tools, Grease Pencil or 2D/3D hybrid boards. Also when an animatic shows the wrong frame, blocking keys are not stepped, Rigify operators are missing, or viewport render fails headless."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Previs, layout and storyboarding
@@ -12,9 +12,9 @@ Expert previs conveys an idea well enough to be judged, as cheaply as possible: 
 every shot designed for what the audience must feel, timing found in the edit from stills. The
 camera is the audience's body; where it stands, how high and through which lens decides the emotion,
 so every non-neutral choice needs a stated reason. If a sibling skill named here is missing from
-your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 

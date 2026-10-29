@@ -3,7 +3,7 @@ name: scenario-grok-imagine-video
 description: "Use when generating or editing video with Grok Imagine models on Scenario via MCP: text-to-video, image-to-video from a first frame, reference-to-video with @image tags for consistent people, products, or clothing, prompt-based editing, extending a clip from its last frame, native audio with lip-synced dialogue and sound effects, or choosing between first-frame and reference conditioning. Keywords: Grok Imagine Video 1.5, R2V, Grok Edit Video, Grok Extend Video, xAI, T2V, I2V, V2V."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Grok Imagine Video
@@ -17,9 +17,10 @@ their own model, so picking the member is picking the mode. Discover them with `
 Grok Imagine image models belong to the `scenario-grok-imagine-image` skill.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic video work: the
-`scenario-video` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-video` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

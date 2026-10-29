@@ -3,7 +3,7 @@ name: scenario-admin-analytics
 description: "Use when answering Scenario admin analytics questions about Creative Unit consumption, most-used models, usage by user or project, AI adoption observability, cached usage data, CSV exports, enterprise PDF reports with charts, or a local analytics dashboard. Keywords: usage API, CU, analytics, adoption, reporting, consumption, cache."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Admin Analytics
@@ -13,9 +13,9 @@ metadata:
 Turn Scenario MCP usage data into answers, CSV, Markdown, a PDF with charts, or an offline
 dashboard. All Scenario data collection stays on MCP. No direct API, SDK, browser scraping, or
 credentials in reporting scripts. Use the `scenario` skill for connection setup. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 Resolve the customer through `teams_list` and, when needed, `projects_list({team_id})`. Reuse the
 user's selected scope. If several names match, ask using the discovered choices; unattended, use the

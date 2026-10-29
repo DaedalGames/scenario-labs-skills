@@ -3,7 +3,7 @@ name: scenario-chatgpt-pet-update
 description: "Use when changing an existing ChatGPT pet or Codex pet sprite sheet with Scenario: fixing a broken row, frame, jump or edge, regenerating one animation state, adding the sixteen look directions to a 1536x1872 v1 sheet, giving the pet a new outfit, color or accessory, renaming it in its pet.json, or checking a pet sheet and previewing it as an animated GIF."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario ChatGPT Pet: Update
@@ -28,8 +28,9 @@ working folder, and read the contract before generating a row or writing directi
 skill's loop and model order (`model_openai-gpt-image-2-5-sunburst`, then
 `model_google-gemini-nano-banana-2-1`, then `recommend` only when both are blocked); connection and
 scope: the `scenario` skill. If a sibling skill named here is missing from your available skills,
-ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended,
-proceed from tool schemas and flag the gap.
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

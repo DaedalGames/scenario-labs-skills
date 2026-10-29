@@ -3,7 +3,7 @@ name: scenario-maya-animation
 description: "Use when animating a character or prop in Maya through Python: a walk or run cycle, a jump or landing, a heavy lift, throw or punch, an acting or dialogue shot, lip sync, eye darts and blinks, stepped blocking, splining, polish, Graph Editor tangents, animation layers, mocap cleanup or retargeting, game clips and root motion, or reviewing a playblast. Also when motion looks floaty, weightless, mushy, poppy, posey, sliding or chattery, or feet slap or skate."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Maya animation (animator)
@@ -13,9 +13,9 @@ and snaps placed on purpose, designed spacing, weight shown by resistance and a 
 big to small (story, body, face, detail); never add detail to a stage that does not read yet. An
 agent cannot scrub, so it measures (world and screen tracks, spacing, holds, contacts, a ballistic
 fit, overlap lags), then looks at a playblast or a headless sheet before calling anything done. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-maya-expert (execution channel, review loop, 2027 version traps).
 

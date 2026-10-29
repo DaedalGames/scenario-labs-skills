@@ -3,7 +3,7 @@ name: scenario-mai-image
 description: "Use when generating or editing images with Microsoft MAI Image models on Scenario via MCP: photoreal or stylized text-to-image with legible in-image typography, posters, packaging, magazine covers, ads, key art, or instruction-based editing such as text swaps, recoloring, object removal or replacement, background swaps, lighting changes, and full restyles. Keywords: MAI Image 2.5, 2.5 Pro, 2.5 Edit, 2.5 Pro Edit, Microsoft, txt2img, img2img, typography, text rendering, image edit."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario MAI Image
@@ -19,9 +19,9 @@ one that carries the source image.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic image work
 (sizing families, masks, upscales): the `scenario-image` skill. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 ## Quick reference
 

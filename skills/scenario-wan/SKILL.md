@@ -3,7 +3,7 @@ name: scenario-wan
 description: "Use when generating or editing video with Wan models on Scenario via MCP: text-to-video, image-to-video from a still, first and last frame brackets, extending a clip, instruction-based video editing, character motion transfer or person replacement (Animate), aspect ratio reframing, video outpainting, uploaded-audio sync or auto-generated audio, or multi-shot prompts with timing brackets. Keywords: Wan 2.7, 2.6, 2.5, 2.2, Alibaba, VACE, T2V, I2V, V2V, lip-sync, multiShots."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Wan Video
@@ -16,9 +16,10 @@ apart disagree on parameter names, not just numbers: pick the member with `searc
 `scenario-image` skill.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic video work: the
-`scenario-video` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-video` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

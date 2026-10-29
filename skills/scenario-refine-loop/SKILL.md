@@ -3,7 +3,7 @@ name: scenario-refine-loop
 description: "Use when a Scenario output must be checked and improved rather than accepted first roll: iterating a generation until it matches the brief, fixing a batch that came back off-brief, retrying failed shots methodically, wiring an automated generate, review, revise loop, or deciding whether to re-prompt, swap references, inpaint, post-process, or change model. Keywords: refine, iterate, critique, review loop, QA, self-correction, verify, acceptance criteria, retry, drift."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Refine Loop
@@ -15,9 +15,10 @@ prompt and re-rolling until the budget dies. Both skip the same two artifacts, a
 a diagnosis. The loop that converges: rubric before generating, a small batch, a recorded verdict
 per asset, the cheapest targeted fix per failure, a hard round cap. Connection and the core loop:
 see the `scenario` skill. Critic tool contracts: `scenario-asset-analysis`. Baseline discipline:
-`scenario-consistency`. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-consistency`. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

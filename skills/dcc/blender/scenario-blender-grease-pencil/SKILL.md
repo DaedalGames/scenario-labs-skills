@@ -3,7 +3,7 @@ name: scenario-blender-grease-pencil
 description: "Use when drawing or animating with Grease Pencil in Blender 5.x from Python: 2D or 2.5D illustration, frame-by-frame animation, a cutout or part-based 2D character, strokes with pressure, filled shapes with holes, in-betweens and interpolation, onion skin, Line Art outlines, strokes on 3D meshes, NPR or hybrid motion graphics. Also when GP code fails (GPENCIL, frame.strokes, grease_pencil_modifiers), fills do not show, colors render dark, or draw brushes will not run from a script."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Grease Pencil (v3, Blender 5.2)
@@ -12,9 +12,9 @@ Expert Grease Pencil work keeps every drawing editable and redrawable, puts mean
 (which object, which layer, which key) and judges the result in motion. The agent draws through the
 data API (drawings are curves with attributes), builds characters the way 2D studios rig them, and
 reviews rendered frames instead of a viewport it cannot flip. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 Shot planning, boards and animatics: scenario-blender-previs-storyboard. Mesh animation principles:

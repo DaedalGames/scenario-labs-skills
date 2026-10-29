@@ -3,7 +3,7 @@ name: scenario-sprite-animation
 description: "Use when animating 2D game art with Scenario: walk, idle or attack cycles in 4 or 8 directions, isometric sprite sheets, animated GIFs, frame-by-frame pixel art animation, VFX loops such as fire or smoke, looping a sprite seamlessly, animating an existing character image, a full animation sheet from one prompt, extracting animation frames from a generated video, or slicing a sprite sheet into engine-ready frames for Unity, Godot, or Unreal. Keywords: spritesheet, keyframes, frame grid, GIF."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Sprite Animation
@@ -18,9 +18,9 @@ alone. This skill routes between lanes and carries the frame math; depth lives w
 character across an action set), `scenario-game-assets` (statics, pixel cleanup, upscaling; a sheet
 whose cells are one character's frames stays here), `scenario-refine-loop` (iterate to brief).
 Connection and the core loop: the `scenario` skill. If a sibling skill named here is missing from
-your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

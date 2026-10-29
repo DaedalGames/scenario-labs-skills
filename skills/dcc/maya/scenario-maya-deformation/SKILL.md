@@ -3,7 +3,7 @@ name: scenario-maya-deformation
 description: 'Use when skinning a character in Maya ("bind skin", "fix the weights", weight painting, Skin Tools or ngSkinTools layers), when deformation looks wrong (pinching, candy-wrapper wrist, collapsing elbow or shoulder, volume loss, clothes poking through), when mirroring, copying or capping skin weights for Unreal or Unity, building blend shapes, corrective shapes or pose space deformation (Pose Editor on IK-driven joints), a face rig with shapes or joints, multiple skinClusters, Delta Mush or the ML Deformer, or running a range-of-motion deformation test.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Maya deformation (character TD)
@@ -12,9 +12,9 @@ Expert deformation is decided before the first weight: joint pivots and edge loo
 can do. Weights are then built region by region, judged in motion at extremes with numbers and
 renders, and every fault is fixed where it originates. Stance: block rigid, diagnose, smooth and
 shape, correct what weights cannot, and keep everything regenerable as data. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-maya-expert (execution channel, review loop, 2027 version traps).
 

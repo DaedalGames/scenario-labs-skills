@@ -3,7 +3,7 @@ name: scenario-identity-library
 description: "Use when a named character or prop must become a reusable identity in Scenario: creating a character or prop from a brief or interview, building its approved image collection (character: <name> or props: <name>), assembling a character sheet or turnaround, or generating new images of an established one. Triggers include create a new character, design a prop, character sheet, turnaround, more images of this character. Keywords: character design, identity, library, collection, grid."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Identity Library
@@ -16,8 +16,9 @@ hero image, file approved shots in a named collection, assemble a sheet, and pul
 out for new images. The per-image mechanics live in siblings and are not repeated here: connection
 and the core loop in `scenario`, holding a look with references in `scenario-consistency`, pass/fail
 verdicts in `scenario-quality-gate`. If a sibling skill named here is missing from your available
-skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

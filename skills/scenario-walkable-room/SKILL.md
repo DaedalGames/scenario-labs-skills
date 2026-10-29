@@ -3,7 +3,7 @@ name: scenario-walkable-room
 description: "Use when one interior photo, uploaded or generated on Scenario, should become a room a visitor walks into in a web browser and plays with: props lifted out of the photo and rebuilt as 3D objects to grab, throw, and hear land, inside a Gaussian splat world, or restyled variants of one room. Keywords: image-blaster, walkable room, photo to 3D room, clean plate, object cut-out, splat world, physics props, grab and throw, impact sounds, heightfield collision."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Walkable Room
@@ -31,8 +31,9 @@ Steps 1 and 7 are the agent's own work on downloaded files; every generation in 
 call. Connection, uploads, and the core loop: see the `scenario` skill. Edits: `scenario-image` or
 `scenario-gemini-image`. Worlds: `scenario-3d-worlds`. 3D models: `scenario-3d`. Sound:
 `scenario-audio` or `scenario-sonilo`. If a sibling skill named here is missing from your available
-skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

@@ -3,7 +3,7 @@ name: scenario-unreal-cinematics
 description: 'Use when making a trailer, cutscene, cinematic or short film in Unreal Engine 5.8 with Sequencer: shot lists, master and shot sequences, cameras, lenses, depth of field, camera cuts, spawnables, character animation in shots, per-shot lighting, Movie Render Graph or Movie Render Queue EXR renders, "render darker than the viewport", "first frames pop", "last frame missing", ACES or OCIO to DaVinci Resolve, the 180-degree rule, Sequencer Python, or reviewing a cut.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Cinematics in Unreal Engine 5.8 (Sequencer and Movie Render Graph)
@@ -12,9 +12,9 @@ Expert level here means the cut is checked as data before anything is built and 
 on its files and frames, not the viewport. The core stance: plan offline, build in one transaction,
 lock timing against the music before animating, light from approved masters, render per shot through
 one template graph, hand linear EXRs, an edit and a color note to the grade. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unreal-expert (channels, review loop, 5.8 traps).
 

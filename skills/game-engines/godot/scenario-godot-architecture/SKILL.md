@@ -3,7 +3,7 @@ name: scenario-godot-architecture
 description: "Use when structuring Godot 4.7 game code: folders, scenes and nodes, signals or an event bus autoload, custom Resources for item data, components (health, hitbox, hurtbox), an inventory, save and load, InputMap and key rebinding for keyboard, mouse and gamepad, GDScript static typing and style, or GDScript vs C#; or when code is spaghetti, a folder scan breaks in the export, a save loads wrong, the gamepad does nothing, or @onready is null."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot architecture (gameplay programmer and architect)
@@ -14,9 +14,10 @@ Expert architecture in Godot means scenes that run alone, data in Resources, beh
 components, and every boundary (save file, input, export) proven by a test. This skill holds the
 expert rules from the sources, corrected where Godot 4.7.2 behaves differently, plus a tested G1
 core (inventory, health and damage, save and load, input with rebinding) and the tools that build
-and audit it. If a sibling skill named here is missing from your available skills, ask the user to
-install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool
-schemas and flag the gap.
+and audit it. If a sibling skill named here is missing from your available skills, load it with
+`skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-godot-expert (channels, `gd_run`, the review loop, 4.7 traps).
 

@@ -3,7 +3,7 @@ name: scenario-blender-geometry-nodes
 description: "Use when building or debugging Geometry Nodes, headless or live: procedural modeling, scattering objects on a surface, arrays along a curve, repeat or for-each loops, simulation zones, 5.2 physics (cloth, colliders, forces, effectors), closures, bundles, matrices, node-group assets with gizmos. Also when a GN script links nothing, shows red links, ignores modifier inputs, loses instances in a bounding box, or a simulation resets or jumps."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Blender Geometry Nodes (procedural systems and simulations)
@@ -13,8 +13,9 @@ declarative (data and instructions come in from outside), and shipping tools tha
 modifier inputs without opening the tree. For an agent it also means proving every tree with numbers
 read from the evaluated geometry and a render, because the node editor's red links and warnings are
 invisible from Python unless you ask for them. If a sibling skill named here is missing from your
-available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 Hair node groups (Interpolate, Clump, Curl, Hair Dynamics grooms): scenario-blender-hair.

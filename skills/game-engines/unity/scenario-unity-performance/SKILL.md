@@ -3,7 +3,7 @@ name: scenario-unity-performance
 description: "Use when a Unity 6.3 game is slow or stutters: low fps, frame spikes, hitches when entering areas or on first effects, GC spikes, too many draw calls or SetPass calls, CPU vs GPU bound questions, Profiler, Profile Analyzer, Memory Profiler, Frame Debugger or Project Auditor work, GPU Resident Drawer or SRP Batcher setup, LOD and Mesh LOD, shader warm-up and variants, memory or VRAM budgets, IL2CPP and build size, or proving a fix with numbers from a player."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity performance (performance engineer)
@@ -14,9 +14,9 @@ fix proven with before/after numbers from a development player. An agent does al
 `AgentProfile` in Editor Play mode to iterate, `PerfProbe` in a batch-mode player for verdicts,
 `PerfCapture` to attribute costs from a Profiler capture, `metal_trace` for GPU time, `PerfBuild`
 for size. Target: Unity 6000.3.21f1, URP 17.3, macOS Apple Silicon. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, review loop, 6.3 traps, `ut_*` toolkit).
 

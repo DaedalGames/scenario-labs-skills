@@ -3,7 +3,7 @@ name: scenario-quality-gate
 description: "Use when a generated Scenario image needs a quality check or a brand-brief compliance verdict before it ships: pass/warn/fail scoring, on-brand review against a configured brief, QA gating a batch, pricing or refreshing a stored verdict, or iterating a generation until it clears the gate. Keywords: quality gate, quality check, QA, verdict, brief compliance, on-brand, brand brief, pass fail, score, review, asset_quality_gate_run."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Quality Gate
@@ -21,9 +21,9 @@ The tool is catalog-only and write-class: get the schema with `scenario_tools_se
 through `scenario_tool_execute_write` with `{name: "asset_quality_gate_run", parameters: {...}}`,
 scope ids inside `parameters` (the read executor rejects it by lane and names the right one). Or
 reconnect with `?toolsets=full`. Connection and scope: see the `scenario` skill. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 ## Quick reference: what a call costs
 

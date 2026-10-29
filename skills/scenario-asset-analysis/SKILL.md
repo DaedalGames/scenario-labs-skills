@@ -3,7 +3,7 @@ name: scenario-asset-analysis
 description: "Use when finished Scenario assets have to give something back: a caption for a dataset or alt text, a reusable style description, a verdict against a brief, a canny, depth, pose, or segmentation control map for the next model, or the asset itself found again by text, tags, or visual similarity and filed into a collection. Keywords: caption, describe, analyze, QA, control map, find similar, reverse image search, semantic search, tag, collection."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Asset Analysis
@@ -21,9 +21,10 @@ through the executor matching the returned `permission`: `read` uses `scenario_t
 `write` uses `scenario_tool_execute_write`. Use that live result for both estimates and runs; do not
 infer the lane from an unchanged input asset. Put the tool name in `name` and its inputs under
 `parameters`. Or reconnect with `?toolsets=full`. Connection and scope: see the `scenario` skill in
-this repo. If a sibling skill named here is missing from your available skills, ask the user to
-install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool
-schemas and flag the gap.
+this repo. If a sibling skill named here is missing from your available skills, load it with
+`skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

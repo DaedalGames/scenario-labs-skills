@@ -3,7 +3,7 @@ name: scenario-blender-sculpting
 description: "Use when sculpting in Blender through Python: sculpt a head, face or bust, a stylized or cartoon character, a creature or a realistic portrait; block out from primitives; cut planes, a jaw or gonial angle, cheekbones; fix a jaw or face that looks like a ball or balloon; stylized hair clumps; eyelids; an expression or smirk; plan remesh or multires resolution; reproduce Clay Strips, Crease, Draw Sharp, Scrape, Grab or mask moves without a tablet; final clay renders; or when a sculpt operator crashes headless."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Sculpting (heads and characters, Blender 5.2)
@@ -13,9 +13,9 @@ proportions locked at low resolution, every stage judged by eye through a long l
 the final test, not the mesh numbers. The agent builds blockout and primary forms headless
 ([`scripts/bx_sculpt.py`](scripts/bx_sculpt.py): smooth-blend `Clay`, plane cuts, numpy brushes) and
 does client-quality surface work with Blender's real brushes in a live GUI session (`bx_gui`). If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 

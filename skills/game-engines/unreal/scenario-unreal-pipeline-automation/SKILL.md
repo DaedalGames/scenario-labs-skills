@@ -3,7 +3,7 @@ name: scenario-unreal-pipeline-automation
 description: "Use when importing FBX, USD, OBJ or glTF from Maya, ZBrush or Blender into Unreal Engine 5.8 in bulk or reimporting changed files, writing Editor Python tools, Interchange pipelines or import presets, enforcing naming conventions, assigning material instances by script, setting Nanite, collision and LODs per asset class, writing data validators or automation tests, fixing redirectors, or cooking and packaging from the command line (BuildCookRun, RunUAT, CI, Perforce). Also when a scripted import ignores its settings or names, a Python validator never runs, or a Mac build will not package."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unreal pipeline automation (pipeline and tools TD)
@@ -12,9 +12,9 @@ Expert pipeline work in Unreal is policy as data plus proof: the import policy i
 pipeline asset, names come from a plan, every rule that matters is a validator that also guards
 human edits, and a build counts once it cooked with fatal validation and booted. Bulk work runs
 headless; anything visual goes to a screenshot someone actually looks at. If a sibling skill named
-here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user
+to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unreal-expert (channels, review loop, 5.8 traps).
 

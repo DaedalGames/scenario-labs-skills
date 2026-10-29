@@ -3,7 +3,7 @@ name: scenario-blender-animation
 description: "Use when animating characters or objects in Blender through Python, a bouncing ball, walk or run cycle, jump, acting shot, lip sync, eye darts or facial animation, blocking in stepped keys, splining, polish, timing and spacing, arcs, overlap, squash and stretch, graph editor handles, slotted actions or NLA layers, staging a playblast, or when animation looks floaty, stiff, slides, pops, chatters, the subject is too small in frame, or a knee pops and needs an expert review."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Blender animation (character and object)
@@ -13,8 +13,9 @@ snaps placed by hand, spacing designed, arcs checked. The Blender Studio stance 
 spline late and in parts, and judge from the shot camera at real speed. An agent cannot scrub, so it
 measures instead: per-frame positions, spacing charts, arc checks, framing, an onion-skin image, a
 curve plot, and a playblast it actually looks at. If a sibling skill named here is missing from your
-available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 Shot planning, cameras and animatics belong to scenario-blender-previs-storyboard; building the rig

@@ -3,7 +3,7 @@ name: scenario-veo
 description: "Use when generating or extending video with Google Veo models on Scenario via MCP: text-to-video, image-to-video from a first frame, first and last frame transitions, reference-to-video (R2V) with asset or style reference images, native audio with dialogue, sound effects, and ambience, negative prompts, seeded reruns, extending a 16:9 clip, or choosing a quality, fast, or lite tier. Keywords: Veo 3.1, Veo 3.1 Fast, Veo 3.1 Lite, Extend Video, Google, T2V, I2V, V2V, 720p, 1080p."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Veo Video
@@ -17,9 +17,10 @@ reference images with a style switch), Veo 3.1 Fast (same modes, quicker, no swi
 on which inputs exist at all.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic video work: the
-`scenario-video` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-video` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

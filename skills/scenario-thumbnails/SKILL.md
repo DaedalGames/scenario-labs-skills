@@ -3,7 +3,7 @@ name: scenario-thumbnails
 description: "Use when creating or revising finished video thumbnails or cover images with Scenario: game trailers, boss reveals, patch updates, devlogs, or community videos needing readable composition, exact headline text and consistent characters. Not for title ideas or critique alone, in-video title cards, or a generic image without a thumbnail deliverable."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Thumbnails
@@ -15,9 +15,9 @@ finished image at the requested dimensions, with exact supplied copy and preserv
 Connection and the generation loop follow `scenario`; image/reference contracts follow
 `scenario-image`. Exact type uses `scenario-text-overlay`, placement specifications use
 `scenario-formats`, and a set that must share a look uses `scenario-consistency`. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 Resolve the destination, topic or title, supplied assets, exact copy, desired count and budget from
 the request. Ask only for missing decisions that affect the result. Do not invent a person, logo,

@@ -3,7 +3,7 @@ name: scenario-workflow-authoring
 description: "Use when a task involves creating or editing a Scenario workflow graph through MCP: building an app from a brief, adding or rewiring nodes (models, prompts, approval gates, loops), authoring editor_info, publishing, unpublishing or renaming, importing an exported workflow JSON, migrating a graph built in Weavy, ComfyUI, or another node tool, copying a workflow, or turning a prompt chain into an app. Running or pricing a workflow is scenario-workflows. Keywords: node graph, editor_info, CEL."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Workflow Authoring
@@ -23,9 +23,10 @@ direction rule, per-node data contracts, and a validated minimal example. Create
 copy and delete live in the tool catalog (`scenario_tools_search` plus the matching executor, see
 the `scenario` skill). `workflows_list`, `workflow_get` and `workflow_run` are direct tools: scope
 and `dry_run` go in their top-level arguments, never an executor wrapper. Running and pricing: the
-`scenario-workflows` skill. If a sibling skill named here is missing from your available skills, ask
-the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed
-from tool schemas and flag the gap.
+`scenario-workflows` skill. If a sibling skill named here is missing from your available skills,
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

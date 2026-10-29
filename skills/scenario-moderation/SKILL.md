@@ -3,7 +3,7 @@ name: scenario-moderation
 description: "Use when a Scenario generation is blocked, refused, or returns a moderation or sensitive-content error, when a video is rejected after rendering or its audio track is flagged, when an output is flagged for likeness to a real person or for IP and copyright detection, when the same prompt passes on one model and fails on another, or when a team's own characters, weapons, or props get flagged. Keywords: blocked prompt, content moderation, refused generation, provider filter, false positive."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Blocked Generations
@@ -18,9 +18,9 @@ on, and no model switch clears it. Plan and blocklist restrictions remove models
 is judged. Treat a block as a routing problem first and a wording problem second. This skill is
 about false positives on content a team is entitled to make; it is not a way to produce content a
 provider prohibits. Core loop: see the `scenario` skill. If a sibling skill named here is missing
-from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

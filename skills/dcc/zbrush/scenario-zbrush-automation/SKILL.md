@@ -3,7 +3,7 @@ name: scenario-zbrush-automation
 description: "Use when automating ZBrush 2026: batch processing a folder of OBJ or ZTL files, a ZBrush Python script or ZScript, recording a macro to learn a palette path, the ZBrush -script command line, scripting UV Master, Decimation Master or Multi Map Exporter, exporting every SubTool, GoZ or GoB round trips with Maya or Blender, renaming SubTools, or batch reports. Also when a plugin press never returns, a dialog stalls a batch, one file kills the whole run, or GoZ updates the wrong SubTool."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # ZBrush automation (tools and pipeline TD)
@@ -12,9 +12,9 @@ An expert ZBrush TD automates with contracts and proof: every file is its own to
 separate call with a time limit, every output is read back from disk, and a hung plugin costs one
 file, never the batch. ZBrush has no timeout, no undo control from Python and dialogs that code
 cannot answer, so the safety lives on the agent side: the runner, the checkpoints, the report. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-zbrush-expert (bridge, zb_launch, zb_ops, zb_audit, review loop,
 2026 traps).

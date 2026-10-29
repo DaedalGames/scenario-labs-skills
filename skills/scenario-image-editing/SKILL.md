@@ -3,7 +3,7 @@ name: scenario-image-editing
 description: "Use when editing an existing image on Scenario through MCP with a tool model, not a new generation: upscale or enhance to 2x, 4K, 8K, super resolution, 3D LUT color grade, color correction, posterize, solarize, vignette, film grain, blur, sharpen, glow, chromatic aberration, oilify, cubism, crystallize, dodge and burn, tint, desaturate, expand or uncrop, reframe an aspect ratio, resize to exact pixels, slice tiles, contact sheet, split into layers, remove a background or watermark, vectorize."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Image Editing
@@ -14,9 +14,10 @@ Editing an existing image is a `model_run` on a tool model: one file in, a few n
 more assets out, nothing to prompt on most of them. Generating a new image, prompt-driven edits and
 masked inpainting are `scenario-image`; the same effects on footage are `scenario-video-editing`;
 stacking layers is `scenario-video-assembly` (Image Studio). Connection and the core loop:
-`scenario`. If a sibling skill named here is missing from your available skills, ask the user to
-install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool
-schemas and flag the gap.
+`scenario`. If a sibling skill named here is missing from your available skills, load it with
+`skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

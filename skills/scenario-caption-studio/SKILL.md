@@ -3,7 +3,7 @@ name: scenario-caption-studio
 description: "Use when a video needs its spoken words on screen through Scenario via MCP: burned-in styled captions for a TikTok, Reels, or Shorts cut, ad captions for sound-off feeds, YouTube subtitles, an SRT sidecar, transcription of a clip's audio, captions translated into another language, karaoke or word-by-word styles, or restyling and correcting an existing transcript. Keywords: captions, subtitles, SRT, transcribe, karaoke, word-by-word, burn in, closed captions, translate video, caption style."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Caption Studio
@@ -21,9 +21,9 @@ the `scenario` skill.
 Captioning is the last pass on a finished cut: assemble first (`scenario-video-assembly`), then
 caption the master once. Captions carry the transcript only; text that must appear letter-perfect
 without being spoken (CTAs, prices, legal supers) is `scenario-text-overlay` territory. If a sibling
-skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+skill named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or
+ask the user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed
+from tool schemas and flag the gap.
 
 ## Ask once, then caption
 

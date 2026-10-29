@@ -3,7 +3,7 @@ name: scenario-team-admin
 description: "Use when administering a Scenario team from an agent through MCP: restricting which models a team or project can run (model access control, allowlist, blocklist), inviting or removing team and project members, changing roles, capping a member's Creative Unit spend, creating or deleting projects, auditing API keys and their roles or scopes, or attributing consumption per user or model. Keywords: governance, model control, consumption cap, spend limit, API key hygiene, team admin, enterprise."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Team Administration
@@ -20,9 +20,9 @@ OAuth and refuse API keys, and the list mode the team runs, since the same model
 the opposite thing in blocklist and allowlist mode. `teams_list` already tells you both: each team
 row carries `modelsManagement`, its model lists, `plan`, and `context.userRole`. A credential that
 reaches one team and one project has its scope; more than one is a stop-and-list, per the `scenario`
-skill. If a sibling skill named here is missing from your available skills, ask the user to install
-it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+skill. If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 ## Quick reference
 

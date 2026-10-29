@@ -3,7 +3,7 @@ name: scenario-maya-retopology-uv
 description: 'Use when turning a dense sculpt, scan, ZBrush export or AI-generated mesh into animation-ready or game-ready topology in Maya without a mouse ("clean up this AI mesh", "retopo this character", Quad Draw, Retopologize), testing it deforms before rigging (bad elbow or wrist bend, lids popping through the eyes), or unwrapping UVs, cutting seams, setting texel density, mip-safe padding, UDIMs, lightmap UVs, stacking mirrored shells, or preparing a low poly and cage for baking. Keywords: edge flow, eye and mouth loops, Unfold3D, bake prep.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Maya retopology and UVs
@@ -13,9 +13,9 @@ around eyes and mouth, three loops per joint, poles where nothing moves, a bend 
 fault a bad crease is. Expert UVs spend texels where the camera looks, at a density derived from the
 closest shot, with padding that survives mips. Without a mouse the agent reuses approved topology,
 builds from data, and measures then renders every stage. If a sibling skill named here is missing
-from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-maya-expert (execution channel, review loop, 2027 version traps).
 Toolkit: [`scripts/mx_retopology_uv.py`](scripts/mx_retopology_uv.py)

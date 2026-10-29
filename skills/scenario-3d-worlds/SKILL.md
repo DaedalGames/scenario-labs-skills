@@ -3,7 +3,7 @@ name: scenario-3d-worlds
 description: "Use when generating navigable 3D worlds or Gaussian splat scenes on Scenario via MCP: text-to-world, image-to-world, a 360 panorama or skybox turned into a walkable splat, multi-view photos or a video walkthrough reconstructed as a splat, or one object photo to splat. Keywords: World Labs Marble 1.1, 1.1 Plus, 1.0 Draft, Hunyuan World, HY World, image-to-skybox, skybox-to-splat, multiview-to-splat, TripoSplat, gaussian splatting, 3DGS, spz, world generation, explorable scene, VR."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario 3D Worlds
@@ -19,9 +19,9 @@ tag at authoring time, so hits differ by team and region.
 
 Connection and the core loop: see the `scenario` skill; polygon meshes, rigging, and the 3D viewer:
 the `scenario-3d` skill; skybox-only work with no splat stage: the `scenario-skyboxes` skill. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 ## Quick reference
 

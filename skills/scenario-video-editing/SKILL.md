@@ -3,7 +3,7 @@ name: scenario-video-editing
 description: "Use when editing footage already on Scenario through MCP with a tool model, not a new generation: LUT grading, color correction, grain, vignette, blur, sharpen, glow, tint, desaturate, posterize, solarize, oilify, cubism, chromatic aberration, dodge and burn on a clip; trimming, splitting, reversing, resizing, re-encoding, frame extraction, image sequences; chroma key, green or blue screen removal to transparent WebM or ProRes MOV, background removal, segmentation masks, subjects as layers."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Video Editing
@@ -14,9 +14,10 @@ Every image post-processing effect has a video twin, and each is a `model_run` o
 clip in, a few numbers, one clip out. Generating or restyling footage, lipsync, dubbing and
 upscaling are `scenario-video`; concatenating, compositing and captioning a cut are
 `scenario-video-assembly`; the still-image side is `scenario-image-editing`. Connection and the core
-loop: `scenario`. If a sibling skill named here is missing from your available skills, ask the user
-to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool
-schemas and flag the gap.
+loop: `scenario`. If a sibling skill named here is missing from your available skills, load it with
+`skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## The twin rule
 

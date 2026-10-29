@@ -3,7 +3,7 @@ name: scenario-godot-expert
 description: "Use when an agent drives Godot 4.7 on macOS or Windows for any task: headless --script jobs, --import, --check-only, command-line exports, GUT tests, windowed screenshots, the headless editor (-e) or an MCP server into a running editor; when a run hangs or fails silently, a capture is black, Godot 3 code breaks in 4.x, 'Identifier not found', export templates are missing; or when a Godot brief (2D, 3D, shaders, VFX, UI, multiplayer, export) must go to the right scenario-godot-* specialist."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot expert (technical director and agent protocol)
@@ -15,9 +15,9 @@ Expert Godot work is a loop run against evidence: set the budget, build one stag
 at it, fix it, advance. An agent without a mouse gets there by picking the right channel, passing
 only on a machine-readable result, and never trusting one signal alone. This skill is that protocol,
 the shared toolkit every scenario-godot-* skill calls ([`scripts/`](scripts/)), and the map of the
-team. If a sibling skill named here is missing from your available skills, ask the user to install
-it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+team. If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **Status (2026-10-02):** every toolkit function below ran in Godot 4.7.2 here (23 live tests, 17
 offline, all pass; [`references/procedures.md`](references/procedures.md)).

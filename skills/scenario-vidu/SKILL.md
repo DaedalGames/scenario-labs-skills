@@ -3,7 +3,7 @@ name: scenario-vidu
 description: "Use when generating video with Vidu models on Scenario via MCP: text-to-video, image-to-video from a single still, start and end frame interpolation, reference-to-video keeping characters and props consistent from up to 7 reference images or reference videos, anime-style motion, movement amplitude control, or deciding between Q3, Q2, Q1, and 2.0 tiers. Keywords: Vidu Q3 Pro, Q2 Turbo, Shengshu Technology, T2V, I2V, R2V, Reference2V, start end frame, background music toggle."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Vidu Video
@@ -17,9 +17,10 @@ pick by name, and treat `model_schema_get` as the contract, since caps disagree 
 boundary.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic video work: the
-`scenario-video` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-video` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

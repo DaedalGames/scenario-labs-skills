@@ -3,7 +3,7 @@ name: scenario-zbrush-pose-print
 description: 'Use when posing a sculpt or preparing it for 3D printing in ZBrush: "pose this character", Transpose Master, TPoseMesh, Gizmo posing with masks, ZSphere rig, Proxy Pose, weapon in the hand, stretching after posing, "3D print this", 1/6 scale statue, miniature, resin or FDM, hollowing, wall thickness, drain holes, keys and pins, cutting into parts, 3D Print Hub, Scale Master, Decimation Master, STL or 3MF, size in millimeters.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # ZBrush posing and 3D print
@@ -12,9 +12,9 @@ Expert level means a pose that stands and reads, transferred onto every SubTool 
 level, and print parts whose size, walls, fits and cavities were measured in millimeters on the
 exported files. The stance: turn every decision into a number the agent can check (scale, point
 order, joint angles, walls, gaps), keep the pose reversible, use strokes only for cleanup. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-zbrush-expert (bridge, stroke engine, review loop, 2026 traps).
 

@@ -3,7 +3,7 @@ name: scenario-reel-recast
 description: "Use when recreating a trending reel, TikTok or Short with a different performer: the same dance, moves, timing and camera, performed by the user's own character from a reference sheet, optionally in another outfit or a redecorated room, keeping the original song in sync. Keywords: reel recast, trend remake, TikTok dance, replace the dancer, character swap, choreography transfer, video to video, keep the music, Seedance edit mode."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Reel Recast
@@ -23,9 +23,9 @@ consent; clearing the song for where it ships is the user's call.
 Edit mode, references and moderation: `scenario-seedance`. Variations, review, ranking and the 1080p
 finish: `scenario-seedance-drafts`. Plate edits: `scenario-image`. Timeline and sync:
 `scenario-video-assembly`. Connection and the core loop: `scenario`. If a sibling skill named here
-is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 ## Quick reference
 

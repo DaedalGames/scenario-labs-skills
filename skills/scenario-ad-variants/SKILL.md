@@ -3,7 +3,7 @@ name: scenario-ad-variants
 description: "Use when making multiple independent ad or campaign edits from existing footage with Scenario: hook, CTA, copy, end-card, placement, or targeted visual variants. Also for revising one variant or resuming a partially completed batch. Not for a new commercial from a still image, ordinary single-clip grading, or automatic Cartesian combinations."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Ad Variants
@@ -14,9 +14,9 @@ One supplied source becomes an ordered set of independently specified edits. Pre
 does not change, and keep every output traceable to the same source. A new storyboard from a product
 still belongs to `scenario-video-ads`; single-clip utilities to `scenario-video-editing`.
 Connection, discovery, submission and recovery follow `scenario`. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 Resolve only missing decisions: source, requested variants, exact copy, destination, runtime, audio
 policy and spend ceiling. Reuse answers already supplied. Distinguish a controlled comparison, where

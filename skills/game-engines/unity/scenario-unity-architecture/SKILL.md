@@ -3,7 +3,7 @@ name: scenario-unity-architecture
 description: "Use when structuring Unity 6.3 C# code: ScriptableObject data vs runtime state, events and services, inventory, health, save and load, Input System actions and key rebinding, async with Awaitable, assembly definitions, Enter Play Mode and domain reload, .meta files, Git, Smart Merge and LFS. Also when 'my save works in the Editor but not in the build', statics keep values on the second Play, events fire twice or never, an await runs after its object died, rebinds are lost on relaunch, a renamed class loses its data, a scene merge breaks."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity architecture (gameplay programmer / architect)
@@ -13,9 +13,9 @@ destroyed object mid-await, a relaunch of the built player, a class rename, a me
 a prefab dropped into an empty scene. Data lives in assets, state lives in plain C# and files,
 systems talk through events they do not own, and every claim is pinned by a test the agent can run
 without a mouse. Target: Unity 6000.3.21f1, Input System 1.20.0, Test Framework 1.6.0, macOS. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, review loop, 6.3 traps). Toolkit:
 `ut_env`, `ut_run`, `ut_live` plus this skill's [`scripts/ut_arch.py`](scripts/ut_arch.py),

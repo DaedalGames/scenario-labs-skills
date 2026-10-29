@@ -3,7 +3,7 @@ name: scenario-inspiration
 description: "Use when a creative task has no direction yet: finding inspiration, exploring looks or styles, proposing concept directions to pick between, building a moodboard or reference board, doing visual research, mining existing assets for a style, or escaping generic AI-looking output. Also when a saved Scenario collection should drive a new batch as art direction. Keywords: inspiration, moodboard, references, art direction, style exploration, concepts, serendipity, ideation, surprise me."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Inspiration
@@ -13,9 +13,9 @@ metadata:
 Asked for inspiration, an agent averages. It returns the most typical answer for the brief, so every
 user with a similar brief gets the same look. This skill trades that for four phases: **prime**,
 **widen**, **choose**, **board**. Connection and scope: see the `scenario` skill in this repo. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 Four moves carry most of the value. Name the reflex answer for this brief and the answer of someone
 merely avoiding that reflex, then rule out both, because an agent told to be original lands on the

@@ -3,7 +3,7 @@ name: scenario-kling
 description: "Use when generating or editing video with Kling models on Scenario via MCP: text-to-video, image-to-video with first and last frames, multi-shot sequences with per-shot prompts, consistent characters via elements and reference images, prompt-based video editing, motion transfer from a driving video (motion control, mocap), lipsync to audio or text, talking avatars, native audio and dialogue, or picking 720p, 1080p, or 4K tiers. Keywords: Kling V3, O1, 2.6, Omni, Kuaishou, T2V, I2V, V2V."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Kling Video
@@ -17,9 +17,10 @@ the same parameter changes shape, default, and legality between members. Kling V
 audio output, the `scenario-audio` skill's domain.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic video work: the
-`scenario-video` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-video` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

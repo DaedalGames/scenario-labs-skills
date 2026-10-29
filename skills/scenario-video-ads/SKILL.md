@@ -3,7 +3,7 @@ name: scenario-video-ads
 description: "Use when producing a video ad with Scenario from a product shot or brand assets: a mobile 9:16 or landscape 16:9 commercial, a TikTok, Reels, Shorts, YouTube, or CTV spot, or campaign creative needing a creative brief, storyboard, cinematic camera work, brand-faithful product footage, music and voiceover, captions, ad variants, budget planning, or platform delivery specs. Keywords: video ad, commercial, product video, advert, hook, CTA, end card, campaign, ad creative."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Video Ads
@@ -16,8 +16,9 @@ creative.
 This skill is the director layer: it turns one product shot and a brief into a finished ad,
 delegating mechanics to the sibling skills it names per stage. Connection and the core loop: see the
 `scenario` skill in this repo. If a sibling skill named here is missing from your available skills,
-ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended,
-proceed from tool schemas and flag the gap. The full sibling map and install commands:
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap. The full sibling map and how to load a missing one:
 [references/dependencies.md](references/dependencies.md).
 
 Two rules bind every stage, because they carry the ad's credibility. The product is never generated:

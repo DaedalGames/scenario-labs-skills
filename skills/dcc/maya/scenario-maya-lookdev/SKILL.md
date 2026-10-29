@@ -3,7 +3,7 @@ name: scenario-maya-lookdev
 description: "Use when shading an asset in Maya with Arnold: OpenPBR or aiStandardSurface materials, hooking up Substance Painter or UDIM texture sets, color spaces (sRGB, Raw, ACEScg), a normal map that looks wrong, displacement with black holes or faceting, skin SSS, chrome and metals, glass or crystal, car paint, aiStandardHair, porting Standard Surface to OpenPBR, or a lookdev turntable with chrome and gray balls. Also when textures render washed out, too dark or plastic in Arnold."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Look development in Maya 2027 (Arnold)
@@ -13,8 +13,9 @@ Expert look dev is a material that holds under any light a lighter throws at it:
 (measured metal colors, glass tinted by depth, scattering at real scale), then deliberate
 imperfection, judged on a neutral turntable with reference balls, one change per render. Nothing is
 done before a render has been looked at. If a sibling skill named here is missing from your
-available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-maya-expert (execution channel, review loop, 2027 version traps).
 

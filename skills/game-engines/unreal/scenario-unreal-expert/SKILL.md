@@ -3,7 +3,7 @@ name: scenario-unreal-expert
 description: "Use when an agent drives Unreal Engine 5.8 on a Mac for any task: Editor Python (the unreal module), headless UnrealEditor-Cmd -run=pythonscript jobs, Epic's Unreal MCP server, the Remote Control API, console commands and cvars; when a script breaks on 5.8 (EditorLevelLibrary, Remote Control calls refused, Substrate materials black, MRQ presets); when a level, material, shot or build must be judged by numbers and a screenshot before it is called done; or when a brief must go to the right scenario-unreal-* specialist."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unreal expert (technical director and agent protocol)
@@ -13,9 +13,9 @@ at it, fix it, then advance. An agent without a mouse gets there by choosing the
 each action, working like the Details panel (one transaction, explicit saves), and never trusting
 its own eyes alone. This skill is the protocol, the shared toolkit in [`scripts/`](scripts/), and
 the map to the team. Target: UE 5.8 on macOS Apple Silicon. If a sibling skill named here is missing
-from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **Status (2026-09-24):** UE 5.8 is not installed. Every in-engine call in `scripts/` and
 `references/` is **not yet run in Unreal**. The pure-Python parts ran offline and pass (eight test

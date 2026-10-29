@@ -3,7 +3,7 @@ name: scenario-rodin
 description: "Use when generating 3D assets with Rodin Hyper3D models on Scenario via MCP: image-to-3D from up to five multiview stills, text-to-3D from a prompt, fast prototyping versus full quality tiers, quad or triangle topology, PBR materials, HighPack 4K textures, T-pose or A-pose characters for rigging, or splitting a finished mesh into parts and retexturing it with Bang!. Keywords: Rodin Gen-2.5, Hyper3D, Deemos, image to 3D, text to 3D, part segmentation, texture delight."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Rodin 3D
@@ -16,9 +16,10 @@ parts. Discover them with `search` and treat `model_schema_get` as the contract:
 ideas and disagree on parameter names.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic 3D work: the
-`scenario-3d` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-3d` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

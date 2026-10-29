@@ -3,7 +3,7 @@ name: scenario-reve
 description: "Use when generating or editing images with Reve models on Scenario via MCP: text-to-image from a prompt alone, instruction edits (swap poster text, recolor a product, change materials, relight or restyle a scene), merging references with consistent subjects, blending up to 6 images into one composite, or choosing between Reve v2.1 and Reve Remix. Keywords: Reve v2.1, Reve Remix, Reve AI, txt2img, img2img, frame tags, compositing, style blending, text swap."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Reve Image
@@ -17,9 +17,10 @@ them with `search` and treat `model_schema_get` as the contract: they disagree o
 prompt caps, and ratio lists.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic image work: the
-`scenario-image` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-image` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

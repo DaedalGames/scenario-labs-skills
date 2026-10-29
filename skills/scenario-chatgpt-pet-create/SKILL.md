@@ -3,7 +3,7 @@ name: scenario-chatgpt-pet-create
 description: "Use when creating a ChatGPT pet or Codex pet with Scenario: hatching an animated companion from a text idea, a character, mascot or brand cue, or reference photos and art; making the 1536x2288 v2 pet sprite sheet with nine animation states and sixteen look directions, the 1536x1872 v1 sheet ChatGPT web uploads, a pixel-perfect pixel-art pet, an animated GIF of the pet, or a Codex pet.json package."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario ChatGPT Pet: Create
@@ -25,8 +25,9 @@ every frame.
 
 Connection, scope and the core loop: the `scenario` skill. Changing a pet that already has a sheet:
 `scenario-chatgpt-pet-update`. If a sibling skill named here is missing from your available skills,
-ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended,
-proceed from tool schemas and flag the gap.
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 Scripts, run by the agent with Python 3, Pillow and NumPy (`pip install pillow numpy`, in a virtual
 environment outside the run folder when the system Python refuses), by their path in this skill's

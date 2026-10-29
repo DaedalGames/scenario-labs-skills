@@ -3,7 +3,7 @@ name: scenario-zbrush-paint-render
 description: "Use when polypainting in ZBrush (skin color zones, fills, cavity or AO passes, Spotlight), baking polypaint to a texture or vertex color, rendering a ZBrush model with BPR or Redshift, making render passes, a turntable or portfolio shots, or when paint looks like uniform beige or clown makeup, is blurry, is hidden under a texture or in Redshift, or a render is noisy, clipped, orthographic or bruised."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # ZBrush paint and render (texture and presentation artist)
@@ -12,9 +12,10 @@ Expert paint in ZBrush is observation made systematic: color zones placed by wha
 skin, pushed enough to survive the shader, judged on neutral and flat views, and baked at a
 resolution the mesh can hold. For an agent without a tablet most of it is buttons: fills at a chosen
 intensity through generated masks, zone images projected onto the mesh, and renders that are both
-measured and looked at. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+measured and looked at. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-zbrush-expert (bridge, stroke engine, review loop, 2026 traps).
 

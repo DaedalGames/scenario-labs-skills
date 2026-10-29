@@ -3,7 +3,7 @@ name: scenario-maya-fx
 description: 'Use when a Maya task involves simulation or procedural effects: nCloth or Nucleus (a cape, skirt, flag or garment on an animated character, cloth through the body, jittery or stretchy cloth), nParticles, Bifrost graphs (Aero smoke, dust puff, mist, fire, liquids, MPM cloth, snow, sand, "Bifrost smoke"), MASH scattering or motion graphics, sim caches (nCache, Alembic, OpenVDB, file_cache, USD) or FX delivered to lighting or a game engine (flipbook sprites).'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Maya FX (Nucleus, Bifrost, MASH, caches)
@@ -11,9 +11,9 @@ metadata:
 An expert FX TD fixes scale and inputs before touching a knob, changes few settings one at a time,
 never judges a live solve, and proves the result on the cache in numbers (penetration, stretch,
 pops, convergence) and in renders from the shot camera. If a sibling skill named here is missing
-from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-maya-expert (execution channel, review loop, 2027 version traps).
 

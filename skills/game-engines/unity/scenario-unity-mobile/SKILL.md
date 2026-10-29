@@ -3,7 +3,7 @@ name: scenario-unity-mobile
 description: "Use when a Unity 6.3 game targets Android or iOS: phone frame budget, overheating after 20 minutes, 'my game stutters on phones', ASTC or ETC2 textures, audio import, URP mobile settings, touch controls, on-screen joystick, UI under the notch or safe area, slow startup, ANRs, 'Android build fails', AAB, keystore signing, target API 36, Google Play upload, iOS Xcode export or archive, privacy manifest, app size, in-app purchases (IAP 5), rewarded ads (LevelPlay), ad consent."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity mobile (mobile specialist)
@@ -13,9 +13,9 @@ phone, starts fast, installs from the store, and never double-charges or double-
 budget the sustained frame, prove every setting on the data the device gets (imported format, built
 bundle, exported Xcode project), and treat stores, SDKs and money code as contracts with ugly event
 orders. Target: Unity 6000.3.21f1, URP 17.3, Input System 1.20, macOS with Xcode 26.6. If a sibling
-skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+skill named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or
+ask the user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed
+from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, review loop, 6.3 traps). Toolkit:
 [`scripts/ut_mobile.py`](scripts/ut_mobile.py) (imports `ut_env`, `ut_run`, `ut_stat`), editor jobs

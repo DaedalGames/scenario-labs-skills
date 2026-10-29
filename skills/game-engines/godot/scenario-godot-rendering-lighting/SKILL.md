@@ -3,7 +3,7 @@ name: scenario-godot-rendering-lighting
 description: "Use when lighting or rendering a Godot 4.7 3D scene: pick a renderer (Forward+, Mobile, Compatibility), choose GI (SDFGI, VoxelGI, LightmapGI, reflection probes), bake lightmaps without a mouse, tune WorldEnvironment, tonemapper (AgX, ACES, Filmic), glow, fog, volumetric fog and god rays, shadows and shadow acne, quality presets for PC and phones, Compositor post effects, or when 'my scene looks flat', 'too dark indoors', 'light leaks', 'lightmap is black', 'looks different on mobile'."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot rendering and lighting (lighter / graphics technical artist)
@@ -15,9 +15,9 @@ at a time, a rendered image looked at after every change, numbers on that image,
 every effect. The renderer and the GI method are chosen first, because they decide what the other
 settings can do. The art direction (value pattern, warm and cool, focal contrast) is judged on
 pixels the agent actually opened, never on the inspector. If a sibling skill named here is missing
-from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-godot-expert (channels, `gd_run`, the review loop, 4.7 traps).
 

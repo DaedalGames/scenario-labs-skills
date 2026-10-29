@@ -3,7 +3,7 @@ name: scenario-roblox-performance
 description: "Use when a Roblox experience is slow, laggy, stuttering, crashing or out of memory, or before shipping or updating one: my game lags on mobile, low FPS, frame spikes, server lag or low heartbeat, physics lag, network lag or high KB/s, memory leaks or memory that keeps growing, crashes on phones, long join or load times, too many parts, instances, draw calls or triangles, MicroProfiler, Script Profiler, Luau heap, Developer Console memory, Scene Analysis, StreamingEnabled tuning, performance budgets, and publishing, releasing an update, restarting servers or rolling back a version."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox Performance and Release
@@ -16,9 +16,9 @@ change, and every fix removes work instead of hiding it. Budgets come from the l
 Studio numbers are labeled as Studio numbers. Release is part of performance: ship with a restart
 plan and a rollback path, and never publish without the owner.
 
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

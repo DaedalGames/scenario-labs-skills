@@ -3,7 +3,7 @@ name: scenario-unreal-lighting-rendering
 description: 'Use when lighting or rendering in Unreal Engine 5.8: physical light units and exposure (EV100, lux, lumens), Lumen GI and reflections, MegaLights, virtual shadow maps, sky, fog and clouds, post process and color grading, the path tracer, or Movie Render Graph stills. Triggers: "Lumen is noisy", "MegaLights noise", "the interior is too dark", "light leaks", neon signs, a night or dusk scene, "fireflies", "path tracer vs Lumen", "render a still", EXR settings.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Lighting and rendering in Unreal Engine 5.8
@@ -11,9 +11,10 @@ metadata:
 Expert lighting in Unreal is a calibrated camera, physical light values, and a renderer that sees
 the same scene you do; everything else is art direction layered on top and listed as such. Each step
 is proved with a representation view and a number before the lit image is trusted; noise is fixed in
-the system that owns it. If a sibling skill named here is missing from your available skills, ask
-the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed
-from tool schemas and flag the gap.
+the system that owns it. If a sibling skill named here is missing from your available skills, load
+it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-unreal-expert (channels, review loop, 5.8 traps).
 

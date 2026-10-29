@@ -78,6 +78,21 @@ expert descriptions at the time. The default command names the core skills inste
   its name and description in every session: the 16 core plugins measured about 10,100 tokens, the
   role sets 700 to 4,000.
 
+## No install commands in skills
+
+The sibling-install sentence once carried `npx skills add scenario-labs/skills --skill <name>`. That
+resolves the latest `skills` package and the repository's moving `main`. A marketplace scan flagged
+skills carrying it as possibly loading code from an untrusted or mutable source (October 2026), and
+the scan names no line, so that sentence is a suspect, not a proven cause.
+
+- A pin cannot live in the skill: a skill cannot name the commit it ships in.
+- `skill_get` serves the core skills from the connected Scenario MCP, with no local install. It
+  returns markdown only and does not serve the expert tools, so the sentence also links the README's
+  Install section. A link is not an instruction to run, and that section carries the pinned form.
+- The pinned form `npx skills@<version> add scenario-labs/skills#<commit>` works: skills 1.7.4
+  clones that commit and records it in `skills-lock.json` (checked in a container, October 2026). It
+  lives in the README, where a person runs it.
+
 ## Release tags
 
 Releases through 0.37.3 tagged bare `vX.Y.Z`. That is because a `release-type: node` package gets

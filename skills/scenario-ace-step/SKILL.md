@@ -3,7 +3,7 @@ name: scenario-ace-step
 description: "Use when creating or editing music with ACE-Step models on Scenario via MCP: text-to-music songs with sung vocals from a lyric sheet, instrumental tracks, covering or restyling an existing song, repainting one section in place, changing sung lyrics, adding an instrument layer, completing a partial recording into a full arrangement, extracting stems, or choosing between Turbo and Quality lanes. Keywords: ACE-Step 1.5, cover strength, repaint, Vocal2BGM, stem separation, karaoke, BPM."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario ACE-Step Music
@@ -16,9 +16,10 @@ Layer, Complete Track, Stem Extract), nine members at authoring time. Discover t
 pick the member by mode name, and treat `model_schema_get` as the contract.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic audio work: the
-`scenario-audio` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-audio` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

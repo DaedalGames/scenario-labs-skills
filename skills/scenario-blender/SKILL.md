@@ -3,7 +3,7 @@ name: scenario-blender
 description: "Use when an agent works in an open Blender scene through the Scenario for Blender extension's local MCP server (scenario-blender on 127.0.0.1:9876): connecting Claude Code, Cursor, Claude Desktop or Codex to Blender, the headless scenario_blender command, quoting and generating Scenario images, PBR materials, 3D meshes, video, audio or 360 environments from the scene, capturing the viewport or selected meshes as references, placing saved results, Render Video camera paths, or execute_python."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario for Blender
@@ -30,8 +30,9 @@ collection rename or deletion, workflow authoring and usage stay on mcp.scenario
 `scenario` skill, and connect both servers when a task needs both. Modeling, sculpting, rigging or
 shading through bpy is the `scenario-blender-expert` skill's work; exporting for an engine is
 `scenario-blender-export`'s. If a sibling skill named here is missing from your available skills,
-ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended,
-proceed from tool schemas and flag the gap.
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Setup
 

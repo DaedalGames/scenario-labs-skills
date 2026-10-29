@@ -3,7 +3,7 @@ name: scenario-sonilo
 description: "Use when adding sound to a video or generating standalone audio with Sonilo models on Scenario via MCP: text-to-sound-effects, text-to-music, video-to-sound-effects or video-to-music from a clip, scoring silent AI video, foley, ambience, muxed video-to-video variants returning the clip with the new track mixed in, keeping speech while replacing music, or per-segment sound control. Keywords: Sonilo V1.1, SFX, soundtrack, score, keepSpeechVocal, segments, royalty-free."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Sonilo Audio
@@ -16,9 +16,10 @@ track muxed in, visuals untouched). Picking the member whose return matches the 
 more than any prompt. Discover with `search` and treat `model_schema_get` as the contract.
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic audio work: the
-`scenario-audio` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-audio` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

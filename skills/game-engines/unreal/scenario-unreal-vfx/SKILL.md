@@ -3,7 +3,7 @@ name: scenario-unreal-vfx
 description: 'Use when a UE5 task involves Niagara or Chaos destruction: a Niagara fireball, projectile trail, impact explosion, muzzle flash, spell, smoke, sparks, debris, Niagara fluids or flipbooks; "Niagara is too expensive", stat NiagaraOverview, Effect Types, pooling, Data Channels, lightweight emitters, VFX scalability; judging an effect''s readability, value, color, timing, white blowout or strobing; or a wall that shatters, geometry collection fracture, Dataflow, damage thresholds, floating chunks, debris cost, Chaos Visual Debugger.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unreal VFX (Niagara, Chaos destruction, VFX critique)
@@ -13,9 +13,10 @@ costs what its gameplay class allows across the whole world, and is proven by pe
 the target core count plus captures scored against a written rubric. Python cannot author Niagara
 emitters or modules (5.8 API): the agent works through templates with a User parameter contract,
 Material Instances, Effect Types and Dataflow recipes, and escalates the few graph edits as precise
-GUI requests. If a sibling skill named here is missing from your available skills, ask the user to
-install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool
-schemas and flag the gap.
+GUI requests. If a sibling skill named here is missing from your available skills, load it with
+`skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-unreal-expert (channels, review loop, 5.8 traps).
 

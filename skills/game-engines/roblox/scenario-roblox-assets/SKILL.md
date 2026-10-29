@@ -3,7 +3,7 @@ name: scenario-roblox-assets
 description: "Use when bringing 3D assets into Roblox Studio or preparing avatar items: import from Blender, GLB, FBX or OBJ files, AI-generated or image-to-3D meshes (Scenario or other tools), wrong scale or size in studs, mesh faces the wrong way, too many triangles, mesh fails validation, holes or non-watertight meshes, textures too big or blurry, SurfaceAppearance and PBR maps, metalness or normal maps look wrong, rigid accessories and hats, UGC items, Accessory Fitting Tool, out of bounds, AvatarCreationService validation, EditableMesh or EditableImage previews, or generate_mesh."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox Asset Pipeline and UGC
@@ -16,9 +16,9 @@ its triangle budget, closed when it must be, with maps sized and split for Roblo
 that prove it. Fix in Blender, preview and audit in Studio without uploading, validate locally to
 green, and stop exactly where Roblox needs an uploaded asset.
 
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

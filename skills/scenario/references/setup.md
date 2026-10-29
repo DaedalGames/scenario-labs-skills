@@ -118,22 +118,11 @@ Each `SKILL.md` names the release it comes from in its frontmatter, as `metadata
 are listed at
 [github.com/scenario-labs/skills/releases](https://github.com/scenario-labs/skills/releases).
 
-- Claude Code: install the skills as plugins from the `scenario-skills` marketplace, added from the
-  `stable` branch, which moves only at releases. Install the getting-started plugin plus the groups
-  for the user's job: [INSTALL.md](https://github.com/scenario-labs/skills/blob/main/INSTALL.md) has
-  one line per role. Each installed skill costs context in every session, so avoid installing every
-  group. From a session:
+When the user asks to install or update these skills, point them to the README's
+[Install section](https://github.com/scenario-labs/skills#install) rather than running an installer:
 
-  ```text
-  /plugin marketplace add scenario-labs/skills#stable
-  /plugin install 010-getting-started@scenario-skills
-  ```
-
-  Then turn on auto-update once: `/plugin`, **Marketplaces**, `scenario-skills`, **Enable
-  auto-update** (off by default for third-party marketplaces). To update now:
-  `claude plugin marketplace update scenario-skills`, then
-  `claude plugin update <plugin>@scenario-skills`, then restart.
-
-- Any other agent: `npx skills add scenario-labs/skills` installs, and `npx skills update` refreshes
-  the skills whose files changed.
-- Use one route, not both: a skill installed both ways loads twice.
+- In Claude Code it recommends the `scenario-skills` plugin marketplace from its `stable` branch,
+  with auto-update turned on once, and a per-role set of plugins.
+- Other agents use the skills CLI.
+- Each installed skill costs context in every session, so a role set beats installing every group.
+- One route, not both: a skill installed both ways loads twice.

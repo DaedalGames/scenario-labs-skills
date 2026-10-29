@@ -3,7 +3,7 @@ name: scenario-unreal-performance
 description: 'Use when an Unreal Engine 5.8 project misses its frame rate or stutters: "optimize to 60 fps", "we run at 38 fps", CPU or GPU bound, game or render thread too long, hitches, traversal or shader stutter (PSO), GC spikes, camera-cut spikes, Lumen, Nanite, VSM, ray tracing, foliage, crowds or Niagara too expensive, async compute, stat unit, ProfileGPU, Unreal Insights, TraceQuery, snapshothitches, scalability and device profiles, dynamic resolution and TSR, streaming budgets, or proving a fix with before and after captures.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Performance engineering in Unreal Engine 5.8
@@ -13,9 +13,9 @@ honest capture, explain the worst frame by the thread that works rather than the
 in the order of measured size, and prove the result with repeated runs on the same route and build,
 hitches judged apart from the average. The performance engineer owns measurement, diagnosis and
 proof; most fixes go back to the teammate who owns the content. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unreal-expert (channels, review loop, 5.8 traps).
 

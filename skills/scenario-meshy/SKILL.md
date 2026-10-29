@@ -3,7 +3,7 @@ name: scenario-meshy
 description: "Use when creating or refining 3D assets with Meshy models on Scenario via MCP: image-to-3D from one photo or 1-4 multi-view angles, text-to-3D, retexturing an existing GLB, remeshing to a target polycount, UV unwrapping, auto-rigging a humanoid character, or applying a library animation clip. Keywords: Meshy 7 and Meshy 6, Ultra mode, Smart Topology, PBR maps, texture prompt, triangle or quad topology, game-ready mesh, A-pose, T-pose, GLB pipeline."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Meshy 3D
@@ -20,8 +20,9 @@ Image to 3D, false on Multi Image and Retexture at authoring time).
 
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic 3D work (viewer,
 capture, engine import): the `scenario-3d` skill. If a sibling skill named here is missing from your
-available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

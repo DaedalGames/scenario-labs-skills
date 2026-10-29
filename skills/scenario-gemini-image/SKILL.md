@@ -3,7 +3,7 @@ name: scenario-gemini-image
 description: "Use when generating or editing images with Google's Gemini image models (Nano Banana) on Scenario via MCP: text-to-image, natural-language instruction editing, identity locking or style transfer from reference images, multi-image fusion, pulling stills from a video clip, Google Search grounding, thinking level tuning, 512 to 4K output, or choosing between Flash, Pro, and Lite. Keywords: Gemini 3.1 Flash, Gemini 3.0 Pro, Gemini 3.1 Lite, Nano Banana 2, Nano Banana Pro, txt2img, img2img."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Gemini Image
@@ -18,8 +18,9 @@ and nearly everything else is per member.
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic image work: the
 `scenario-image` skill. Gemini video belongs to the `scenario-gemini-omni` skill; Gemini speech
 models are the audio domain. If a sibling skill named here is missing from your available skills,
-ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended,
-proceed from tool schemas and flag the gap.
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

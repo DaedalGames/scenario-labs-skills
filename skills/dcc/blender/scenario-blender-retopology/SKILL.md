@@ -3,7 +3,7 @@ name: scenario-blender-retopology
 description: "Use when turning a dense sculpt, scan or AI-generated mesh into clean topology in Blender, for animation, subdivision or a game low poly with a triangle budget. Also when choosing between QuadriFlow or voxel remesh and manual retopo, placing loops around eyes, mouth and joints, deciding pole placement, setting up a Shrinkwrap cage, fixing volume loss after subdivision, preparing a low poly for baking, or auditing topology for spirals, 6-poles and triangles. Keywords: retopo, retopology, quad remesh, clean up an AI mesh, edge flow, low poly, bake prep."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Blender retopology
@@ -13,9 +13,9 @@ deform: loops close around eyes, mouth and joints, poles sit where nothing moves
 surface, not the cage, matches the sculpt. An agent without a mouse can build every piece of this
 from data, but it reaches expert quality only on the parts it plans explicitly. Automatic remeshing
 is a finish for static assets and a start for everything else. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 Toolkit: [`scripts/bx_retopo.py`](scripts/bx_retopo.py)

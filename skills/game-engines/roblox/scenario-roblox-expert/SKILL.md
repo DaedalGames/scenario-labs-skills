@@ -3,7 +3,7 @@ name: scenario-roblox-expert
 description: "Use when an agent builds, fixes or tests anything in Roblox Studio: \"make a Roblox game\", \"Roblox Studio\", a Luau script, \"my Roblox game lags\", agent control of Studio, the Studio MCP server (execute_luau, start_stop_play, screen_capture), Rojo or Script Sync projects, offline Luau checks, playtests driven by code; when the MCP server lists no Studio, a playtest hangs, or 2019 to 2023 Roblox code breaks; or when a Roblox brief (UI, data, networking, combat, monetization, assets, performance) must go to the right scenario-roblox-* specialist."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox expert (technical director and agent protocol)
@@ -16,9 +16,9 @@ at it, fix it, advance. An agent without a mouse gets there through Studio's bui
 offline checks and text files, passing only on a parsed result and never on one signal alone. This
 skill is that protocol, the shared toolkit every scenario-roblox-* skill calls
 ([`scripts/`](scripts/)), and the map of the team. If a sibling skill named here is missing from
-your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **Status (2026-10-18):** the toolkit ran live in Studio 0.743, 36 live tests and 16 offline tests,
 all pass ([`references/procedures.md`](references/procedures.md)). `run_headless` is live run

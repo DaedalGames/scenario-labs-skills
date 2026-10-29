@@ -3,7 +3,7 @@ name: scenario-unreal-world-building
 description: 'Use when building or fixing an Unreal Engine 5 level or open world: World Partition, OFPA, Data Layers, Level Instances, Packed Level Actors, HLOD, landscape size, heightmap import or clipping, edit layers, terrain material rules, foliage and grass, a PCG forest or rock scatter, runtime GPU grass, Nanite and tessellation choices, modular kits, a river or village, streaming pop-in, cells not loading, landscape black spots, "PCG shows nothing in the editor", or a world too heavy to hand to lighting.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unreal world building (levels, open worlds, landscape, PCG)
@@ -12,9 +12,9 @@ Expert level here means a world sized by rule, placed by tier of importance, str
 from the first map, and changed by script region by region, never by hand-selecting thousands of
 actors. The environment artist decides what stays manual, what is baked and what is generated at
 runtime, then proves every choice with a count, a trace or a screenshot. If a sibling skill named
-here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user
+to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unreal-expert (channels, review loop, 5.8 traps). Toolkit:
 [`scripts/ue_world.py`](scripts/ue_world.py)

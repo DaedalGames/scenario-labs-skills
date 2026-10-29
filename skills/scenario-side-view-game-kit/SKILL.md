@@ -3,7 +3,7 @@ name: scenario-side-view-game-kit
 description: "Use when making the art for a side-scroller or 2D platformer: side-view pixel-art sprite sheets for a hero and ground enemies (run, walk, idle, attack, hurt cycles, air spin, jump and fall poses) and per-level layers (parallax background and midground, seamless wall texture, platform strip, props). Also use when a magenta key eats part of a sprite, a walk loop will not close, a slash trail keys into a solid block, generated textures do not tile, or poses on one sheet will not split."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Side-View Game Kit
@@ -31,9 +31,9 @@ strips on the platform too, `upload_asset` them into a collection.
 Connection, scope and the core loop: the `scenario` skill. Frame tools, GIF previews and engine
 slicing: `scenario-sprite-animation`. Pixel cleanup and other statics: `scenario-game-assets`. Clip
 model families: `scenario-video`. Music and sound effects are outside this image skill. If a sibling
-skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+skill named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or
+ask the user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed
+from tool schemas and flag the gap.
 
 The agent runs the scripts locally (Python 3, Pillow, NumPy; `side_sprites.py` also needs ffmpeg):
 [reframe_stills.py](scripts/reframe_stills.py) makes the clip first frames,

@@ -3,7 +3,7 @@ name: scenario-roblox-ui
 description: "Use when building or fixing Roblox game UI or input: HUD (health bar, currency, ability cooldowns), main menu, shop with a scrolling grid, settings screen, inventory, \"UI scales wrong on phone\", buttons hidden behind the jump button, UI too small on a tablet or TV, portrait and landscape, top bar and safe area, Scale vs Offset, UIListLayout, UIGridLayout, UIFlexItem, StyleSheets and themes, gamepad or console menu navigation, the Input Action System (InputContext, InputAction, InputBinding), ContextActionService migration, PreferredInput, reduced motion and accessibility, localization and AutoLocalize, React, Fusion or Vide, the Device Simulator, and testing UI without a phone."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox UI and Input
@@ -16,9 +16,9 @@ without owning any of them. Build the UI as instances in Edit, keep the look in 
 controls in Input Action System (IAS) contexts, then measure it under Studio's device presets and
 drive it with real clicks and keys.
 
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

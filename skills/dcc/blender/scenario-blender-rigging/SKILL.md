@@ -3,7 +3,7 @@ name: scenario-blender-rigging
 description: 'Use when rigging a character, creature or prop in Blender through Python: "rig this character", Rigify metarig fitting or generation errors, automatic weights or "Bone Heat Weighting failed", weight painting fixes, clothes that do not follow, IK/FK switch, foot roll, twist bones, drivers and custom properties, corrective shape keys, a stylized face rig, ARKit 52 blend shapes or viseme shape keys for face capture, lip sync or a game engine, a mechanical or hard-surface rig, or testing how a rig deforms.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Blender rigging
@@ -12,8 +12,9 @@ Expert rigging means the rig is specified by bone placement, proven by deformati
 poses, and shaped around what the animator will actually use. The stance of every source expert:
 place joints precisely, generate or build the simplest mechanism that works, then pose it, measure
 it, render it and fix it before calling it done. If a sibling skill named here is missing from your
-available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 

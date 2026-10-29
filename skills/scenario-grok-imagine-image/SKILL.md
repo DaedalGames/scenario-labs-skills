@@ -3,7 +3,7 @@ name: scenario-grok-imagine-image
 description: "Use when generating or editing images with Grok Imagine models on Scenario via MCP: text-to-image, instruction editing with up to three reference images, posters, packaging, ads, or infographics with exact in-image text, photoreal shots from camera and lighting cues, extended aspect ratios up to 20:9 and 9:20, quality and resolution tiers, or batches of variations. Keywords: Grok Imagine Image 2.0, Image Quality, xAI, Aurora, Grok, txt2img, img2img, typography, 2K."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Grok Imagine Images
@@ -18,9 +18,10 @@ contract and disagreeing on knobs and price, so discover them with `search` and 
 `scenario-grok-imagine-video` skill.
 
 Connection and the core loop: see the `scenario` skill; model-agnostic image work: the
-`scenario-image` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-image` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

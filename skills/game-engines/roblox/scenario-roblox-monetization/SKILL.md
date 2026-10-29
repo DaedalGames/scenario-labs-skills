@@ -3,7 +3,7 @@ name: scenario-roblox-monetization
 description: "Use when a Roblox game sells something or plans live ops: Developer Products, game passes, experience subscriptions, Roblox Plus perks, ProcessReceipt or BindReceiptHandler, \"bought it but didn't get it\", a purchase granted twice, shop UI prices, eggs, crates or loot boxes with odds (paid random items, PolicyService), rewarded video ads, AnalyticsService funnels, economy or custom events, ConfigService live config, A/B experiments, price optimization or regional pricing, game thumbnails and icons, play-through rate, Creator Rewards, Ads Manager campaigns, or a launch and update plan."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox Monetization and Live Ops
@@ -17,9 +17,9 @@ every live change ships behind a config with a metric that decides it. The agent
 the code in an unpublished place; product creation, dashboards and store art uploads stay with the
 owner.
 
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

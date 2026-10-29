@@ -3,7 +3,7 @@ name: scenario-zbrush-stylized
 description: "Use when sculpting a stylized or cartoon character, bust, collectible or toy in ZBrush (Overwatch, Fortnite, Disney look), judging shape language (S and C curves, parallel lines, 70/30, silhouette read at a distance), exaggerating proportions on purpose, keeping stylized planes crisp through subdivision, sculpting stylized hair (chunky clumps, curve tube strands, ClayPolish), or designing a figure for toy production (articulation, wall thickness, scale)."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # ZBrush stylized characters and collectibles
@@ -12,9 +12,9 @@ Expert stylized work is anatomy simplified on purpose: real landmarks and propor
 baseline, a few named exaggerations, and shape-language rules an agent can measure on a silhouette.
 Curves are the agent's best tool: strands, clumps, straps and scarf tails come from computed 3D
 paths, so a "tweak" regenerates a path instead of sculpting it. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-zbrush-expert (bridge, stroke engine, review loop, 2026 traps).
 

@@ -3,7 +3,7 @@ name: scenario-seedance-storyboard
 description: "Use when a Seedance video must hold continuous movement across shots: dance choreography, fights, sports, or any performance where limbs teleport, feet slide, or motion resets at every cut, or when turning a storyboard and character sheet into a multi-shot sequence that plays as one take. Keywords: storyboard to video, choreography, movement control, pose chain, timecoded shot script, first and last frame chaining, character sheet, multi-shot continuity, Seedance 2.5 and 2.0."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Seedance Storyboard
@@ -22,9 +22,9 @@ traps, and sound lanes: the `scenario-seedance` skill; identity across stills an
 character sheet: the `scenario-consistency` and `scenario-identity-library` skills; a board or comic
 page that is itself the deliverable: the `scenario-storyboards` skill; splitting and rejoining
 shots: the `scenario-video-editing` and `scenario-video-assembly` skills. If a sibling skill named
-here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user
+to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 ## Quick reference
 

@@ -3,7 +3,7 @@ name: scenario-seedance
 description: "Use when generating or editing video with Seedance models on Scenario via MCP: text-to-video, image-to-video, first and last frame anchors, reference-to-video from identity, product, or world references, prompt-based editing, extending a clip, audio-conditioned motion or voice, shot sound without music, first-frame versus reference conditioning, or an output blocked by moderation. Keywords: Seedance 2.5 and 2.0, ByteDance, T2V, I2V, V2V, native audio, OutputVideoSensitiveContentDetected."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Seedance Video
@@ -18,8 +18,9 @@ the shape and disagreeing on every number.
 Connection and the core loop: see the `scenario` skill in this repo; model-agnostic video work: the
 `scenario-video` skill; choreography held across cuts from a storyboard: the
 `scenario-seedance-storyboard` skill. If a sibling skill named here is missing from your available
-skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

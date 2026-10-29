@@ -3,7 +3,7 @@ name: scenario-unreal-animation
 description: 'Use when a UE5 task involves characters in motion: "import FBX from Maya" with a skeleton, "retarget animations", IK Rig, IK Retargeter, feet sinking or floating after retarget, mocap cleanup, Motion Matching, Pose Search, Choosers, GASP, state machine vs motion matching, root motion, offset root bone, foot IK, Control Rig, Animation Blueprint cost, "animation is expensive", budget allocator, URO, MetaHuman LODs, ML Deformer, cloth.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unreal animation (technical animator)
@@ -13,9 +13,9 @@ movement model that changes category on the input frame, animation that costs a 
 milliseconds on the target, and clean data at the source. The agent works through data and
 templates: it scripts assets, IK Rigs, retargeters, databases and settings, duplicates Epic's
 AnimBPs instead of drawing graphs, measures contact numerically, then looks at frames. If a sibling
-skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+skill named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or
+ask the user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed
+from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unreal-expert (channels, review loop, 5.8 traps).
 

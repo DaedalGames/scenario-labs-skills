@@ -3,7 +3,7 @@ name: scenario-unity-animation
 description: "Use when a Unity 6.3 task involves character animation or cameras: Mixamo or mocap humanoid import and retargeting, Animator Controllers, blend trees, layers and avatar masks, root motion, foot sliding, IK and Animation Rigging, Playables, Timeline cutscenes, custom tracks and markers, Cinemachine 3 cameras, camera jitter, flipping blends or cameras hitting walls; or when clips import with no animation, a character T-poses, an idle drifts, feet slide or the head misses its aim target."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity animation (animator and technical animator)
@@ -14,9 +14,9 @@ numbers taken from the clips. An agent without the Animator, Timeline or Scene w
 everything from data (AnimatorController, TimelineAsset, Cinemachine and Rigging components), steps
 it deterministically, measures it, and looks at contact sheets. Target: Unity 6000.3.21f1,
 Cinemachine 3.1.7, Animation Rigging 1.4.1, Timeline 1.8.12. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, review loop, 6.3 traps). Toolkit:
 [`scripts/ut_animation.py`](scripts/ut_animation.py) and C# jobs in

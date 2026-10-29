@@ -3,7 +3,7 @@ name: scenario-text-overlay
 description: "Use when text must appear letter-perfect on generated media: taglines, CTAs, prices, legal supers, lower thirds, end cards, nameplates, or styled rich cards composited over Scenario images and video. Keywords: text overlay, text card, caption card, CTA, legal super, tagline, end card, lower third, price card, HUD text, transparent PNG."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Text Overlay
@@ -30,8 +30,9 @@ platform, never locally: `model_run` on the compose tool models, `model_scenario
 stills and `model_scenario-compose-video` for video (fixed ids: each is Scenario's single
 deterministic compositor for its medium, so discovery would only re-derive them), whose layer
 contract lives in `scenario-video-assembly`. If a sibling skill named here is missing from your
-available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

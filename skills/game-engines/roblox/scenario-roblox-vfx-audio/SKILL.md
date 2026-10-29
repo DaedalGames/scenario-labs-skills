@@ -3,7 +3,7 @@ name: scenario-roblox-vfx-audio
 description: "Use when making or fixing Roblox visual effects or game audio: ParticleEmitter, Beam, Trail, flipbook sprite sheets, slash, hit, impact, explosion, fireball, aura or projectile VFX; effects only one player sees, effects that lag or pile up, particles invisible, popping or too bright; the Audio API (AudioPlayer, Wire, AudioEmitter, AudioListener, AudioDeviceOutput, effects), \"no sound\", \"3D sound not working\", music, ducking, footsteps, SoundGroup volumes; or importing Scenario-generated sound effects, music, voice or VFX sheets into a Roblox game."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox VFX and audio
@@ -15,9 +15,9 @@ Expert effects read in one glance and get out of the way: layered bursts emitted
 the server and drawn by each client. Expert audio is a wired graph proven connected and measured
 before anyone listens. The agent builds effects as data, freezes and captures them over time, and
 checks audio through `Wire.Connected`, `GetAudibilityFor` and analyzers; a person's ear judges the
-mix. If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+mix. If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

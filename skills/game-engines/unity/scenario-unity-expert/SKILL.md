@@ -3,7 +3,7 @@ name: scenario-unity-expert
 description: "Use when an agent drives Unity 6.3 (6000.3) on a Mac for any task: batch mode and -executeMethod jobs, a running editor (the user's GUI editor or a headless one), the Unity CLI and com.unity.pipeline, MCP servers, the Test Framework, command-line builds; when a batch run fails silently, 'Scripts have compiler errors', a capture comes back black or pink, or a result must be proven with numbers and a frame; or when a Unity brief must go to the right scenario-unity-* specialist."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity expert (technical director and agent protocol)
@@ -13,9 +13,10 @@ at it, fix it, then advance. An agent without a mouse gets there by choosing the
 each action, editing through serialization with explicit saves, and never trusting its own eyes
 alone. This skill is that protocol, the shared toolkit every scenario-unity-* skill imports
 ([`scripts/`](scripts/)), and the map of the team. Target: Unity 6000.3.21f1 (6.3 LTS), URP 17.3,
-macOS Apple Silicon. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+macOS Apple Silicon. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **Status (2026-09-24, after blind grading and the refactor):** every toolkit function ran in Unity
 6000.3.21f1 here (`tests/code/unity-expert/run_all.sh --live --builds`; results in

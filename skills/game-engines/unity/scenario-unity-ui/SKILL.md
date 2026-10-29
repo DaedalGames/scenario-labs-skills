@@ -3,7 +3,7 @@ name: scenario-unity-ui
 description: "Use when building or fixing game UI in Unity 6.3: main menu, settings screen (resolution, quality, volume, key rebinding), HUD, health bar, minimap frame; choosing uGUI or UI Toolkit or mixing both; 'UI scales wrong on phones', portrait to 4K, Canvas Scaler, anchors, layout groups collapsing, sort order, UXML/USS, data binding, TextMeshPro or UI Toolkit fonts missing glyphs, localized menus, gamepad navigation, UI draw calls, canvas rebuild spikes, UI tests, or capturing UI to check it."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity UI (UI developer)
@@ -13,9 +13,9 @@ answers mouse, touch, keyboard and gamepad alike, reads clearly, and costs almos
 sits still. An agent gets there by building from code or text, then proving each screen with a
 capture at every device size, a layout assertion on the same frame, an audit, behavior tests and
 counters. Target: Unity 6000.3.21f1, uGUI 2.0 (TextMeshPro inside), UI Toolkit, Input System 1.20.
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, review loop, 6.3 traps). Toolkit:
 [`scripts/ut_ui.py`](scripts/ut_ui.py) (imports `ut_env`, `ut_run`, `ut_review`), jobs in

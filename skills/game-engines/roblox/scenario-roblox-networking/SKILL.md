@@ -3,7 +3,7 @@ name: scenario-roblox-networking
 description: "Use when securing a Roblox experience against exploiters or designing its networking: RemoteEvent, RemoteFunction or UnreliableRemoteEvent design, validating remote arguments on the server, remote spam and rate limits, speed hacks, teleport or fly hacks, kill aura or hitbox abuse, hit validation under lag, network ownership and fling exploits, ProximityPrompt or ClickDetector abuse, honeypots, kick and ban policy, Server Authority (AuthorityMode) setup, bandwidth or payload size problems, or after an exploit (free items, infinite money, duplicated items)."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox Networking and Security
@@ -15,9 +15,9 @@ Expert level here means every client-triggerable action is attacker input: the s
 checks each call in a fixed order, and proves it by firing hostile arguments from a playtest client.
 Detection supplements validation, and visible consequences come late, from varied signals.
 
-If a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+If a sibling skill named here is missing from your available skills, load it with `skill_get`
+(Scenario MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install);
+unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

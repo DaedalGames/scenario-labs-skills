@@ -3,7 +3,7 @@ name: scenario-roblox-gameplay
 description: "Use when building Roblox gameplay systems: NPC or enemy AI that patrols, chases and attacks, state machines or behavior trees, 'NPC pathfinding stuck', 100 zombies lag the server, hitboxes, melee combos, M1 combat, 'hits register twice', raycasts, Spherecast, Shapecast, guns and projectiles, 'bullets go through walls', knockback and stun, LinearVelocity, VectorForce or AlignPosition movers, replacing BodyVelocity, cars and vehicles with suspension, 'car flips', VehicleSeat, network ownership of NPCs and vehicles, round loops, BindToSimulation logic."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Roblox gameplay systems (gameplay systems programmer)
@@ -14,9 +14,9 @@ toolkit.
 At expert level, a gameplay system is a pure rule tested in Lune, wired to the engine by one server
 scheduler, and proven in a playtest with measured server cost. The core stance: the client sends
 intent, the server decides every hit with a spatial query, and no number ships unmeasured. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-roblox-expert (channels, review loop, toolkit, current-Roblox
 traps).

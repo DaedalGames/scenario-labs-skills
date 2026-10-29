@@ -3,7 +3,7 @@ name: scenario-multi-reference
 description: "Use when one image must be composed from several reference pictures through the Scenario MCP server, each lending one thing: the character from one, the place, pose, style, light, palette, material, outfit, or layout from others. Also when a reference leaks into the result (its object, colors, or face showing where it should not) or a reference's role is ignored. Keywords: multi-reference, reference roles, combine references, style reference, pose reference, give each picture a job."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Multi-Reference Composition
@@ -18,9 +18,9 @@ image that keeps each contribution and nothing else. Connection and the generati
 `scenario` skill. Per-family reference caps and syntax: `scenario-image` lists the image
 model-family skills. One subject held across many images: `scenario-consistency`. Animating the
 result: `scenario-video`. Refusals: `scenario-moderation`. If a sibling skill named here is missing
-from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

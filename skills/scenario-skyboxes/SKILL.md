@@ -3,7 +3,7 @@ name: scenario-skyboxes
 description: Use when a task involves generating or iterating on skyboxes, 360 panoramas, equirectangular images, environment maps, HDRI-style backdrops, or VR backdrops through the Scenario MCP. Triggers include text-to-skybox, turning a photo into a 360 environment, restyling a panorama's mood, upscaling a skybox without breaking the seam wrap, or exporting equirectangular or cubemap layouts for game engines such as Unity, Unreal, or Godot.
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Skyboxes and 360 Panoramas
@@ -16,9 +16,9 @@ image model: these enforce the seam continuity and pole geometry that ordinary t
 lacks.
 
 Connection and the core generation loop: see the `scenario` skill in this repo. If a sibling skill
-named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the
+user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool
+schemas and flag the gap.
 
 ## Quick reference
 

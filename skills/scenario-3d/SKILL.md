@@ -3,7 +3,7 @@ name: scenario-3d
 description: Use when generating or handling 3D assets through the Scenario MCP server, including text-to-3D or image-to-3D meshes, GPT-6 Astra 3D or Claude Opus 5.5 3D, GLB, FBX, OBJ, STL, or VOX files, PBR-textured or game-ready models, voxel models, multi-view reconstruction, editing a mesh by prompt, retexture, remesh, UV unwrap, auto-rigging a biped or quadruped, or retargeting an animation, previewing a mesh in the 3D viewer, or downloading a model for import into Unity, Unreal, Godot, or Blender.
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario 3D Asset Workflows
@@ -15,9 +15,9 @@ than text-to-3D (`txt23d`). Per-family contracts: `scenario-meshy`, `scenario-ro
 `scenario-sparc3d`. Walkable scenes and Gaussian splats: `scenario-3d-worlds`. PBR retexture of a
 finished mesh or scene: `scenario-patina-retexture`. Inside Blender, through the Scenario for
 Blender extension: `scenario-blender`. Connection and the core loop: the `scenario` skill. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 ## Quick reference
 

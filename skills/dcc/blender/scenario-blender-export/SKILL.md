@@ -3,7 +3,7 @@ name: scenario-blender-export
 description: "Use when exporting a model, character or animation from Blender to a game engine, the web or a 3D printer: FBX, glTF/GLB, USD/USDZ or STL for Unity, Unreal Engine, Godot, Roblox, three.js or Apple AR Quick Look. Also when an export arrives at the wrong scale (100x, 0.01), rotated 90 degrees, facing backwards, with extra leaf bones, without its animation, blend shapes or textures; when an FBX loses its metallic or roughness map; when a generated model needs its real size and its pivot on the floor; when making LODs or collision meshes (UCX_, -colonly) for an engine; when converting a folder of models in batch; or when checking an exported file by re-importing it."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Blender export (engine-ready files)
@@ -12,8 +12,9 @@ An export is done when the file has been re-imported and measured, not when the 
 `FINISHED`. Gate the asset first, export with a preset, then round-trip the file. This skill builds
 on `scenario-blender-expert` (execution channels, the delivery gate) and imports its scripts, so
 install the two side by side. If a sibling skill named here is missing from your available skills,
-ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended,
-proceed from tool schemas and flag the gap.
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 Toolkit: [`scripts/bx_export.py`](scripts/bx_export.py). Per-engine facts with their sources:
 [`references/engines.md`](references/engines.md).

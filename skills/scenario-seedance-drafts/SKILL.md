@@ -3,7 +3,7 @@ name: scenario-seedance-drafts
 description: "Use when exploring several Seedance video takes before paying for a final: cheap 480p previews, variations of one shot to compare, reviewing and ranking takes before a pick, or finalizing a chosen preview to 1080p without regenerating it, including within its 7-day window. Keywords: Seedance draft, draft mode, draft complete, finalize, 480p preview, variations, takes, review, rank, pick, Seedance 2.5."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Seedance Drafts
@@ -25,9 +25,9 @@ than rendered.
 
 Seedance modes, conditioning and sound: `scenario-seedance`. Connection and the core loop:
 `scenario`. Music over the finals: `scenario-video-assembly`. If a sibling skill named here is
-missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+missing from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to
+install it (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas
+and flag the gap.
 
 ## Quick reference
 

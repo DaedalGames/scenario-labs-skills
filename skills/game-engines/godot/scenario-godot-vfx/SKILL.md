@@ -3,7 +3,7 @@ name: scenario-godot-vfx
 description: "Use when making or fixing particle effects and game feel in Godot 4.7: GPUParticles3D or GPUParticles2D explosion, fireball projectile with trail, impact, sparks, smoke, shockwave, ribbon trails, sub-emitters, particle collision, color curve does nothing, particles pop out or vanish, effect too heavy on mobile, CPUParticles fallback for Compatibility or web, overdraw, hit-stop, freeze frame, screen shake, juice."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot VFX
@@ -14,9 +14,9 @@ Expert level here means effects built as layers of small systems, every silent p
 caught by a script before anyone looks, and every claim about look or cost backed by frames captured
 at exact times and by measured overdraw and GPU time per renderer. The agent builds effects in code,
 renders them windowed, and looks at contact sheets. If a sibling skill named here is missing from
-your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-godot-expert (gd_env, gd_run, gd_review, AgentKit, GD_MAX slots,
 windowed vs headless).

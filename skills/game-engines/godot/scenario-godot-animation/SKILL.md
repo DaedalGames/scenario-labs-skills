@@ -3,7 +3,7 @@ name: scenario-godot-animation
 description: "Use when animating characters or scenes in Godot 4.7: AnimationPlayer clips and RESET, AnimationTree state machines and blend spaces built in code, Mixamo or glTF import, loop settings, BoneMap retargeting and shared animation libraries, root motion, foot sliding, foot IK with TwoBoneIK3D or custom SkeletonModifier3D, tweens, SpringArm3D cameras, cutscenes; or when a character T-poses, slides, floats, freezes mid-blend or a transition never fires."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot animation (animator and technical animator)
@@ -35,9 +35,9 @@ procedurally built humanoid, so nothing needs a download.
 - **Silent failures are the norm here.** A BoneMap naming bones that do not exist, an expression
   transition at advance mode Enabled, a missing RESET key: each produced no error in 4.7.2. Audit
   after every import and every tree change. If a sibling skill named here is missing from your
-  available skills, ask the user to install it
-  (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-  flag the gap.
+  available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+  (https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+  the gap.
 
 ## Establish first
 

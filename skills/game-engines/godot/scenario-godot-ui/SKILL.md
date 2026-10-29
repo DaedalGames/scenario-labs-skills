@@ -3,7 +3,7 @@ name: scenario-godot-ui
 description: "Use when building or fixing game UI in Godot 4.7: main menu, settings screen, HUD (health bar, ammo, minimap frame), Control layout, containers, anchors, themes in code, 'UI scales wrong on phones', 'text too small on 4K', notch or safe area, stretch mode and aspect, gamepad or keyboard menu navigation, focus lost, input rebinding screen, localization (CSV, PO, tr_n plurals, Arabic RTL, CJK fonts, pseudolocalization), screen reader accessibility, UI scale slider, or clicks not reaching the game."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot UI (UI developer)
@@ -13,9 +13,10 @@ Target: Godot 4.7.2.stable, macOS Apple Silicon.
 Expert level here means one layout proven, by numbers and images, from a 1080x2400 phone in portrait
 to a 3840x2160 monitor, in every language, with mouse, pad and screen reader. The stretch transform
 scales, containers place, one Theme built in code styles, and nothing ships before a layout matrix
-and a contact sheet say so. If a sibling skill named here is missing from your available skills, ask
-the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed
-from tool schemas and flag the gap.
+and a contact sheet say so. If a sibling skill named here is missing from your available skills,
+load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-godot-expert (channels, review loop, 6.3 traps).
 

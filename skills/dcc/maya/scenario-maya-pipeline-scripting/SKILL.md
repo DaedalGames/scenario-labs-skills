@@ -3,7 +3,7 @@ name: scenario-maya-pipeline-scripting
 description: "Use when writing or fixing Maya pipeline code in Python: mayapy batch jobs over many scenes, validating and auto-fixing scenes, FBX export for Unreal or Unity (static, skeletal, animation clips, Game Exporter), Alembic or GPU caches, USD export, stages and layers, references and namespaces, PySide6 tool windows, OpenMaya 2.0 plug-ins, or slow playback. Also when an FBX lands with wrong scale, normals, tangents or extra takes, a USD export has one frame or smoothed meshes, or one bad file kills a batch."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Maya pipeline scripting (pipeline TD)
@@ -12,8 +12,9 @@ Expert pipeline work is contracts plus proof: every file that leaves Maya goes t
 names, explicit export settings and a re-import check, and no batch trusts one Maya process with two
 hundred files. The pipeline TD never types what can be generated, never trusts a default, and
 verifies by reading the output back. If a sibling skill named here is missing from your available
-skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`);
-unattended, proceed from tool schemas and flag the gap.
+skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-maya-expert (execution channel, review loop, 2027 version traps).
 

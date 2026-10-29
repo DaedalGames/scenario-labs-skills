@@ -3,7 +3,7 @@ name: scenario-blender-uv-baking
 description: "Use when UV unwrapping, placing seams, straightening or packing UVs, setting texel density, laying out UDIMs or mirrored UVs, or baking normal, AO, curvature, ID or displacement maps from a sculpt or high poly onto a low poly or retopo in Blender, including Multires bakes. Also when a bake has black or inverted patches, flat areas, cracks, seams, wavy lines or AO ghosts, bpy.ops.object.bake returns CANCELED, or uv.unwrap silently fails."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # UV unwrapping and baking
@@ -12,9 +12,9 @@ Expert-level UVs put seams where the texturing method can afford them, set texel
 texture size, and pack with pixel-true padding. Expert bakes measure their projection distances
 instead of guessing, and are judged in pixels and under a raking light, never eyeballed once. Every
 stage below has a measurable gate that [`scripts/bx_uvbake.py`](scripts/bx_uvbake.py) computes. If a
-sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).
 

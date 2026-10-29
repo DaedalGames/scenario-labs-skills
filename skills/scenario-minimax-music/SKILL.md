@@ -3,7 +3,7 @@ name: scenario-minimax-music
 description: "Use when generating music with MiniMax models on Scenario via MCP: full songs with vocals from a lyric sheet, structure tags like [Verse] and [Chorus], auto-written lyrics from a plain-language brief, instrumental tracks from a style prompt, or covering an uploaded MP3 or WAV in a new genre while keeping the melody. Keywords: MiniMax Music 3.0, Music Cover, Hailuo, text-to-music, audio-to-audio, song generation, lyrics, vocals, instrumental, BPM, genre swap."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario MiniMax Music
@@ -16,9 +16,10 @@ while keeping its melody. Discover both with `search` and treat `model_schema_ge
 the members share `prompt`, `sampleRate`, and `bitrate` and agree on nothing else.
 
 Connection and the core loop: see the `scenario` skill; model-agnostic audio work: the
-`scenario-audio` skill. If a sibling skill named here is missing from your available skills, ask the
-user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from
-tool schemas and flag the gap.
+`scenario-audio` skill. If a sibling skill named here is missing from your available skills, load it
+with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## Quick reference
 

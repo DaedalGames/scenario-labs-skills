@@ -3,7 +3,7 @@ name: scenario-zbrush-character-creature
 description: 'Use when sculpting a realistic head, face, portrait, body or creature in ZBrush (anatomy, landmarks, proportions, "the face looks off", eyes, lips, jaw), adding skin, pores, wrinkles or reptile and dragon scales with alphas, Surface Noise, layers or morph targets, planning subdivision or HD Geometry for a film close-up, reprojecting detail, sculpting cloth folds or running Dynamics cloth, growing FiberMesh fur or hair, making horns, or judging a character sculpt the way a senior character artist would.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Realistic characters and creatures (ZBrush 2026)
@@ -12,9 +12,9 @@ Expert level here means every form has a cause (skull, mass, tension, compressio
 exists, and every detail pass is reversible, regional and judged in renders from several views and
 lights. The agent works the way Kingslien and Costa do: find the upstream cause, fix it at the
 lowest level that holds it, and keep detail on layers or behind a stored morph target. If a sibling
-skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+skill named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or
+ask the user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed
+from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-zbrush-expert (bridge, stroke engine, review loop, 2026 traps).
 Toolkit: [`scripts/zb_character.py`](scripts/zb_character.py) (stroke plans, ZBrush-side wrappers

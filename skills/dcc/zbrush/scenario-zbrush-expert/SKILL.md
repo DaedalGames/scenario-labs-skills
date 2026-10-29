@@ -3,7 +3,7 @@ name: scenario-zbrush-expert
 description: "Use when an agent drives Maxon ZBrush 2026 for any task (sculpt in ZBrush, DynaMesh, ZRemesher, UVs, export, polypaint, posing, 3D print, clean up an AI mesh in ZBrush), when writing ZBrush Python (zbrush.commands) or ZScript, when the ZBrush bridge is not answering, a palette path or set() does nothing, a scripted stroke does not sculpt or a dialog blocks a script, or when a ZBrush result has to be judged the way a professional artist would."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # ZBrush expert (router and agent protocol)
@@ -12,9 +12,10 @@ An agent does expert ZBrush work as a loop: deterministic palette operations, sy
 and canvas renders from fixed views, gated at every stage. One long script is not the method. This
 skill is the protocol every ZBrush task follows, the shared toolkit in [`scripts/`](scripts/), and
 the map to the team skills. Target: ZBrush 2026.2.1 on macOS, driven through the project's Python
-bridge. If a sibling skill named here is missing from your available skills, ask the user to install
-it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+bridge. If a sibling skill named here is missing from your available skills, load it with
+`skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 ## 1. Execution channel
 

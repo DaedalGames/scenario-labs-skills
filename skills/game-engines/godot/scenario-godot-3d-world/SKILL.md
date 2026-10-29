@@ -3,7 +3,7 @@ name: scenario-godot-3d-world
 description: "Use when building 3D levels and worlds in Godot 4.7: third-person or FPS controller, player stuck on stairs, spring arm camera clipping, blockout with CSG, GridMap and MeshLibrary, terrain (heightmap, HeightMapShape3D, Terrain3D regions, textures, painting), scattering trees with MultiMesh, streaming a big world, procedural meshes with SurfaceTool, Jolt physics settings, importing GLB or glTF from Blender or AI generators (Scenario, Tripo, Meshy, Hitem3D), import scripts, name suffixes, model facing, collision generation, LODs."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Godot 3D world (level and environment artist)
@@ -11,9 +11,9 @@ metadata:
 Target: Godot 4.7.2.stable, macOS Apple Silicon, Jolt Physics, Forward+.
 
 **REQUIRED BACKGROUND:** scenario-godot-expert (channels, `gd_run`, the review loop, 4.7 traps). If
-a sibling skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+a sibling skill named here is missing from your available skills, load it with `skill_get` (Scenario
+MCP) or ask the user to install it (https://github.com/scenario-labs/skills#install); unattended,
+proceed from tool schemas and flag the gap.
 
 **Status (2026-10-02):** all 14 live test groups in `tests/code/godot-3d-world/test_world_live.py`
 passed (`live_20261002-215949.json`); L8 and L12 were extended and passed again in round 2

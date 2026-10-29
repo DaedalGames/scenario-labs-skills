@@ -3,7 +3,7 @@ name: scenario-unity-2d
 description: 'Use when building a 2D game in Unity 6.3 URP: pixel-art or HD sprite import and PPU, sprite atlases, Tilemaps, Rule Tiles and reskins, the 2D Renderer and 2D lights with normal maps, 2D animation, a platformer or top-down controller ("make a platformer controller that feels good", coyote time, jump buffer, one-way platforms, spikes), Pixel Perfect Camera, a follow or room camera, hit stop and screen shake; or when pixel art looks blurry or shimmers, tiles show seams, 2D lights do nothing or cost too much, the jump feels floaty, or the camera loses the player when falling.'
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Unity 2D (developer and artist)
@@ -13,9 +13,9 @@ from art to camera, atlases judged by what they save, tiles and lights authored 
 a camera that moves in whole pixels, and a controller whose feel is measured, not asserted.
 Everything below was run in Unity 6000.3.21f1 through batch jobs and PlayMode tests
 ([`references/procedures.md`](references/procedures.md)). If a sibling skill named here is missing
-from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+from your available skills, load it with `skill_get` (Scenario MCP) or ask the user to install it
+(https://github.com/scenario-labs/skills#install); unattended, proceed from tool schemas and flag
+the gap.
 
 **REQUIRED BACKGROUND:** scenario-unity-expert (channels, review loop, 6.3 traps).
 

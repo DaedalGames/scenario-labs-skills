@@ -3,7 +3,7 @@ name: scenario-image
 description: "Use when generating or editing images with Scenario through MCP: text-to-image, image-to-image, instruction editing, inpainting or outpainting with a mask, background control, aspect ratio or resolution sizing, several outputs per run, or choosing between Scenario image models. Also when a run fails on prompt length, a plan-restricted model, or a reference image that was silently ignored. Keywords: txt2img, img2img, image edit, inpaint, mask, reference image, aspect ratio."
 license: MIT
 metadata:
-  version: "0.59.0" # x-release-please-version
+  version: "0.60.1" # x-release-please-version
 ---
 
 # Scenario Image Generation and Editing
@@ -20,9 +20,9 @@ between two models that do the same job, so read `model_schema_get` every time. 
 the other tool models: see `scenario-image-editing`. Holding one look across a set: see
 `scenario-consistency`. One image from several references, each with one job:
 `scenario-multi-reference`. Sprites, icons, and tilesets: see `scenario-game-assets`. If a sibling
-skill named here is missing from your available skills, ask the user to install it
-(`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and
-flag the gap.
+skill named here is missing from your available skills, load it with `skill_get` (Scenario MCP) or
+ask the user to install it (https://github.com/scenario-labs/skills#install); unattended, proceed
+from tool schemas and flag the gap.
 
 ## Quick reference
 
