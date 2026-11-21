@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.63.0](https://github.com/scenario-labs/skills/compare/skills-v0.62.0...skills-v0.63.0) (2026-11-21)
+
+
+### Features
+
+* **scenario-blender-animation:** measure foot slip on dense clips ([#358](https://github.com/scenario-labs/skills/issues/358)) ([bbcf395](https://github.com/scenario-labs/skills/commit/bbcf395cbfa22e2a923045d2d00201988ced9df7))
+* **scenario-blender-expert:** gate parts that stand on a ground plane ([932df75](https://github.com/scenario-labs/skills/commit/932df7551696a7c5c5381ad8be50f5214cedafc8))
+* **scenario-blender-rigging:** put a new body on an existing skeleton ([#360](https://github.com/scenario-labs/skills/issues/360)) ([cf3f0e5](https://github.com/scenario-labs/skills/commit/cf3f0e51febfa032fdbebaf2d52a450592241e94))
+* **scenario-blender-rigging:** robust garment weight transfer and a garment depth check ([#359](https://github.com/scenario-labs/skills/issues/359)) ([1338595](https://github.com/scenario-labs/skills/commit/13385958c76b956f1d4b3398e98a94479837d6f0))
+
+
+### Bug Fixes
+
+* **scenario-blender-expert:** stop calling parts outside a thin shell enclosed ([#433](https://github.com/scenario-labs/skills/issues/433)) ([8907d39](https://github.com/scenario-labs/skills/commit/8907d390268a02d7d850bd9f9729814be96a26df))
+* **scenario-blender-rigging:** mirror _l/_r names in weight_report ([cf3f0e5](https://github.com/scenario-labs/skills/commit/cf3f0e51febfa032fdbebaf2d52a450592241e94))
+* **scenario-kinetic-film:** close three gaps found by validation ([#432](https://github.com/scenario-labs/skills/issues/432)) ([5c0492a](https://github.com/scenario-labs/skills/commit/5c0492a7c923c9c2d41723d79e47cbbeae80aa2a))
+* **scenario-kinetic-music-video:** close four gaps found by validation ([#431](https://github.com/scenario-labs/skills/issues/431)) ([af157e1](https://github.com/scenario-labs/skills/commit/af157e13e2897b665bedfbe39e91a4f0cd9e4483))
+* **scenario:** stop on a plan 403 instead of switching models ([1879dcc](https://github.com/scenario-labs/skills/commit/1879dccdfe49cfc64a2770a428717fdff7520e6d))
+
 ## [0.62.0](https://github.com/scenario-labs/skills/compare/skills-v0.61.0...skills-v0.62.0) (2026-11-11)
 
 
